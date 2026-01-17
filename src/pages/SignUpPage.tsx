@@ -41,11 +41,11 @@ const SignUpPage: React.FC = () => {
             className="h-10 mx-auto mb-6 dark:invert"
           />
           <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tighter uppercase">Join Us</h1>
-          <p className="text-gray-500 dark:text-gray-400 font-bold text-sm mt-2">Start your worship journey today</p>
+          <p className="text-gray-500 dark:text-gray-400 font-regular text-sm mt-2">Start your worship journey today</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-bold rounded-xl border border-red-100 dark:border-red-900/50">
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-regular rounded-xl border border-red-100 dark:border-red-900/50">
             {error}
           </div>
         )}
@@ -57,7 +57,7 @@ const SignUpPage: React.FC = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-5 py-4 bg-gray-50 dark:bg-black/20 border border-gray-100 dark:border-white/5 rounded-xl focus:ring-2 focus:ring-[#ff6600] outline-none dark:text-white font-bold"
+              className="w-full px-5 py-4 bg-gray-50 dark:bg-black/20 border border-gray-100 dark:border-white/5 rounded-xl focus:ring-2 focus:ring-[#ff6600] outline-none dark:text-white font-regular"
               placeholder="name@example.com"
               required
             />
@@ -68,7 +68,7 @@ const SignUpPage: React.FC = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-5 py-4 bg-gray-50 dark:bg-black/20 border border-gray-100 dark:border-white/5 rounded-xl focus:ring-2 focus:ring-[#ff6600] outline-none dark:text-white font-bold"
+              className="w-full px-5 py-4 bg-gray-50 dark:bg-black/20 border border-gray-100 dark:border-white/5 rounded-xl focus:ring-2 focus:ring-[#ff6600] outline-none dark:text-white font-regular"
               placeholder="Min 6 characters"
               required
             />
@@ -79,7 +79,7 @@ const SignUpPage: React.FC = () => {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-5 py-4 bg-gray-50 dark:bg-black/20 border border-gray-100 dark:border-white/5 rounded-xl focus:ring-2 focus:ring-[#ff6600] outline-none dark:text-white font-bold"
+              className="w-full px-5 py-4 bg-gray-50 dark:bg-black/20 border border-gray-100 dark:border-white/5 rounded-xl focus:ring-2 focus:ring-[#ff6600] outline-none dark:text-white font-regular"
               placeholder="Repeat password"
               required
             />
@@ -99,7 +99,7 @@ const SignUpPage: React.FC = () => {
         </form>
 
         <div className="mt-8 pt-8 border-t border-gray-100 dark:border-white/5 text-center">
-          <p className="text-gray-500 dark:text-gray-400 font-bold text-sm">
+          <p className="text-gray-500 dark:text-gray-400 font-regular text-sm">
             Already have an account?{' '}
             <Link to="/login" className="text-[#ff6600] hover:underline">Sign In</Link>
           </p>

@@ -77,7 +77,7 @@ const TermsOfUsePage: React.FC = () => {
               <h2 className="text-3xl font-medium uppercase tracking-tighter mb-8 dark:text-white border-b-2 border-black dark:border-white pb-4 inline-block">2. Broadcasting Rights</h2>
               <p className="text-gray-600 dark:text-gray-400 font-normal uppercase tracking-tight text-sm leading-relaxed mb-6">Praise FM USA provides a 24/7 digital broadcast. You are granted a personal, non-commercial, limited license to listen to our stream for private entertainment purposes only.</p>
               <div className="bg-gray-50 dark:bg-white/5 p-8 border-l-4 border-[#ff6600]">
-                <p className="text-xs font-bold text-black dark:text-white uppercase tracking-widest">PROHIBITED: Redistribution, recording for commercial use, or re-broadcasting of our signal without written consent is strictly forbidden.</p>
+                <p className="text-xs font-regular text-black dark:text-white uppercase tracking-widest">PROHIBITED: Redistribution, recording for commercial use, or re-broadcasting of our signal without written consent is strictly forbidden.</p>
               </div>
             </section>
 

@@ -175,7 +175,7 @@ const Playlist: React.FC = () => {
                   <h3 className="text-lg font-black dark:text-white uppercase tracking-tight mb-3">The A-List Artists</h3>
                   <div className="flex flex-wrap gap-2">
                     {item.artists.map((artist, aIdx) => (
-                      <span key={aIdx} className="bg-white dark:bg-black px-3 py-1 text-xs font-bold border border-gray-200 dark:border-white/10 dark:text-gray-300">
+                      <span key={aIdx} className="bg-white dark:bg-black px-3 py-1 text-xs font-regular border border-gray-200 dark:border-white/10 dark:text-gray-300">
                         {artist}
                       </span>
                     ))}
@@ -184,7 +184,7 @@ const Playlist: React.FC = () => {
               ))}
             </div>
             <div className="p-6 border-t border-gray-100 dark:border-white/10 text-center">
-              <p className="text-xs text-gray-400 uppercase font-bold tracking-widest">Showing last 4 daily editions</p>
+              <p className="text-xs text-gray-400 uppercase font-regular tracking-widest">Showing last 4 daily editions</p>
             </div>
           </div>
         </div>

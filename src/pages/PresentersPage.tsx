@@ -90,7 +90,7 @@ const PresentersPage: React.FC<PresentersPageProps> = ({ onNavigateToProgram }) 
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
                   
                   <div className="absolute bottom-6 left-6 right-6">
-                    <span className="text-[#ff6600] text-[10px] font-bold uppercase tracking-[0.3em] mb-2 block">{presenter.programTitle}</span>
+                    <span className="text-[#ff6600] text-[10px] font-regular uppercase tracking-[0.3em] mb-2 block">{presenter.programTitle}</span>
                     <h2 className="text-3xl font-medium text-white uppercase tracking-tighter">{presenter.name}</h2>
                   </div>
                 </div>
@@ -104,7 +104,7 @@ const PresentersPage: React.FC<PresentersPageProps> = ({ onNavigateToProgram }) 
                     {program && (
                       <button 
                         onClick={() => onNavigateToProgram(program)}
-                        className="w-full bg-[#ff6600] text-white py-4 px-6 text-[10px] font-bold uppercase tracking-[0.2em] flex items-center justify-center space-x-2 hover:bg-black transition-colors"
+                        className="w-full bg-[#ff6600] text-white py-4 px-6 text-[10px] font-regular uppercase tracking-[0.2em] flex items-center justify-center space-x-2 hover:bg-black transition-colors"
                       >
                         <span>View Program</span>
                         <ArrowRight className="w-4 h-4" />
@@ -125,7 +125,7 @@ const PresentersPage: React.FC<PresentersPageProps> = ({ onNavigateToProgram }) 
            </p>
            <button 
               onClick={() => window.location.hash = '#/schedule'}
-              className="bg-black dark:bg-white text-white dark:text-black px-12 py-5 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-[#ff6600] dark:hover:bg-[#ff6600] hover:text-white transition-all shadow-xl active:scale-95"
+              className="bg-black dark:bg-white text-white dark:text-black px-12 py-5 text-[10px] font-regular uppercase tracking-[0.3em] hover:bg-[#ff6600] dark:hover:bg-[#ff6600] hover:text-white transition-all shadow-xl active:scale-95"
             >
               Full Schedule
            </button>

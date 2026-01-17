@@ -114,7 +114,7 @@ const Hero: React.FC<HeroProps> = ({
 
           {/* RIGHT SIDE: TEXT AND PLAY BUTTON */}
           <div className="flex-grow pt-4 text-center md:text-left">
-            <div className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1 flex items-center justify-center md:justify-start space-x-2">
+            <div className="text-[11px] font-regular text-gray-500 dark:text-gray-400 mb-1 flex items-center justify-center md:justify-start space-x-2">
               <span>{format12h(currentProgram.startTime)} - {format12h(currentProgram.endTime)}</span>
             </div>
             
@@ -158,7 +158,7 @@ const Hero: React.FC<HeroProps> = ({
                       />
                     </div>
                     <div className="flex flex-col">
-                      <div className="text-[11px] font-bold mb-1">
+                      <div className="text-[11px] font-regular mb-1">
                         <span className="text-[#ff6600] uppercase tracking-widest font-black mr-2">UP NEXT</span>
                         <span className="text-gray-400 font-medium lowercase">{format12h(prog.startTime)} - {format12h(prog.endTime)}</span>
                       </div>
@@ -183,7 +183,7 @@ const Hero: React.FC<HeroProps> = ({
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter leading-none mb-1">New Music Alert</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest">Fresh anthems dropping now</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 font-regular uppercase tracking-widest">Fresh anthems dropping now</p>
                 </div>
               </div>
               <button 

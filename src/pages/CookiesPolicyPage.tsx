@@ -52,7 +52,7 @@ const CookiesPolicyPage: React.FC = () => {
           </section>
           
           <div className="p-8 bg-[#ff6600]/10 border-2 border-[#ff6600] text-center">
-             <p className="text-black dark:text-white text-sm font-bold uppercase tracking-widest">We do not use third-party advertising cookies to track your behavior across other websites.</p>
+             <p className="text-black dark:text-white text-sm font-regular uppercase tracking-widest">We do not use third-party advertising cookies to track your behavior across other websites.</p>
           </div>
         </div>
       </div>

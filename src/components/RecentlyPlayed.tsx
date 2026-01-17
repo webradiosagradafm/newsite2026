@@ -73,11 +73,11 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
   return (
     <section className="bg-white dark:bg-[#000] py-12 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 tracking-tight">Recent Tracks</h2>
+        <h2 className="text-3xl font-regular text-gray-900 dark:text-white mb-6 tracking-tight">Recent Tracks</h2>
         
         <div className="w-full">
           {/* Header minimalista */}
-          <div className="grid grid-cols-12 gap-4 pb-2 border-b border-gray-200 dark:border-white/10 text-sm font-bold text-gray-900 dark:text-gray-100 mb-1">
+          <div className="grid grid-cols-12 gap-4 pb-2 border-b border-gray-200 dark:border-white/10 text-sm font-regular text-gray-900 dark:text-gray-100 mb-1">
             <div className="col-span-8 md:col-span-6">Track</div>
             <div className="col-span-4 md:col-span-6">Artist</div>
           </div>

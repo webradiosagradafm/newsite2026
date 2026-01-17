@@ -104,7 +104,7 @@ const HelpCenterPage: React.FC = () => {
               <p className="text-gray-400 uppercase tracking-widest text-sm">No topics found for "{searchQuery}"</p>
               <button 
                 onClick={() => setSearchQuery('')}
-                className="mt-4 text-[#ff6600] font-bold uppercase text-[10px] tracking-widest hover:underline"
+                className="mt-4 text-[#ff6600] font-regular uppercase text-[10px] tracking-widest hover:underline"
               >
                 Clear Search
               </button>

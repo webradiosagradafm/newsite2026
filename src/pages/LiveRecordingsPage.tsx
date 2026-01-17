@@ -163,7 +163,7 @@ const LiveRecordingsPage: React.FC = () => {
                 <div className="absolute top-8 left-8">
                   <div className="flex items-center space-x-2 bg-black/80 backdrop-blur-md px-3 py-1.5 border border-white/10">
                     <Calendar className="w-3 h-3 text-[#ff6600]" />
-                    <span className="text-[9px] font-bold uppercase tracking-widest">{session.date}</span>
+                    <span className="text-[9px] font-regular uppercase tracking-widest">{session.date}</span>
                   </div>
                 </div>
 

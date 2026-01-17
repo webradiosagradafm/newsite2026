@@ -155,7 +155,7 @@ const ProfilePage: React.FC = () => {
                 ) : (
                   <div className="flex flex-col items-center text-gray-400">
                     <User className="w-12 h-12 mb-2" />
-                    <span className="text-[8px] font-bold uppercase tracking-widest text-center px-4">Upload Photo</span>
+                    <span className="text-[8px] font-regular uppercase tracking-widest text-center px-4">Upload Photo</span>
                   </div>
                 )}
               </div>
@@ -195,7 +195,7 @@ const ProfilePage: React.FC = () => {
           <div className="md:col-span-8">
             <form onSubmit={handleUpdate} className="space-y-10">
               {message && (
-                <div className={`p-5 text-xs font-bold uppercase tracking-widest border-l-4 animate-in fade-in slide-in-from-top-2 ${message.type === 'success' ? 'bg-green-50 text-green-600 border-green-600' : 'bg-red-50 text-red-600 border-red-600'}`}>
+                <div className={`p-5 text-xs font-regular uppercase tracking-widest border-l-4 animate-in fade-in slide-in-from-top-2 ${message.type === 'success' ? 'bg-green-50 text-green-600 border-green-600' : 'bg-red-50 text-red-600 border-red-600'}`}>
                   {message.text}
                 </div>
               )}
