@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { GoogleGenAI } from import { ... } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { MapPin, Calendar, Ticket, Loader2, Search, ArrowRight, Music, Star, ExternalLink, Info, Bell, BellRing, X, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
