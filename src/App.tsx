@@ -1,19 +1,14 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { HashRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
-import RecentlyPlayed from './components/RecentlyPlayed';
 import LivePlayerBar from './components/LivePlayerBar';
-import ProgramDetail from './components/ProgramDetail';
-import Playlist from './components/Playlist';
-import ScheduleList from './components/ScheduleList';
 import { SCHEDULES } from './constants';
 import { Program } from './types';
 
 const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv';
-const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv';
 
 const getChicagoDayAndTotalMinutes = () => {
   const now = new Date();
@@ -25,13 +20,11 @@ const getChicagoDayAndTotalMinutes = () => {
 
 const AppContent: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isPlayerActive, setIsPlayerActive] = useState(false); // NOVO: Controla exibição do miniplayer
-  const [liveMetadata, setLiveMetadata] = useState<any | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('praise-theme') as 'light' | 'dark') || 'light');
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
+  const [isPlayerActive, setIsPlayerActive] = useState(false); // Controla o "nascimento" da barra
+  const [liveMetadata, setLiveMetadata] = useState<any>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const location = useLocation();
-  const navigate = useNavigate();
 
   const { day, total } = getChicagoDayAndTotalMinutes();
   
@@ -44,15 +37,15 @@ const AppContent: React.FC = () => {
       const end = eH === 0 ? 24 * 60 : eH * 60 + eM;
       return total >= start && total < end;
     });
-    const current = currentIndex !== -1 ? schedule[currentIndex] : schedule[0];
-    return { currentProgram: current, queue: schedule.slice(currentIndex + 1, currentIndex + 5) };
+    return { 
+      currentProgram: currentIndex !== -1 ? schedule[currentIndex] : schedule[0], 
+      queue: schedule.slice(currentIndex + 1, currentIndex + 5) 
+    };
   }, [day, total]);
 
   const togglePlayback = () => {
     if (!audioRef.current) return;
-    
-    // Ativa o miniplayer no primeiro clique
-    if (!isPlayerActive) setIsPlayerActive(true);
+    if (!isPlayerActive) setIsPlayerActive(true); // Ativa o miniplayer no primeiro clique
 
     if (isPlaying) {
       audioRef.current.pause();
@@ -70,23 +63,23 @@ const AppContent: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col pb-[120px] dark:bg-[#000]">
+    <div className={`min-h-screen flex flex-col ${isPlayerActive ? 'pb-[90px]' : ''} dark:bg-[#000]`}>
       <Navbar activeTab="home" theme={theme} onToggleTheme={() => setTheme(theme === 'light' ? 'dark' : 'light')} />
       
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={
-            <>
-              <Hero onListenClick={togglePlayback} isPlaying={isPlaying} onNavigateToProgram={(p) => setSelectedProgram(p)} />
-            </>
+            <Hero 
+              onListenClick={togglePlayback} 
+              isPlaying={isPlaying} 
+              currentProgram={currentProgram}
+            />
           } />
-          {/* Adicione suas outras rotas aqui */}
         </Routes>
       </main>
 
       <Footer />
 
-      {/* MINI PLAYER BAR: Só renderiza se isPlayerActive for true */}
       <LivePlayerBar 
         isVisible={isPlayerActive}
         isPlaying={isPlaying} 
