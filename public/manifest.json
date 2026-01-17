@@ -1,0 +1,23 @@
+
+{
+  "name": "Praise FM USA",
+  "short_name": "Praise FM",
+  "description": "The best in contemporary worship and devotional content.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#ff6600",
+  "icons": [
+    {
+      "src": "https://res.cloudinary.com/dtecypmsh/image/upload/v1766869698/SVGUSA_lduiui.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://res.cloudinary.com/dtecypmsh/image/upload/v1766869698/SVGUSA_lduiui.webp",
+      "sizes": "512x512",
+      "type": "image/webp"
+    }
+  ]
+}
