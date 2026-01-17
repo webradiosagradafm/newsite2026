@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Play, Pause, ChevronRight, Zap, ArrowRight } from 'lucide-react';
 import { SCHEDULES } from '../constants';
@@ -108,22 +107,22 @@ const Hero: React.FC<HeroProps> = ({
               </svg>
             </div>
             <div className="absolute bottom-2 right-2 w-12 h-12 bg-black rounded-full flex items-center justify-center border-[3px] border-white dark:border-black shadow-lg">
-              <span className="text-white text-2xl font-[900]" style={{ fontWeight: 900 }}>1</span>
+              <span className="text-white text-2xl font-bold">1</span>
             </div>
           </div>
 
           {/* RIGHT SIDE: TEXT AND PLAY BUTTON */}
           <div className="flex-grow pt-4 text-center md:text-left">
-            <div className="text-[11px] font-regular text-gray-500 dark:text-gray-400 mb-1 flex items-center justify-center md:justify-start space-x-2">
+            <div className="text-[11px] font-normal text-gray-500 dark:text-gray-400 mb-1 flex items-center justify-center md:justify-start space-x-2">
               <span>{format12h(currentProgram.startTime)} - {format12h(currentProgram.endTime)}</span>
             </div>
             
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tighter mb-1 hover:text-[#ff6600] transition-colors cursor-pointer inline-flex items-center" onClick={() => onNavigateToProgram(currentProgram)}>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight mb-1 hover:text-[#ff6600] transition-colors cursor-pointer inline-flex items-center" onClick={() => onNavigateToProgram(currentProgram)}>
               {currentProgram.title} with {currentProgram.host}
               <ChevronRight className="w-6 h-6 ml-1 text-[#ff6600]" />
             </h2>
             
-            <p className="text-lg text-gray-600 dark:text-gray-400 font-medium mb-6">
+            <p className="text-lg text-gray-600 dark:text-gray-400 font-normal mb-6">
               {currentProgram.description}
             </p>
 
@@ -132,7 +131,7 @@ const Hero: React.FC<HeroProps> = ({
               className="bg-[#ff6600] text-white px-10 py-3.5 flex items-center justify-center space-x-3 hover:bg-[#e65c00] transition-all active:scale-95 mx-auto md:mx-0 rounded-sm shadow-md"
             >
               {isPlaying ? <Pause className="fill-current w-5 h-5" /> : <Play className="fill-current w-5 h-5" />}
-              <span className="text-lg font-black tracking-tight">
+              <span className="text-lg font-bold tracking-tight">
                 {isPlaying ? 'Pause' : 'Play'}
               </span>
             </button>
@@ -158,11 +157,11 @@ const Hero: React.FC<HeroProps> = ({
                       />
                     </div>
                     <div className="flex flex-col">
-                      <div className="text-[11px] font-regular mb-1">
-                        <span className="text-[#ff6600] uppercase tracking-widest font-black mr-2">UP NEXT</span>
-                        <span className="text-gray-400 font-medium lowercase">{format12h(prog.startTime)} - {format12h(prog.endTime)}</span>
+                      <div className="text-[11px] font-normal mb-1">
+                        <span className="text-[#ff6600] uppercase tracking-widest font-semibold mr-2">UP NEXT</span>
+                        <span className="text-gray-400 font-normal lowercase">{format12h(prog.startTime)} - {format12h(prog.endTime)}</span>
                       </div>
-                      <h3 className="text-xl font-black text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-[#ff6600] transition-colors">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-[#ff6600] transition-colors">
                         {prog.title}
                       </h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 leading-snug">
@@ -182,12 +181,12 @@ const Hero: React.FC<HeroProps> = ({
                   <div className="absolute inset-0 rounded-full border-2 border-[#ff6600] scale-110 animate-ping opacity-20"></div>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter leading-none mb-1">New Music Alert</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 font-regular uppercase tracking-widest">Fresh anthems dropping now</p>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white uppercase tracking-tight leading-none mb-1">New Music Alert</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 font-normal uppercase tracking-widest">Fresh anthems dropping now</p>
                 </div>
               </div>
               <button 
-                className="flex items-center space-x-3 text-[11px] font-black uppercase tracking-[0.3em] text-black dark:text-white group-hover:text-[#ff6600] transition-colors"
+                className="flex items-center space-x-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-black dark:text-white group-hover:text-[#ff6600] transition-colors"
               >
                 <span>Explore All</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
@@ -212,14 +211,14 @@ const Hero: React.FC<HeroProps> = ({
              {showDetails && (
                <button 
                  onClick={() => onNavigateToProgram(currentProgram)}
-                 className="flex items-center text-sm font-black text-black dark:text-white hover:text-[#ff6600] transition-colors w-fit group"
+                 className="flex items-center text-sm font-semibold text-black dark:text-white hover:text-[#ff6600] transition-colors w-fit group"
                >
                  Programme Website <ExternalLinkIcon className="w-4 h-4 ml-2 text-[#ff6600]" />
                </button>
              )}
              <button 
                onClick={() => setShowDetails(!showDetails)}
-               className="flex items-center text-sm font-black text-black dark:text-white hover:text-[#ff6600] transition-colors w-fit"
+               className="flex items-center text-sm font-semibold text-black dark:text-white hover:text-[#ff6600] transition-colors w-fit"
              >
                {showDetails ? (
                  <>Show less <ChevronUpIcon className="w-4 h-4 ml-1 text-[#ff6600]" /></>
