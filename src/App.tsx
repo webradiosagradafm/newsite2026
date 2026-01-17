@@ -218,7 +218,7 @@ const AppContent: React.FC = () => {
   const activeTab = location.pathname === '/' ? 'home' : location.pathname.split('/')[1];
 
   return (
-    <div className="min-h-screen flex flex-col pb-[120px] dark:bg-[#000] transition-colors duration-300">
+    <div className="min-h-screen flex flex-col pb-[120px] bg-white text-black dark:bg-black dark:text-white transition-colors duration-300">
       <Navbar 
         activeTab={activeTab} 
         theme={theme}
