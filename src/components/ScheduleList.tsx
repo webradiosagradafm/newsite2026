@@ -132,14 +132,14 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
     <section ref={listContainerRef} className="bg-white dark:bg-[#000] min-h-screen font-sans transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 py-20">
         {onBack && (
-          <button onClick={onBack} className="flex items-center text-gray-400 hover:text-[#ff6600] transition-colors mb-6 text-xs font-bold uppercase tracking-widest">
+          <button onClick={onBack} className="flex items-center text-gray-400 hover:text-[#ff6600] transition-colors mb-6 text-xs font-regular uppercase tracking-widest">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back Home
           </button>
         )}
         
         <div className="flex flex-col md:flex-row md:items-baseline md:space-x-4 mb-12 border-b-4 border-black dark:border-white pb-6">
           <h1 className="text-5xl md:text-7xl font-black text-gray-900 dark:text-white uppercase tracking-tighter leading-none">Schedule</h1>
-          <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-sm mt-4 md:mt-0">
+          <p className="text-gray-400 font-regular uppercase tracking-[0.2em] text-sm mt-4 md:mt-0">
             Today • {now.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
         </div>
@@ -207,7 +207,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
                         <h4 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white group-hover:text-[#ff6600] leading-none tracking-tighter mb-4 truncate uppercase transition-all duration-300">
                           {prog.title}
                         </h4>
-                        <p className="text-gray-500 dark:text-gray-400 font-bold text-xl mb-6 uppercase tracking-tight">
+                        <p className="text-gray-500 dark:text-gray-400 font-regular text-xl mb-6 uppercase tracking-tight">
                           with {prog.host}
                         </p>
                         <p className="text-gray-600 dark:text-gray-300 text-lg line-clamp-2 leading-relaxed font-normal max-w-3xl uppercase tracking-tight">

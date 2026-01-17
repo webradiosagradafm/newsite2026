@@ -115,7 +115,7 @@ const DailyVerse: React.FC = () => {
     <div className="max-w-4xl mx-auto px-4 py-12 text-center">
       <div className="bg-red-50 dark:bg-red-900/10 p-10 border border-red-100 dark:border-red-900/20">
         <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-4" />
-        <p className="text-red-600 dark:text-red-400 text-sm font-bold uppercase tracking-widest">{error}</p>
+        <p className="text-red-600 dark:text-red-400 text-sm font-regular uppercase tracking-widest">{error}</p>
       </div>
     </div>
   );

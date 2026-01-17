@@ -15,7 +15,7 @@ const DevotionalPage: React.FC = () => {
         <div className="relative z-10">
           <Book className="w-16 h-16 text-[#ff6600] mx-auto mb-10" />
           <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-none">Devotional</h1>
-          <p className="text-xl md:text-2xl text-gray-400 font-bold max-w-2xl mx-auto uppercase tracking-tight">Faith, Reflected. Your Daily Digital Bread.</p>
+          <p className="text-xl md:text-2xl text-gray-400 font-regular max-w-2xl mx-auto uppercase tracking-tight">Faith, Reflected. Your Daily Digital Bread.</p>
         </div>
       </div>
 
