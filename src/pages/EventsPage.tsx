@@ -59,7 +59,7 @@ const EventsPage: React.FC = () => {
 
     setSearching(artistName);
     try {
-      const response = await ai.models.generateContent({
+      const response = await .models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `Find the next 3 upcoming tour dates for the artist ${artistName}. 
         Return ONLY a JSON array of objects with keys: "date" (e.g. Nov 15, 2025), "venue", "city", and "link" (ticket URL). 
