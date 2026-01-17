@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { HashRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -218,7 +217,7 @@ const AppContent: React.FC = () => {
   const activeTab = location.pathname === '/' ? 'home' : location.pathname.split('/')[1];
 
   return (
-    <div className="min-h-screen flex flex-col pb-[120px] bg-white text-black dark:bg-black dark:text-white transition-colors duration-300">
+    <div className="min-h-screen flex flex-col pb-[120px] bg-white text-black dark:bg-[#121212] dark:text-white transition-colors duration-300">
       <Navbar 
         activeTab={activeTab} 
         theme={theme}
