@@ -4,19 +4,27 @@
 
 @layer base {
   html {
-    font-size: 15px; /* BBC padrão visual */
+    font-size: 15px;
+    font-synthesis: none;
   }
 
   body {
     font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-weight: 400;
+    font-weight: 400 !important;
     line-height: 1.45;
-    letter-spacing: -0.01em;
-    @apply text-gray-900 dark:text-gray-100;
+    letter-spacing: -0.005em;
+  }
+
+  *, *::before, *::after {
+    font-weight: 400 !important;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-weight: 500; /* Reith não usa bold */
-    letter-spacing: -0.015em;
+    font-weight: 400 !important;
+    letter-spacing: -0.01em;
+  }
+
+  strong, b {
+    font-weight: 400 !important;
   }
 }
