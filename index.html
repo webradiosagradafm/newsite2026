@@ -5,21 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Praise FM USA</title>
 
-    <!-- ✅ Inter SOMENTE Regular (400) -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Tailwind via CDN (como estava antes) -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- ⚠️ NADA de Tailwind CDN -->
-    <!-- Tailwind será carregado via src/index.css -->
-
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+    </style>
   </head>
 
   <body>
     <div id="root"></div>
 
-    <!-- Entrada única do Vite -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
