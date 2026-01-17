@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabase';
 
 // Suporte para rodar localmente com Vite (VITE_GEMINI_API_KEY) ou em produção (process.env.API_KEY)
 const API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || process.env.API_KEY;
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const genAI = new GoogleGenerativeAI(API_KEY);
 
 const FEATURED_ARTISTS = [
   { name: 'Brandon Lake', genre: 'Worship', image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1767583738/BRANDON_LAKE_nf7pyj.jpg' },
