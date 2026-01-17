@@ -1,16 +1,15 @@
-const CACHE_NAME = 'praise-fm-usa-v2';
+const CACHE_NAME = 'praise-fm-usa-v3';
 
-const APP_SHELL = [
+const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json',
 ];
 
 // INSTALL
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(APP_SHELL);
+      return cache.addAll(STATIC_ASSETS);
     })
   );
   self.skipWaiting();
@@ -35,57 +34,51 @@ self.addEventListener('activate', (event) => {
 // FETCH
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  const url = new URL(request.url);
 
-  // 🚫 NEVER cache live stream / radio metadata
-  if (url.hostname.includes('zeno.fm')) return;
+  // ❌ NUNCA mexer com streams
+  if (request.url.includes('zeno.fm')) return;
 
-  // 🚫 Skip non-GET
-  if (request.method !== 'GET') return;
-
-  // 🖼 Images: stale-while-revalidate
-  if (request.destination === 'image') {
-    event.respondWith(
-      caches.open(CACHE_NAME).then(async (cache) => {
-        const cached = await cache.match(request);
-        const fetched = fetch(request)
-          .then((res) => {
-            if (res.ok) cache.put(request, res.clone());
-            return res;
-          })
-          .catch(() => cached);
-
-        return cached || fetched;
-      })
-    );
+  // ❌ NÃO cachear CDN ou fontes
+  if (
+    request.url.includes('cdn.tailwindcss.com') ||
+    request.url.includes('googleapis.com') ||
+    request.url.includes('gstatic.com')
+  ) {
     return;
   }
 
-  // 📄 HTML / JS / CSS (app shell)
-  if (
-    request.destination === 'document' ||
-    request.destination === 'script' ||
-    request.destination === 'style'
-  ) {
-    event.respondWith(
-      caches.match(request).then((cached) => {
-        const fetchPromise = fetch(request)
-          .then((res) => {
-            if (res.ok) {
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(request, res.clone());
-              });
-            }
-            return res;
-          })
-          .catch(() => {
-            if (request.mode === 'navigate') {
-              return caches.match('/');
-            }
+  // Apenas GET
+  if (request.method !== 'GET') return;
+
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
+
+      return fetch(request)
+        .then((response) => {
+          // ⚠️ IMPORTANTE: só cacheia respostas válidas
+          if (
+            !response ||
+            response.status !== 200 ||
+            response.type !== 'basic'
+          ) {
+            return response;
+          }
+
+          const responseClone = response.clone();
+
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, responseClone);
           });
 
-        return cached || fetchPromise;
-      })
-    );
-  }
+          return response;
+        })
+        .catch(() => {
+          // fallback offline
+          if (request.mode === 'navigate') {
+            return caches.match('/');
+          }
+        });
+    })
+  );
 });
