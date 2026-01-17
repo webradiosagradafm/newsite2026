@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
 import LivePlayerBar from './components/LivePlayerBar';
+import RecentlyPlayed from './components/RecentlyPlayed';
 import { SCHEDULES } from './constants';
 import { Program } from './types';
 
@@ -13,18 +14,15 @@ const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv';
 const getChicagoDayAndTotalMinutes = () => {
   const now = new Date();
   const chicagoDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-  const h = chicagoDate.getHours();
-  const m = chicagoDate.getMinutes();
-  return { day: chicagoDate.getDay(), total: h * 60 + m };
+  return { day: chicagoDate.getDay(), total: chicagoDate.getHours() * 60 + chicagoDate.getMinutes() };
 };
 
 const AppContent: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isPlayerActive, setIsPlayerActive] = useState(false); // Controla o "nascimento" da barra
+  const [isPlayerActive, setIsPlayerActive] = useState(false);
   const [liveMetadata, setLiveMetadata] = useState<any>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [trackHistory, setTrackHistory] = useState<any[]>([]); // Para o Recent Tracks
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const location = useLocation();
 
   const { day, total } = getChicagoDayAndTotalMinutes();
   
@@ -34,7 +32,7 @@ const AppContent: React.FC = () => {
       const [sH, sM] = p.startTime.split(':').map(Number);
       const [eH, eM] = p.endTime.split(':').map(Number);
       const start = sH * 60 + sM;
-      const end = eH === 0 ? 24 * 60 : eH * 60 + eM;
+      const end = eH === 0 ? 1440 : eH * 60 + eM;
       return total >= start && total < end;
     });
     return { 
@@ -45,14 +43,8 @@ const AppContent: React.FC = () => {
 
   const togglePlayback = () => {
     if (!audioRef.current) return;
-    if (!isPlayerActive) setIsPlayerActive(true); // Ativa o miniplayer no primeiro clique
-
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.load();
-      audioRef.current.play().catch(() => {});
-    }
+    if (!isPlayerActive) setIsPlayerActive(true);
+    isPlaying ? audioRef.current.pause() : audioRef.current.play().catch(() => {});
     setIsPlaying(!isPlaying);
   };
 
@@ -63,17 +55,17 @@ const AppContent: React.FC = () => {
   }, []);
 
   return (
-    <div className={`min-h-screen flex flex-col ${isPlayerActive ? 'pb-[90px]' : ''} dark:bg-[#000]`}>
-      <Navbar activeTab="home" theme={theme} onToggleTheme={() => setTheme(theme === 'light' ? 'dark' : 'light')} />
+    <div className={`min-h-screen flex flex-col dark:bg-[#000] ${isPlayerActive ? 'pb-[90px]' : ''}`}>
+      <Navbar activeTab="home" theme="dark" onToggleTheme={() => {}} />
       
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={
-            <Hero 
-              onListenClick={togglePlayback} 
-              isPlaying={isPlaying} 
-              currentProgram={currentProgram}
-            />
+            <>
+              <Hero onListenClick={togglePlayback} isPlaying={isPlaying} currentProgram={currentProgram} queue={queue} />
+              {/* SEÇÃO RECENT TRACKS RESTAURADA */}
+              <RecentlyPlayed tracks={trackHistory} />
+            </>
           } />
         </Routes>
       </main>
