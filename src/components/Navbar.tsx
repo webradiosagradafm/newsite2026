@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Home, Music, Radio, Menu, Calendar, Sun, Moon, X, User as UserIcon, Library, Settings, Ticket } from 'lucide-react';
+import { Home, Music, Radio, Menu, Calendar, Sun, Moon, X, User as UserIcon, Library, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -31,11 +30,11 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
     }
   }, [user]);
 
+  // Array atualizado sem o item 'events'
   const navItems = [
     { id: 'home', label: 'Home', icon: Home, path: '/' },
     { id: 'music', label: 'Music', icon: Music, path: '/music' },
     { id: 'schedule', label: 'Schedule', icon: Calendar, path: '/schedule' },
-    { id: 'events', label: 'Events', icon: Ticket, path: '/events' },
     { id: 'devotional', label: 'Devotional', icon: Radio, path: '/devotional' },
   ];
 
@@ -84,12 +83,11 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
         </div>
 
         <div className="flex items-center">
-          {/* Botão de tema movido mais para a esquerda com margem maior à direita */}
           <button 
             onClick={onToggleTheme}
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-gray-400 mr-8 md:mr-12"
           >
-            {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-praise-accent" />}
+            {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-[#ff6600]" />}
           </button>
 
           <div className="flex items-center space-x-4">
