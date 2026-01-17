@@ -1,250 +1,119 @@
+import React, { useState } from 'react';
+import { Play, Pause, RotateCcw, Volume2, SkipBack, SkipForward, ListMusic, ChevronUp } from 'lucide-react';
 
-import React, { useState, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX, Volume1, List, X } from 'lucide-react';
-import { Program } from '../types';
-
-interface LivePlayerBarProps {
-  isPlaying: boolean;
-  onTogglePlayback: () => void;
-  program: Program;
-  liveMetadata?: { artist: string; title: string; artwork?: string } | null;
-  queue?: Program[];
-  audioRef: React.RefObject<HTMLAudioElement | null>;
-}
-
-const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayback, program, liveMetadata, queue = [], audioRef }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [volume, setVolume] = useState(() => {
-    const saved = localStorage.getItem('praise-volume');
-    return saved ? parseFloat(saved) : 0.8;
-  });
-  const [isMuted, setIsMuted] = useState(false);
-  const [prevVolume, setPrevVolume] = useState(0.8);
-  const [isHoveringVolume, setIsHoveringVolume] = useState(false);
-
-  useEffect(() => {
-    if ('mediaSession' in navigator && (liveMetadata || program)) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: liveMetadata?.title || program.title,
-        artist: liveMetadata?.artist || program.host,
-        artwork: [
-          { src: liveMetadata?.artwork || program.image, sizes: '512x512', type: 'image/png' }
-        ]
-      });
-      navigator.mediaSession.setActionHandler('play', onTogglePlayback);
-      navigator.mediaSession.setActionHandler('pause', onTogglePlayback);
-    }
-  }, [liveMetadata, program, onTogglePlayback]);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
-      audioRef.current.muted = isMuted;
-    }
-  }, [volume, isMuted, audioRef]);
-
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseFloat(e.target.value);
-    setVolume(val);
-    if (val > 0) {
-      setIsMuted(false);
-      setPrevVolume(val);
-    } else {
-      setIsMuted(true);
-    }
-    localStorage.setItem('praise-volume', val.toString());
-  };
-
-  const toggleMute = () => {
-    if (isMuted) {
-      setIsMuted(false);
-      setVolume(prevVolume > 0.05 ? prevVolume : 0.8);
-    } else {
-      setPrevVolume(volume);
-      setIsMuted(true);
-    }
-  };
-
-  const VolumeIcon = () => {
-    if (isMuted || volume === 0) return <VolumeX className="w-5 h-5" />;
-    if (volume < 0.5) return <Volume1 className="w-5 h-5" />;
-    return <Volume2 className="w-5 h-5" />;
-  };
-
-  useEffect(() => {
-    if (isExpanded) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [isExpanded]);
+export default function LivePlayerBar() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress] = useState(35); // Exemplo de progresso da transmissão
 
   return (
-    <>
-      {/* FULL SCREEN EXPANDED QUEUE/SCHEDULE */}
-      <div 
-        className={`fixed inset-0 z-[100] bg-white transition-transform duration-300 flex flex-col ${isExpanded ? 'translate-y-0' : 'translate-y-full'}`}
-      >
-        {/* Clean Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-medium uppercase tracking-tighter text-black">Schedule</h2>
-          <button 
-            onClick={() => setIsExpanded(false)} 
-            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <X className="w-7 h-7 text-black" />
+    <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#0c0c0c] border-t border-gray-100 dark:border-white/5 z-[100] transition-all duration-300 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+      
+      {/* 1. Barra de Progresso no Topo (Design BBC) */}
+      <div className="absolute top-0 left-0 right-0 h-[3px] bg-gray-200 dark:bg-white/10 cursor-pointer group">
+        <div 
+          className="h-full bg-[#ff6600] relative transition-all duration-300" 
+          style={{ width: `${progress}%` }}
+        >
+          {/* O marcador (dot) que aparece na BBC */}
+          <div className="absolute right-[-6px] top-[-4px] w-3 h-3 bg-[#ff6600] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+        </div>
+      </div>
+
+      <div className="max-w-[1400px] mx-auto px-4 h-[72px] md:h-[85px] flex items-center justify-between gap-4">
+        
+        {/* 2. Info da Rádio (Lado Esquerdo) */}
+        <div className="flex items-center space-x-3 min-w-0 flex-1 md:flex-none">
+          <div className="relative flex-shrink-0">
+            <img 
+              src="https://res.cloudinary.com/dtecypmsh/image/upload/v1766869698/SVGUSA_lduiui.webp" 
+              alt="Live" 
+              className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover border border-gray-100 dark:border-white/10"
+            />
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-black rounded-full flex items-center justify-center border-2 border-white dark:border-[#0c0c0c]">
+              <span className="text-[10px] font-bold text-white">1</span>
+            </div>
+          </div>
+          <div className="min-w-0">
+            <h4 className="text-[15px] font-bold text-black dark:text-white truncate leading-tight">
+              Praise FM USA
+            </h4>
+            <p className="text-[13px] text-gray-500 dark:text-gray-400 truncate">
+              Midnight Grace with Daniel Brooks
+            </p>
+          </div>
+          {/* Badge LIVE estilo BBC */}
+          <div className="hidden lg:flex items-center space-x-1 ml-4 text-[#00b2b2] font-bold text-[11px] uppercase tracking-wider">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00b2b2] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00b2b2]"></span>
+            </span>
+            <span>Live</span>
+          </div>
+        </div>
+
+        {/* 3. Controles Centrais (Design da Imagem) */}
+        <div className="flex flex-col items-center justify-center flex-1">
+          <div className="flex items-center space-x-4 md:space-x-10">
+            {/* Start Over */}
+            <button className="hidden md:flex flex-col items-center group transition-colors">
+              <RotateCcw className="w-5 h-5 text-gray-400 group-hover:text-black dark:group-hover:text-white" />
+              <span className="text-[9px] font-black uppercase mt-1 tracking-tighter">Start</span>
+            </button>
+
+            {/* Back 20s */}
+            <button className="text-gray-400 hover:text-black dark:hover:text-white transition-all relative group">
+              <SkipBack className="w-7 h-7" strokeWidth={1.5} />
+              <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold mt-1 group-hover:scale-110">20</span>
+            </button>
+
+            {/* PLAY / PAUSE (Círculo Vazado da BBC) */}
+            <button 
+              onClick={() => setIsPlaying(!isPlaying)}
+              className="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-black dark:border-white flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+            >
+              {isPlaying ? (
+                <Pause className="w-6 h-6 fill-black dark:fill-white text-black dark:text-white" />
+              ) : (
+                <Play className="w-6 h-6 fill-black dark:fill-white text-black dark:text-white ml-1" />
+              )}
+            </button>
+
+            {/* Forward 20s */}
+            <button className="text-gray-400 hover:text-black dark:hover:text-white transition-all relative group">
+              <SkipForward className="w-7 h-7" strokeWidth={1.5} />
+              <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold mt-1 group-hover:scale-110">20</span>
+            </button>
+
+            {/* Live Toggle */}
+            <button className="hidden md:flex flex-col items-center opacity-30 cursor-not-allowed">
+              <SkipForward className="w-5 h-5" />
+              <span className="text-[9px] font-black uppercase mt-1 tracking-tighter">Live</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 4. Volume e Extras (Lado Direito) */}
+        <div className="hidden md:flex items-center justify-end space-x-6 flex-1 md:flex-none">
+          <div className="flex items-center space-x-2 group">
+            <Volume2 className="w-5 h-5 text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors" />
+            <div className="w-20 h-[3px] bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
+              <div className="w-[70%] h-full bg-gray-600 dark:bg-gray-400"></div>
+            </div>
+          </div>
+          
+          <button className="text-sm font-black text-gray-500 hover:text-black dark:hover:text-white">1×</button>
+
+          <button className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full">
+            <ListMusic className="w-5 h-5 text-gray-500" />
           </button>
         </div>
 
-        {/* List Content */}
-        <div className="flex-grow overflow-y-auto">
-          {/* Current Playing in List */}
-          <div className="flex items-center p-6 border-b border-gray-100 space-x-6 bg-gray-50/50">
-            <div className="w-[84px] h-[84px] flex-shrink-0 shadow-sm">
-               <img src={program.image} className="w-full h-full object-cover" alt="" />
-            </div>
-            <div className="flex flex-col min-w-0 flex-grow">
-              <div className="flex items-center space-x-2 mb-1">
-                <span className="text-[10px] font-medium text-[#ff6600] uppercase tracking-widest">Live Now</span>
-              </div>
-              <span className="font-medium text-2xl text-black leading-none uppercase tracking-tighter mb-1 truncate">
-                {program.title}
-              </span>
-              <span className="text-gray-500 text-sm leading-tight uppercase tracking-tight mb-2 truncate">
-                {program.host}
-              </span>
-              <span className="text-gray-400 text-[11px] font-medium uppercase tracking-widest">{program.startTime} - {program.endTime}</span>
-            </div>
-          </div>
-          
-          {/* Upcoming items */}
-          {queue && queue.map((prog) => (
-            <div key={prog.id} className="flex items-center p-6 border-b border-gray-100 space-x-6 hover:bg-gray-50/50 transition-colors">
-              <div className="w-[84px] h-[84px] flex-shrink-0 shadow-sm">
-                <img src={prog.image} className="w-full h-full object-cover grayscale opacity-80" alt="" />
-              </div>
-              <div className="flex flex-col min-w-0 flex-grow">
-                <span className="font-medium text-2xl text-black leading-none uppercase tracking-tighter mb-1 truncate">
-                  {prog.title}
-                </span>
-                <span className="text-gray-500 text-sm leading-tight uppercase tracking-tight mb-2 truncate">
-                  {prog.host}
-                </span>
-                <span className="text-gray-400 text-[11px] font-medium uppercase tracking-widest">{prog.startTime} - {prog.endTime}</span>
-              </div>
-            </div>
-          ))}
-          
-          <div className="p-10 text-center">
-            <p className="text-[10px] font-medium text-gray-300 uppercase tracking-widest">End of upcoming</p>
-          </div>
+        {/* Botão Mobile para abrir detalhes */}
+        <div className="md:hidden flex items-center">
+            <ChevronUp className="w-6 h-6 text-gray-400 animate-bounce" />
         </div>
+
       </div>
-
-      {/* MOBILE MINI-PLAYER (Bottom Sticky Bar) */}
-      <div 
-        className={`fixed bottom-0 left-0 right-0 z-[60] bg-white border-t border-gray-200 md:hidden flex flex-col transition-transform ${isExpanded ? 'translate-y-full' : 'translate-y-0'}`}
-        onClick={() => setIsExpanded(true)}
-      >
-        <div className="flex items-center justify-between px-5 py-3 h-[72px]">
-          <div className="flex items-center flex-grow min-w-0 pr-4">
-            <div className="w-11 h-11 rounded-full overflow-hidden flex-shrink-0 mr-3 border-2 border-gray-100">
-              <img src={program.image} className="w-full h-full object-cover" alt="" />
-            </div>
-            <div className="flex flex-col min-w-0">
-              <div className="flex items-center space-x-2">
-                 <div className="w-1.5 h-1.5 bg-[#ff6600] rounded-full animate-pulse"></div>
-                 <span className="text-[12px] font-medium text-black leading-tight uppercase tracking-tighter">Praise FM USA</span>
-              </div>
-              <span className="text-[13px] text-gray-500 truncate leading-tight font-medium uppercase tracking-tight">
-                {program.title}
-              </span>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <button 
-              onClick={(e) => { e.stopPropagation(); setIsExpanded(true); }}
-              className="p-2 text-gray-400"
-            >
-              <List className="w-6 h-6" />
-            </button>
-            <button 
-              onClick={(e) => { e.stopPropagation(); onTogglePlayback(); }}
-              className="flex-shrink-0 w-12 h-12 rounded-full border-2 border-black flex items-center justify-center bg-white shadow-sm"
-            >
-              {isPlaying ? (
-                <Pause className="w-5 h-5 text-black fill-current" />
-              ) : (
-                <Play className="w-5 h-5 text-black fill-current ml-0.5" />
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* DESKTOP PLAYER BAR */}
-      <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#000] h-[84px] border-t border-gray-200 dark:border-white/10 hidden md:flex flex-col transition-colors duration-300">
-        <div className="w-full h-1 bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
-          <div className="absolute top-0 left-0 h-full bg-[#ff6600] transition-all duration-1000" style={{ width: isPlaying ? '100%' : '0%' }}></div>
-        </div>
-
-        <div className="flex-grow flex items-center justify-between px-10">
-          <div className="flex items-center space-x-5 w-[30%] min-w-0">
-            <div className="w-14 h-14 rounded-none overflow-hidden flex-shrink-0 border border-gray-200 dark:border-white/10 shadow-sm">
-              <img src={program.image} alt="" className="w-full h-full object-cover" />
-            </div>
-            <div className="min-w-0">
-              <h4 className="font-medium text-gray-900 dark:text-white uppercase tracking-tighter leading-tight truncate text-[16px]">
-                {program.title}
-              </h4>
-              <p className="text-[10px] font-medium text-[#ff6600] truncate uppercase tracking-[0.2em] mt-0.5">
-                Live with {program.host}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center flex-grow space-x-12">
-            <div 
-              className="flex items-center space-x-3 group"
-              onMouseEnter={() => setIsHoveringVolume(true)}
-              onMouseLeave={() => setIsHoveringVolume(false)}
-            >
-              <button onClick={toggleMute} className="text-gray-900 dark:text-white hover:text-[#ff6600] transition-colors p-1">
-                <VolumeIcon />
-              </button>
-              <div className={`flex items-center transition-all duration-300 overflow-hidden ${isHoveringVolume ? 'w-32 opacity-100' : 'w-0 opacity-0'}`}>
-                <input 
-                  type="range" min="0" max="1" step="0.01"
-                  value={isMuted ? 0 : volume}
-                  onChange={handleVolumeChange}
-                  className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#ff6600]"
-                />
-              </div>
-            </div>
-
-            <button 
-              onClick={onTogglePlayback}
-              className="w-14 h-14 bg-black dark:bg-[#ff6600] text-white rounded-full flex items-center justify-center hover:bg-[#ff6600] dark:hover:bg-white dark:hover:text-black transition-all active:scale-95 shadow-lg"
-            >
-              {isPlaying ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current ml-0.5" />}
-            </button>
-          </div>
-
-          <div className="flex items-center justify-end space-x-8 w-[30%]">
-            <button 
-              onClick={() => setIsExpanded(true)}
-              className="p-2 text-gray-400 dark:text-gray-500 hover:text-[#ff6600] dark:hover:text-[#ff6600] transition-all transform hover:scale-110"
-              title="Open Schedule"
-            >
-              <List className="w-7 h-7" strokeWidth={2.5} />
-            </button>
-          </div>
-        </div>
-      </div>
-    </>
+    </div>
   );
-};
-
-export default LivePlayerBar;
+}
