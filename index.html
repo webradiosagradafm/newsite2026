@@ -3,13 +3,48 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Praise FM USA</title>
-
-    <link rel="manifest" href="/manifest.json" />
+    <title>Praise FM USA - Live Music & Podcasts</title>
+    <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#ff6600" />
-  </head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: { praise: { accent: '#ff6600' } },
+            fontFamily: { sans: ['Inter', 'sans-serif'] }
+          }
+        }
+      }
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+      body { font-family: 'Inter', sans-serif; background: #fff; color: #1a1a1a; transition: all 0.3s ease; }
+      .dark body { background: #000; color: #fff; }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .bbc-section-title { border-bottom: 2px solid currentColor; display: inline-block; padding-bottom: 4px; margin-bottom: 2rem; font-weight: 500; text-transform: uppercase; }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@google/genai": "https://esm.sh/@google/genai@^1.37.0",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.90.1"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <script type="module" src="/main.tsx"></script>
+  <script type="module" src="/index.tsx"></script>
+</body>
 </html>
