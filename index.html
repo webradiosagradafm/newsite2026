@@ -3,28 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Praise FM USA - Live Music & Podcasts</title>
+    <title>Praise FM USA</title>
 
-    <!-- Tailwind via CDN (ok para agora) -->
+    <!-- Tailwind via CDN (DEV only) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: { praise: { accent: '#ff6600' } },
-            fontFamily: { sans: ['Inter', 'sans-serif'] }
-          }
-        }
-      }
-    </script>
 
-    <link rel="stylesheet" href="/src/index.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, sans-serif;
+      }
+    </style>
   </head>
 
   <body>
     <div id="root"></div>
 
-    <!-- ÚNICO ENTRY POINT -->
+    <!-- ⚠️ ÚNICO SCRIPT -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
