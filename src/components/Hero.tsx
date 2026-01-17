@@ -1,34 +1,45 @@
 import React from 'react';
 import { Play, Pause, ChevronRight } from 'lucide-react';
 
-export default function Hero({ onListenClick, isPlaying, currentProgram, queue }: any) {
+export default function Hero({ onListenClick, isPlaying, currentProgram, queue }) {
   return (
-    <section className="py-12 px-4 max-w-7xl mx-auto">
+    <section className="max-w-7xl mx-auto px-4 pt-12">
+      {/* SEÇÃO PRINCIPAL - FOTO INICIO.png */}
       <div className="flex flex-col md:flex-row items-center gap-10 mb-16">
-        <div className="relative w-56 h-56 flex-shrink-0">
-          <img src={currentProgram?.image} className="w-full h-full rounded-full object-cover border-4 border-praise-accent" />
-          <div className="absolute bottom-2 right-2 bg-black text-white w-10 h-10 rounded-full flex items-center justify-center font-bold border-2 border-white">1</div>
+        <div className="relative w-64 h-64 flex-shrink-0">
+          <div className="w-full h-full rounded-full overflow-hidden border-4 border-praise-orange">
+            <img src={currentProgram?.image} className="w-full h-full object-cover" />
+          </div>
+          <div className="absolute bottom-4 right-4 bg-black text-white w-12 h-12 rounded-full flex items-center justify-center font-black border-4 border-white dark:border-black text-xl">1</div>
         </div>
-        <div className="text-center md:text-left">
-          <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">{currentProgram?.startTime} - {currentProgram?.endTime}</p>
-          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter my-2 flex items-center justify-center md:justify-start">
-            {currentProgram?.title} <ChevronRight className="text-praise-accent w-12 h-12" />
+        
+        <div className="text-center md:text-left flex-grow">
+          <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+            <span className="bg-white/10 px-2 py-1 text-[10px] font-black uppercase tracking-widest">Live</span>
+            <span className="text-gray-400 font-bold text-sm">{currentProgram?.startTime} - {currentProgram?.endTime}</span>
+          </div>
+          <h1 className="text-5xl md:text-7xl bbc-title mb-4 flex items-center justify-center md:justify-start group cursor-pointer">
+            {currentProgram?.title} <ChevronRight className="text-praise-orange w-12 h-12 transition-transform group-hover:translate-x-2" />
           </h1>
-          <p className="text-xl text-gray-500 mb-6 italic font-medium">with {currentProgram?.host}</p>
-          <button onClick={onListenClick} className="bg-praise-accent text-white px-10 py-4 font-black uppercase tracking-tight flex items-center gap-3 mx-auto md:mx-0 hover:scale-105 transition-transform">
-            {isPlaying ? <Pause fill="white" /> : <Play fill="white" />} Listen Live
+          <p className="text-xl text-gray-500 mb-8 italic">with {currentProgram?.host}</p>
+          <button onClick={onListenClick} className="bg-praise-orange text-white px-12 py-4 bbc-title flex items-center gap-4 mx-auto md:mx-0 hover:brightness-110 transition-all">
+            {isPlaying ? <Pause fill="white" size={32} /> : <Play fill="white" size={32} />} Play
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-10 border-t border-gray-100 dark:border-white/10">
-        {queue?.slice(0, 2).map((item: any, i: number) => (
-          <div key={i} className="flex gap-4 group cursor-pointer">
-            <img src={item.image} className="w-24 h-24 object-cover rounded shadow-lg group-hover:scale-105 transition-transform" />
+      {/* SEÇÃO UP NEXT - FOTO UPNEXT.png */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-10 border-t border-white/10">
+        {queue?.slice(0, 2).map((prog, i) => (
+          <div key={i} className="flex gap-6 items-start group cursor-pointer">
+            <img src={prog.image} className="w-24 h-24 object-cover rounded shadow-lg" />
             <div>
-              <p className="text-[10px] font-black text-praise-accent uppercase italic">Up Next • {item.startTime}</p>
-              <h3 className="text-xl font-black uppercase dark:text-white group-hover:underline">{item.title}</h3>
-              <p className="text-sm text-gray-500 line-clamp-2">{item.description}</p>
+              <div className="flex gap-2 text-[11px] bbc-title mb-1">
+                <span className="text-praise-orange">UP NEXT:</span>
+                <span className="text-gray-400">{prog.startTime} - {prog.endTime}</span>
+              </div>
+              <h3 className="text-xl font-black uppercase dark:text-white group-hover:underline">{prog.title}</h3>
+              <p className="text-sm text-gray-500 line-clamp-2 mt-1 italic">{prog.description}</p>
             </div>
           </div>
         ))}
