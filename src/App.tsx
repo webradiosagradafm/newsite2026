@@ -247,7 +247,6 @@ const AppContent: React.FC = () => {
             <Route path="/live-recordings" element={<LiveRecordingsPage />} />
             <Route path="/artists" element={<FeaturedArtistsPage />} />
             <Route path="/schedule" element={<ScheduleList onNavigateToProgram={handleNavigateToProgram} onBack={() => navigate('/')} />} />
-      
             <Route path="/presenters" element={<PresentersPage onNavigateToProgram={handleNavigateToProgram} />} />
             <Route path="/devotional" element={<DevotionalPage />} />
             <Route path="/help" element={<HelpCenterPage />} />
