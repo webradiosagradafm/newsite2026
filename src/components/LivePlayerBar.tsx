@@ -1,45 +1,29 @@
 import React, { useState } from 'react';
 import { Play, Pause, SkipBack, SkipForward, ListMusic, X } from 'lucide-react';
 
-interface PlayerBarProps {
-  isVisible: boolean;
-  isPlaying: boolean;
-  onTogglePlayback: () => void;
-  program: any;
-  queue: any[];
-  liveMetadata: any;
-}
-
-export default function LivePlayerBar({ isVisible, isPlaying, onTogglePlayback, program, queue, liveMetadata }: PlayerBarProps) {
+export default function LivePlayerBar({ isVisible, isPlaying, onTogglePlayback, program, queue, liveMetadata }: any) {
   const [showQueue, setShowQueue] = useState(false);
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[1000] animate-in slide-in-from-bottom-full duration-500 shadow-[0_-15px_50px_rgba(0,0,0,0.3)]">
+    <div className="fixed bottom-0 left-0 right-0 z-[1000] animate-in slide-in-from-bottom-full duration-500">
       
-      {/* PAINEL UP NEXT (AGENDA) */}
+      {/* PAINEL SCHEDULE (LATERAL BBC) */}
       {showQueue && (
-        <div className="absolute bottom-[90px] right-6 w-[350px] bg-white dark:bg-[#0c0c0c] border border-gray-100 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden">
-          <div className="p-4 border-b dark:border-white/5 flex justify-between items-center bg-gray-50 dark:bg-white/5">
-            <div>
-              <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-[#ff6600]">Up Next</h3>
-              <p className="text-[10px] text-gray-400 font-bold uppercase">On Praise FM USA</p>
-            </div>
-            <button onClick={() => setShowQueue(false)} className="hover:rotate-90 transition-transform p-1">
-              <X size={18} />
-            </button>
+        <div className="absolute bottom-[90px] right-0 w-full md:w-[400px] h-[500px] bg-white dark:bg-[#0c0c0c] shadow-2xl border-l dark:border-white/10 flex flex-col">
+          <div className="p-6 border-b dark:border-white/10 flex justify-between items-center">
+            <h3 className="text-2xl font-black dark:text-white uppercase tracking-tighter">Schedule</h3>
+            <button onClick={() => setShowQueue(false)} className="hover:rotate-90 transition-transform"><X /></button>
           </div>
-          <div className="p-2 max-h-[350px] overflow-y-auto">
-            {queue.map((item, i) => (
-              <div key={i} className="flex items-center space-x-4 p-3 hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-all group">
-                <div className="relative w-12 h-12 flex-shrink-0">
-                  <img src={item.image} className="w-full h-full rounded-md object-cover grayscale group-hover:grayscale-0 transition-all" />
-                  <div className="absolute top-0 right-0 w-2 h-2 bg-[#ff6600] rounded-full animate-pulse" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[12px] font-black uppercase leading-tight dark:text-white truncate">{item.title}</p>
-                  <p className="text-[10px] text-gray-400 font-bold">{item.startTime} - {item.host}</p>
+          <div className="flex-grow overflow-y-auto p-4 space-y-4">
+            {queue.map((item: any, i: number) => (
+              <div key={i} className="flex space-x-4 p-2 hover:bg-gray-50 dark:hover:bg-white/5 rounded transition-all">
+                <img src={item.image} className="w-20 h-20 object-cover" />
+                <div>
+                  <h4 className="font-black text-sm dark:text-white uppercase">{item.title}</h4>
+                  <p className="text-xs text-[#ff6600] font-bold mb-1">{item.startTime}</p>
+                  <p className="text-[11px] text-gray-500 line-clamp-2">{item.description}</p>
                 </div>
               </div>
             ))}
@@ -47,68 +31,48 @@ export default function LivePlayerBar({ isVisible, isPlaying, onTogglePlayback, 
         </div>
       )}
 
-      {/* BARRA DO PLAYER */}
-      <div className="h-[90px] bg-white dark:bg-[#0c0c0c] border-t border-gray-100 dark:border-white/5 flex items-center px-4 md:px-8 relative">
-        
-        {/* Linha de Progresso BBC */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gray-100 dark:bg-white/10">
-          <div className="h-full bg-[#ff6600] w-[60%] shadow-[0_0_10px_#ff6600]" />
+      {/* BARRA PRINCIPAL */}
+      <div className="h-[90px] bg-white dark:bg-[#0c0c0c] border-t border-gray-100 dark:border-white/10 flex items-center px-4 md:px-8 relative">
+        <div className="absolute top-0 left-0 right-0 h-[4px] bg-gray-100 dark:bg-white/10">
+          <div className="h-full bg-[#ff6600] w-[40%]" />
         </div>
 
-        {/* ESQUERDA: LOGO + FOTO DANIEL BROOKS */}
-        <div className="flex items-center space-x-4 md:space-x-6 w-1/3 min-w-0">
-          {/* Logo da Rádio Estilo BBC */}
-          <div className="hidden lg:flex flex-col border-r border-gray-200 dark:border-white/10 pr-6 mr-2">
-            <span className="text-[16px] font-black tracking-tighter dark:text-white leading-none">PRAISE</span>
-            <span className="text-[10px] font-black bg-[#ff6600] text-white px-1 mt-0.5 self-start leading-none">FM USA</span>
-          </div>
+        {/* LOGO PRAISE FM USA (Estilo Blocos BBC) */}
+        <div className="hidden lg:flex items-center border-r dark:border-white/10 pr-8 mr-6">
+           <div className="flex flex-col leading-none">
+              <span className="text-xl font-black dark:text-white tracking-tighter">PRAISE</span>
+              <span className="text-[10px] font-black bg-[#ff6600] text-white px-1 self-start mt-0.5">FM USA</span>
+           </div>
+        </div>
 
-          <div className="flex items-center space-x-3 min-w-0">
-            <div className="relative flex-shrink-0">
-              <img src={program?.image} className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover border-2 border-transparent" alt="" />
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-black rounded-full flex items-center justify-center border-2 border-white dark:border-[#0c0c0c]">
-                <span className="text-[9px] font-black text-white">LIVE</span>
-              </div>
-            </div>
-            <div className="min-w-0">
-              <h4 className="text-[13px] md:text-[14px] font-black uppercase tracking-tighter dark:text-white truncate">
-                {liveMetadata?.title || program?.title}
-              </h4>
-              <p className="text-[11px] md:text-[12px] text-[#ff6600] font-bold truncate uppercase tracking-widest">
-                {liveMetadata?.artist || program?.host}
-              </p>
-            </div>
+        {/* INFO ATUAL */}
+        <div className="flex items-center space-x-4 min-w-0 flex-grow md:flex-grow-0 md:w-1/3">
+          <img src={program?.image} className="w-14 h-14 rounded-full object-cover border-2 border-transparent shadow-lg" />
+          <div className="min-w-0">
+            <h4 className="text-[14px] font-black uppercase dark:text-white truncate tracking-tight">{program?.title}</h4>
+            <p className="text-[12px] text-gray-500 font-bold truncate">with {program?.host}</p>
           </div>
         </div>
 
-        {/* CENTRO: CONTROLES */}
-        <div className="flex-1 flex items-center justify-center space-x-6 md:space-x-12">
-          <button className="text-gray-400 hover:text-black dark:hover:text-white transition-colors relative">
-            <SkipBack size={24} />
-            <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold mt-1">20</span>
-          </button>
-          
+        {/* CONTROLES CENTRAIS */}
+        <div className="flex-1 flex items-center justify-center space-x-8">
+          <button className="text-gray-400 hover:text-black dark:hover:text-white"><SkipBack size={28} /></button>
           <button 
             onClick={onTogglePlayback}
-            className="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-black dark:border-white flex items-center justify-center text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
+            className="w-14 h-14 rounded-full border-2 border-black dark:border-white flex items-center justify-center text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all shadow-xl"
           >
-            {isPlaying ? <Pause size={22} fill="currentColor" /> : <Play size={22} fill="currentColor" className="ml-1" />}
+            {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}
           </button>
-
-          <button className="text-gray-400 hover:text-black dark:hover:text-white transition-colors relative">
-            <SkipForward size={24} />
-            <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold mt-1">20</span>
-          </button>
+          <button className="text-gray-400 hover:text-black dark:hover:text-white"><SkipForward size={28} /></button>
         </div>
 
-        {/* DIREITA: BOTÃO UP NEXT (LIST MUSIC) */}
-        <div className="w-1/3 flex items-center justify-end">
+        {/* BOTÃO QUEUE (ÍCONE LARANJA QUANDO ATIVO) */}
+        <div className="flex items-center justify-end w-1/3 space-x-4">
           <button 
             onClick={() => setShowQueue(!showQueue)}
-            className={`flex items-center space-x-2 px-3 py-2 rounded-full transition-all ${showQueue ? 'bg-[#ff6600] text-white shadow-lg' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'}`}
+            className={`p-2 transition-colors ${showQueue ? 'text-[#ff6600]' : 'text-gray-400'}`}
           >
-            <span className="hidden md:block text-[10px] font-black uppercase tracking-widest">Up Next</span>
-            <ListMusic size={22} />
+            <ListMusic size={32} />
           </button>
         </div>
       </div>
