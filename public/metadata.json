@@ -1,7 +1,0 @@
-{
-  "name": "NEWSITEUSA2026 - SAVE 2",
-  "description": "A world-class radio platform inspired by BBC Radio 1, featuring a 24/7 live schedule, Devotional podcasts, and high-energy music programming.",
-  "requestFramePermissions": [
-    "microphone"
-  ]
-}
