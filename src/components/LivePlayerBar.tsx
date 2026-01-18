@@ -155,12 +155,13 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         </div>
       </div>
 
-      {/* MOBILE COLLAPSED MINI-PLAYER */}
+      {/* MOBILE COLLAPSED MINI-PLAYER - Só aparece quando isPlaying */}
+      {isPlaying && (
       <div 
         className={`fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 md:hidden transition-all duration-300 ${isExpanded ? 'h-auto' : 'h-[72px]'}`}
       >
         {!isExpanded ? (
-          // COLLAPSED VIEW - Só título e botão pause
+          // COLLAPSED VIEW - Só título sem foto
           <div 
             className="flex items-center justify-between px-5 py-3 h-[72px]"
             onClick={() => setIsExpanded(true)}
@@ -293,8 +294,10 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
           </div>
         )}
       </div>
+      )}
 
-      {/* DESKTOP PLAYER BAR */}
+      {/* DESKTOP PLAYER BAR - Só aparece quando isPlaying */}
+      {isPlaying && (
       <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 hidden md:flex flex-col transition-colors duration-300">
         <div className="w-full h-1 bg-gray-100 dark:bg-white/5 relative overflow-hidden">
           <div className="absolute top-0 left-0 h-full bg-[#ff6600] transition-all duration-1000" style={{ width: isPlaying ? '100%' : '0%' }}></div>
@@ -387,6 +390,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
           </div>
         </div>
       </div>
+      )}
     </>
   );
 };
