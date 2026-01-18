@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { Play, ArrowLeft, MapPin, Calendar as CalendarIcon } from 'lucide-react';
 import { SCHEDULES } from '../constants';
@@ -33,39 +32,39 @@ const ProgramProgressRing: React.FC<{ program: Program; isActive: boolean; nowMi
     return Math.min(Math.max(elapsed / duration, 0), 1);
   }, [program, isActive, nowMinutes]);
 
-  const size = 160;
-  const strokeWidth = 4;
+  const size = 120;
+  const strokeWidth = 3;
   const center = size / 2;
   const radius = center - strokeWidth / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - progress * circumference;
 
   return (
-    <div className="relative flex-shrink-0 flex items-center justify-center bg-[#f2f2f2] dark:bg-[#1a1a1a] p-4 group-hover:scale-105 transition-transform duration-500">
-      <div className="relative rounded-full overflow-hidden" style={{ width: size - 32, height: size - 32 }}>
+    <div className="relative flex-shrink-0 flex items-center justify-center bg-[#f2f2f2] dark:bg-[#1a1a1a] p-3 group-hover:scale-105 transition-transform duration-500">
+      <div className="relative rounded-full overflow-hidden" style={{ width: size - 24, height: size - 24 }}>
         <img 
           src={program.image} 
           alt="" 
           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" 
         />
         <svg 
-          width={size - 32} 
-          height={size - 32} 
+          width={size - 24} 
+          height={size - 24} 
           className="absolute inset-0 -rotate-90 pointer-events-none"
         >
           <circle 
-            cx={(size - 32) / 2} cy={(size - 32) / 2} r={(size - 32) / 2 - strokeWidth / 2} 
+            cx={(size - 24) / 2} cy={(size - 24) / 2} r={(size - 24) / 2 - strokeWidth / 2} 
             stroke="#dbdbdb" strokeWidth={strokeWidth} 
             fill="transparent" 
             className="dark:stroke-white/10"
           />
           {isActive && (
             <circle 
-              cx={(size - 32) / 2} cy={(size - 32) / 2} r={(size - 32) / 2 - strokeWidth / 2} 
+              cx={(size - 24) / 2} cy={(size - 24) / 2} r={(size - 24) / 2 - strokeWidth / 2} 
               stroke="#ff6600" strokeWidth={strokeWidth} 
               fill="transparent" 
-              strokeDasharray={2 * Math.PI * ((size - 32) / 2 - strokeWidth / 2)}
-              strokeDashoffset={2 * Math.PI * ((size - 32) / 2 - strokeWidth / 2) - progress * 2 * Math.PI * ((size - 32) / 2 - strokeWidth / 2)}
+              strokeDasharray={2 * Math.PI * ((size - 24) / 2 - strokeWidth / 2)}
+              strokeDashoffset={2 * Math.PI * ((size - 24) / 2 - strokeWidth / 2) - progress * 2 * Math.PI * ((size - 24) / 2 - strokeWidth / 2)}
               strokeLinecap="butt"
               className="transition-all duration-1000"
             />
@@ -117,7 +116,6 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
 
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
-  // Automatic scroll to live program on mount
   useEffect(() => {
     const scrollInterval = setTimeout(() => {
       const liveElement = document.querySelector('[data-live="true"]');
@@ -132,20 +130,20 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
     <section ref={listContainerRef} className="bg-white dark:bg-[#000] min-h-screen font-sans transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 py-20">
         {onBack && (
-          <button onClick={onBack} className="flex items-center text-gray-400 hover:text-[#ff6600] transition-colors mb-6 text-xs font-regular uppercase tracking-widest">
+          <button onClick={onBack} className="flex items-center text-gray-400 hover:text-[#ff6600] transition-colors mb-6 text-xs font-normal uppercase tracking-widest">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back Home
           </button>
         )}
         
         <div className="flex flex-col md:flex-row md:items-baseline md:space-x-4 mb-12 border-b-4 border-black dark:border-white pb-6">
-          <h1 className="text-5xl md:text-7xl font-black text-gray-900 dark:text-white uppercase tracking-tighter leading-none">Schedule</h1>
-          <p className="text-gray-400 font-regular uppercase tracking-[0.2em] text-sm mt-4 md:mt-0">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white uppercase tracking-tight leading-none">Schedule</h1>
+          <p className="text-gray-400 font-normal uppercase tracking-wide text-sm mt-4 md:mt-0">
             Today • {now.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
         </div>
 
         <div className="sticky top-16 z-[40] bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-gray-100 dark:border-white/5 py-4 mb-16 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <div className="flex items-center space-x-6 text-[11px] font-black uppercase tracking-[0.2em] overflow-x-auto no-scrollbar">
+          <div className="flex items-center space-x-6 text-[11px] font-semibold uppercase tracking-wide overflow-x-auto no-scrollbar">
             <span className="text-gray-400 flex-shrink-0">JUMP TO:</span>
             <div className="flex items-center space-x-6 whitespace-nowrap">
               {(Object.keys(sections) as string[]).map((title) => (
@@ -169,12 +167,12 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
 
         {(Object.entries(sections) as [string, Program[]][]).map(([title, items]) => (
           items.length > 0 && (
-            <div key={title} id={title} className="mb-24 scroll-mt-32">
-              <h3 className="bbc-section-title text-2xl dark:text-white mb-10 uppercase">
+            <div key={title} id={title} className="mb-20 scroll-mt-32">
+              <h3 className="text-xl font-semibold dark:text-white mb-8 uppercase tracking-tight">
                 {title}
               </h3>
               
-              <div className="space-y-12">
+              <div className="space-y-8">
                 {items.map((prog) => {
                   const active = isLiveNow(prog.startTime, prog.endTime);
                   return (
@@ -182,20 +180,20 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
                       key={prog.id}
                       data-live={active}
                       onClick={() => onNavigateToProgram(prog)}
-                      className={`relative flex flex-col md:flex-row items-start p-8 transition-all cursor-pointer group rounded-sm ${active ? 'bg-gray-50 dark:bg-white/5 border-l-[16px] border-[#ff6600] shadow-xl' : 'border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5'}`}
+                      className={`relative flex flex-col md:flex-row items-start p-6 transition-all cursor-pointer group rounded-sm ${active ? 'bg-gray-50 dark:bg-white/5 border-l-8 border-[#ff6600] shadow-lg' : 'border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5'}`}
                     >
-                      <div className="w-40 flex-shrink-0 flex flex-col mb-8 md:mb-0 pt-2">
-                        <span className={`text-4xl font-black tracking-tighter ${active ? 'text-[#ff6600]' : 'text-gray-300 dark:text-gray-700 group-hover:text-black dark:group-hover:text-white'}`}>
+                      <div className="w-32 flex-shrink-0 flex flex-col mb-6 md:mb-0 pt-1">
+                        <span className={`text-2xl font-bold tracking-tight ${active ? 'text-[#ff6600]' : 'text-gray-300 dark:text-gray-700 group-hover:text-black dark:group-hover:text-white'}`}>
                           {format12h(prog.startTime)}
                         </span>
                         {active && (
-                          <div className="mt-4 inline-flex items-center justify-center bg-[#ff6600] text-white text-[11px] font-black px-4 py-1.5 uppercase tracking-widest w-28">
+                          <div className="mt-3 inline-flex items-center justify-center bg-[#ff6600] text-white text-[10px] font-bold px-3 py-1 uppercase tracking-wider w-24">
                             ON AIR
                           </div>
                         )}
                       </div>
 
-                      <div className="md:mx-12">
+                      <div className="md:mx-8">
                         <ProgramProgressRing 
                           program={prog} 
                           isActive={active} 
@@ -203,20 +201,20 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
                         />
                       </div>
 
-                      <div className="flex-grow min-w-0 pt-2">
-                        <h4 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white group-hover:text-[#ff6600] leading-none tracking-tighter mb-4 truncate uppercase transition-all duration-300">
+                      <div className="flex-grow min-w-0 pt-1">
+                        <h4 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#ff6600] leading-tight tracking-tight mb-2 transition-all duration-300">
                           {prog.title}
                         </h4>
-                        <p className="text-gray-500 dark:text-gray-400 font-regular text-xl mb-6 uppercase tracking-tight">
+                        <p className="text-gray-500 dark:text-gray-400 font-normal text-base mb-4 tracking-tight">
                           with {prog.host}
                         </p>
-                        <p className="text-gray-600 dark:text-gray-300 text-lg line-clamp-2 leading-relaxed font-normal max-w-3xl uppercase tracking-tight">
+                        <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 leading-relaxed font-normal max-w-2xl">
                           {prog.description}
                         </p>
                         {active && (
-                          <div className="mt-8 flex items-center space-x-4">
-                             <div className="h-1.5 w-12 bg-[#ff6600] animate-pulse"></div>
-                             <span className="text-[11px] font-black text-[#ff6600] uppercase tracking-[0.4em]">Listening now live</span>
+                          <div className="mt-6 flex items-center space-x-3">
+                             <div className="h-1 w-10 bg-[#ff6600] animate-pulse"></div>
+                             <span className="text-[10px] font-semibold text-[#ff6600] uppercase tracking-wider">Listening now live</span>
                           </div>
                         )}
                       </div>
