@@ -114,43 +114,44 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         </div>
 
         <div className="flex-grow overflow-y-auto">
-          <div className="flex items-center p-6 border-b border-gray-100 dark:border-white/5 space-x-6 bg-gray-50/50 dark:bg-white/5">
-            <div className="w-[84px] h-[84px] flex-shrink-0 shadow-sm">
+          <div className="flex items-center p-4 border-b border-gray-100 dark:border-white/5 space-x-4 bg-gray-50/50 dark:bg-white/5">
+            <div className="w-16 h-16 flex-shrink-0">
                <img src={program.image} className="w-full h-full object-cover" alt="" />
             </div>
             <div className="flex flex-col min-w-0 flex-grow">
-              <div className="flex items-center space-x-2 mb-1">
-                <span className="text-[10px] font-semibold text-[#ff6600] uppercase tracking-widest">Live Now</span>
-              </div>
-              <span className="font-semibold text-xl text-black dark:text-white leading-tight mb-1 truncate">
+              <span className="font-bold text-base text-black dark:text-white leading-tight mb-1 truncate">
                 {program.title} with {program.host}
               </span>
-              <span className="text-gray-400 dark:text-gray-500 text-xs font-normal">
-                {new Date().toLocaleDateString('en-GB')}
+              <span className="text-gray-500 dark:text-gray-400 text-xs mb-0.5 truncate">
+                {program.host}
               </span>
-              <span className="text-gray-400 dark:text-gray-500 text-xs font-normal">{program.startTime} - {program.endTime}</span>
+              <div className="flex items-center space-x-2">
+                <span className="text-[10px] font-semibold text-[#ff6600] uppercase tracking-wide">Live Now</span>
+                <span className="text-gray-400 dark:text-gray-500 text-xs">{program.startTime} - {program.endTime}</span>
+              </div>
             </div>
           </div>
           
-          {queue && queue.map((prog) => (
-            <div key={prog.id} className="flex items-center p-6 border-b border-gray-100 dark:border-white/5 space-x-6">
-              <div className="w-[84px] h-[84px] flex-shrink-0">
+          {queue && queue.slice(0, 6).map((prog) => (
+            <div key={prog.id} className="flex items-center p-4 border-b border-gray-100 dark:border-white/5 space-x-4 hover:bg-gray-50/30 dark:hover:bg-white/5 transition-colors">
+              <div className="w-16 h-16 flex-shrink-0">
                 <img src={prog.image} className="w-full h-full object-cover" alt="" />
               </div>
               <div className="flex flex-col min-w-0 flex-grow">
-                <span className="font-semibold text-lg text-black dark:text-white leading-tight mb-1 truncate">
+                <span className="font-bold text-base text-black dark:text-white leading-tight mb-1 truncate">
                   {prog.title}
                 </span>
-                <span className="text-gray-500 dark:text-gray-400 text-sm mb-1 truncate">
+                <span className="text-gray-500 dark:text-gray-400 text-xs mb-0.5 truncate">
                   {prog.host}
-                </span>
-                <span className="text-gray-400 dark:text-gray-500 text-xs">
-                  {new Date().toLocaleDateString('en-GB')}
                 </span>
                 <span className="text-gray-400 dark:text-gray-500 text-xs">{prog.startTime} - {prog.endTime}</span>
               </div>
             </div>
           ))}
+          
+          <div className="p-6 text-center">
+            <p className="text-xs text-gray-400 dark:text-gray-500">End of schedule</p>
+          </div>
         </div>
       </div>
 
