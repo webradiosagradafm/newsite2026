@@ -10,7 +10,7 @@ const WEEKDAY_SCHEDULE = [
     host: "Daniel Brooks",
     startTime: "00:00",
     endTime: "06:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Daniel_Brooks_iukwmr.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882820/Daniel_Brooks_bcammc.png"
   },
   {
     id: 2,
@@ -18,7 +18,7 @@ const WEEKDAY_SCHEDULE = [
     host: "Praise FM USA",
     startTime: "06:00",
     endTime: "07:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Praise_FM_Worship_lqymcl.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Worship_ypenw8.png"
   },
   {
     id: 3,
@@ -26,7 +26,7 @@ const WEEKDAY_SCHEDULE = [
     host: "Stancy Campbell",
     startTime: "07:00",
     endTime: "12:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Stancy_Campbell_xkwprb.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882823/Stancy_Campbell_oair1x.png"
   },
   {
     id: 4,
@@ -34,7 +34,7 @@ const WEEKDAY_SCHEDULE = [
     host: "Praise FM USA",
     startTime: "12:00",
     endTime: "13:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Praise_FM_Worship_lqymcl.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Worship_ypenw8.png"
   },
   {
     id: 5,
@@ -42,7 +42,7 @@ const WEEKDAY_SCHEDULE = [
     host: "Michael Ray",
     startTime: "13:00",
     endTime: "16:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Michael_Ray_kz8rea.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882821/Michael_Ray_u4bkfd.png"
   },
   {
     id: 6,
@@ -50,7 +50,7 @@ const WEEKDAY_SCHEDULE = [
     host: "Praise FM USA",
     startTime: "16:00",
     endTime: "17:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Non_Stop_ntwfkt.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Non_Stop_ipfman.png"
   },
   {
     id: 7,
@@ -58,7 +58,7 @@ const WEEKDAY_SCHEDULE = [
     host: "Sarah Jordan",
     startTime: "17:00",
     endTime: "18:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Sarah_Jordan_zgvxuu.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882821/Sarah_Jordan_uecxmi.png"
   },
   {
     id: 8,
@@ -66,7 +66,7 @@ const WEEKDAY_SCHEDULE = [
     host: "Rachael Harris",
     startTime: "18:00",
     endTime: "20:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Rachael_Harris_gywdjb.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Rachel_Harris_kxjpa1.png"
   },
   {
     id: 9,
@@ -74,7 +74,7 @@ const WEEKDAY_SCHEDULE = [
     host: "Praise FM USA",
     startTime: "20:00",
     endTime: "21:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/POP_Hits_qct3ml.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Worship_ypenw8.png"
   },
   {
     id: 10,
@@ -82,7 +82,7 @@ const WEEKDAY_SCHEDULE = [
     host: "Scott Turner",
     startTime: "21:00",
     endTime: "22:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Scott_Turner_qxn3o8.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882823/Scott_Turner_hxkuxd.png"
   },
   {
     id: 11,
@@ -90,7 +90,7 @@ const WEEKDAY_SCHEDULE = [
     host: "Praise FM USA",
     startTime: "22:00",
     endTime: "00:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Praise_FM_Worship_lqymcl.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Worship_ypenw8.png"
   }
 ];
 
@@ -102,7 +102,7 @@ const SUNDAY_SCHEDULE = [
     host: "Daniel Brooks",
     startTime: "00:00",
     endTime: "06:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Daniel_Brooks_iukwmr.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882820/Daniel_Brooks_bcammc.png"
   },
   {
     id: 2,
@@ -110,7 +110,7 @@ const SUNDAY_SCHEDULE = [
     host: "Praise FM USA",
     startTime: "06:00",
     endTime: "07:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Praise_FM_Worship_lqymcl.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Worship_ypenw8.png"
   },
   {
     id: 3,
@@ -118,7 +118,7 @@ const SUNDAY_SCHEDULE = [
     host: "Matt Riley",
     startTime: "07:00",
     endTime: "12:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Matt_Riley_Sunday_Morning_jdvkyz.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882820/Matt_Riley_b2n8fi.png"
   },
   {
     id: 4,
@@ -126,7 +126,7 @@ const SUNDAY_SCHEDULE = [
     host: "Praise FM USA",
     startTime: "12:00",
     endTime: "13:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Praise_FM_Worship_lqymcl.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Worship_ypenw8.png"
   },
   {
     id: 5,
@@ -134,7 +134,7 @@ const SUNDAY_SCHEDULE = [
     host: "Michael Ray",
     startTime: "13:00",
     endTime: "16:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Michael_Ray_kz8rea.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882821/Michael_Ray_u4bkfd.png"
   },
   {
     id: 6,
@@ -142,7 +142,7 @@ const SUNDAY_SCHEDULE = [
     host: "Praise FM USA",
     startTime: "16:00",
     endTime: "17:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Non_Stop_ntwfkt.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Non_Stop_ipfman.png"
   },
   {
     id: 7,
@@ -150,7 +150,7 @@ const SUNDAY_SCHEDULE = [
     host: "Sarah Jordan",
     startTime: "17:00",
     endTime: "18:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Sarah_Jordan_zgvxuu.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882821/Sarah_Jordan_uecxmi.png"
   },
   {
     id: 8,
@@ -158,7 +158,7 @@ const SUNDAY_SCHEDULE = [
     host: "Praise FM USA",
     startTime: "18:00",
     endTime: "20:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Praise_FM_Worship_lqymcl.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Worship_ypenw8.png"
   },
   {
     id: 9,
@@ -166,7 +166,7 @@ const SUNDAY_SCHEDULE = [
     host: "Praise FM USA",
     startTime: "20:00",
     endTime: "21:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/POP_Hits_qct3ml.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Worship_ypenw8.png"
   },
   {
     id: 10,
@@ -174,7 +174,7 @@ const SUNDAY_SCHEDULE = [
     host: "Scott Turner",
     startTime: "21:00",
     endTime: "22:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Scott_Turner_qxn3o8.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882823/Scott_Turner_hxkuxd.png"
   },
   {
     id: 11,
@@ -182,7 +182,7 @@ const SUNDAY_SCHEDULE = [
     host: "Praise FM USA",
     startTime: "22:00",
     endTime: "22:30",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Praise_FM_Worship_lqymcl.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882820/Living_the_Message_x7hmwc.png"
   },
   {
     id: 12,
@@ -190,7 +190,7 @@ const SUNDAY_SCHEDULE = [
     host: "Praise FM USA",
     startTime: "22:30",
     endTime: "00:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Praise_FM_Worship_lqymcl.webp"
+    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Worship_ypenw8.png"
   }
 ];
 
