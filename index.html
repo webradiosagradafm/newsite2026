@@ -1,130 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="/manifest.json">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Praise FM USA</title>
-    <style>
-        body, html { margin: 0; padding: 0; background: #000; font-family: 'Segoe UI', sans-serif; }
-        
-        /* INTERFACE DO NAVEGADOR */
-        #site-view { display: block; color: white; text-align: center; }
-        .install-prompt { background: #ff6600; padding: 15px; display: none; justify-content: space-between; align-items: center; }
-
-        /* INTERFACE DO APP (STANDALONE) */
-        #app-view { display: none; min-height: 100vh; background: #000; color: white; }
-        .app-header { padding: 20px; text-align: center; border-bottom: 1px solid #222; }
-        .app-logo { height: 40px; }
-        
-        /* Carrossel Estilo BBC */
-        .bbc-carousel { display: flex; overflow-x: auto; gap: 20px; padding: 20px; scrollbar-width: none; }
-        .bbc-carousel::-webkit-scrollbar { display: none; }
-        .program-card { flex: 0 0 110px; text-align: center; }
-        .img-circle { 
-            width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 10px; 
-            padding: 3px; background: #333; position: relative; 
-        }
-        .is-live .img-circle { background: linear-gradient(180deg, #ff6600, #ffcc00); }
-        .img-circle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #000; }
-        .live-tag { 
-            display: none; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
-            background: #ff6600; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: bold;
-        }
-        .is-live .live-tag { display: block; }
-    </style>
-</head>
-<body>
-
-    <div id="site-view">
-        <div id="install-banner" class="install-prompt">
-            <span>Get the full experience!</span>
-            <button onclick="doInstall()" style="border-radius:20px; padding:5px 15px; border:none; font-weight:bold;">Install the App</button>
-        </div>
-        <div style="padding: 100px 20px;">
-            <h1>Praise FM USA</h1>
-            <p>Access our site from your mobile browser and install the app for the custom player view.</p>
-        </div>
-    </div>
-
-    <div id="app-view">
-        <header class="app-header">
-            <img src="/logo.png" class="app-logo" alt="Praise FM">
-        </header>
-        <div class="bbc-carousel" id="praiseCarousel"></div>
-        <div style="position:fixed; bottom:30px; width:100%; text-align:center;">
-             <button style="background:#ff6600; color:white; border:none; padding:15px 60px; border-radius:30px; font-weight:bold; font-size:18px;">PLAY LIVE</button>
-        </div>
-    </div>
-
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#ff6600" />
+    
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <script>
-        // Lógica de Programação baseada no arquivo NEW SCHEDULE 
-        const schedule = [
-            { h: 0, d: "12:00 AM", n: "Midnight Grace", host: "Daniel Brooks", img: "daniel.jpg" },
-            { h: 6, d: "06:00 AM", n: "Praise FM Worship", host: "Worship", img: "worship.jpg" },
-            { h: 7, d: "07:00 AM", n: "Morning Show", host: "Stancy Cambpell", img: "stancy.jpg" },
-            { h: 12, d: "12:00 PM", n: "Praise FM Worship", host: "Worship", img: "worship.jpg" },
-            { h: 13, d: "01:00 PM", n: "Midday Grace", host: "Michael Ray", img: "michael.jpg" },
-            { h: 16, d: "04:00 PM", n: "Praise FM Non Stop", host: "Non Stop", img: "worship.jpg" },
-            { h: 17, d: "05:00 PM", n: "Future Artists", host: "Sarah Jordan", img: "sarah.jpg" },
-            { h: 18, d: "06:00 PM", n: "Carpool", host: "Rachael Harris", img: "rachael.jpg" },
-            { h: 20, d: "08:00 PM", n: "Praise FM POP", host: "Music", img: "pop.jpg" },
-            { h: 21, d: "09:00 PM", n: "Classics", host: "Scott Turner", img: "scott.jpg" },
-            { h: 22, d: "10:00 PM", n: "Praise FM Worship", host: "Worship", img: "worship.jpg" }
-        ];
-
-        function renderApp() {
-            const container = document.getElementById('praiseCarousel');
-            const chicagoTime = new Intl.DateTimeFormat("en-US", {timeZone: "America/Chicago", hour: "numeric", hour12: false}).format(new Date());
-            const hour = parseInt(chicagoTime);
-            const day = new Date().getDay(); // 0 = Domingo, 3 = Quarta
-
-            container.innerHTML = schedule.map((item, index) => {
-                let name = item.n;
-                // Ajuste Especial Quarta [cite: 1]
-                if(day === 3 && item.h === 20) name = "Praise FM Live Show";
-                // Ajuste Especial Domingo [cite: 2]
-                if(day === 0 && item.h === 7) name = "Sunday Morning With Christ";
-                if(day === 0 && item.h === 22) name = "Living The Message";
-
-                const nextHour = schedule[index + 1] ? schedule[index + 1].h : 24;
-                const isLive = hour >= item.h && hour < nextHour;
-
-                return `
-                    <div class="program-card ${isLive ? 'is-live' : ''}">
-                        <div class="img-circle">
-                            <img src="/images/${item.img}" onerror="this.src='/images/default.jpg'">
-                            <div class="live-tag">LIVE</div>
-                        </div>
-                        <div style="font-size:12px; font-weight:bold;">${name}</div>
-                        <div style="font-size:10px; color:#888;">${item.d}</div>
-                    </div>`;
-            }).join('');
-        }
-
-        // DETECTAR MODO STANDALONE
-        function init() {
-            const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-            if (isPWA) {
-                document.getElementById('app-view').style.display = 'block';
-                document.getElementById('site-view').style.display = 'none';
-                renderApp();
-            }
-        }
-
-        // INSTALAÇÃO
-        let promptEvt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            promptEvt = e;
-            document.getElementById('install-banner').style.display = 'flex';
-        });
-
-        function doInstall() {
-            if(promptEvt) { promptEvt.prompt(); promptEvt = null; }
-        }
-
-        window.onload = init;
+      tailwind.config = {
+        darkMode: 'class',
+      }
     </script>
-</body>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('✅ SW registered'))
+            .catch(err => console.log('❌ SW failed:', err));
+        });
+      }
+    </script>
+  </body>
 </html>
