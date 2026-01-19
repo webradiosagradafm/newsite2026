@@ -8,7 +8,7 @@ import RecentlyPlayed from './components/RecentlyPlayed';
 import ScheduleList from './components/ScheduleList';
 import LoginPage from './pages/LoginPage';
 
-// URL de streaming fornecida 
+// URL de streaming e metadados da Zeno FM [cite: 1]
 const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv';
 
 const AppContent: React.FC = () => {
@@ -16,7 +16,6 @@ const AppContent: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const navigate = useNavigate();
 
-  // Inicializa o áudio apenas uma vez
   useEffect(() => {
     audioRef.current = new Audio(STREAM_URL);
     audioRef.current.crossOrigin = "anonymous";
@@ -40,7 +39,7 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-[#000] text-black dark:text-white">
-      {/* Navbar com as propriedades exigidas  */}
+      {/* Navbar configurada para evitar o erro ts(2741)  */}
       <Navbar 
         activeTab="home" 
         theme="dark" 
@@ -51,7 +50,7 @@ const AppContent: React.FC = () => {
         <Routes>
           <Route path="/" element={
             <>
-              {/* Hero com as propriedades exigidas  */}
+              {/* Hero configurado para tocar o áudio da Zeno [cite: 1, 8] */}
               <Hero 
                 onListenClick={togglePlayback} 
                 isPlaying={isPlaying} 
