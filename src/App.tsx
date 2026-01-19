@@ -24,6 +24,7 @@ import EventsPage from './pages/EventsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfUsePage from './pages/TermsOfUsePage';
 import CookiesPolicyPage from './pages/CookiesPolicyPage';
+import AppHomePage from './pages/AppHomePage';
 import { SCHEDULES } from './constants';
 import { Program } from './types';
 
@@ -216,13 +217,18 @@ const AppContent: React.FC = () => {
 
   const activeTab = location.pathname === '/' ? 'home' : location.pathname.split('/')[1];
 
+  // Verifica se está na rota do app (sem navbar/footer)
+  const isAppRoute = location.pathname === '/app';
+
   return (
     <div className="min-h-screen flex flex-col pb-[120px] bg-white text-black dark:bg-[#121212] dark:text-white transition-colors duration-300">
-      <Navbar 
-        activeTab={activeTab} 
-        theme={theme}
-        onToggleTheme={() => setTheme(prev => prev === 'light' ? 'dark' : 'light')}
-      />
+      {!isAppRoute && (
+        <Navbar 
+          activeTab={activeTab} 
+          theme={theme}
+          onToggleTheme={() => setTheme(prev => prev === 'light' ? 'dark' : 'light')}
+        />
+      )}
       
       <main className="flex-grow">
         {selectedProgram ? (
@@ -241,6 +247,7 @@ const AppContent: React.FC = () => {
                 <RecentlyPlayed tracks={trackHistory} />
               </>
             } />
+            <Route path="/app" element={<AppHomePage />} />
             <Route path="/music" element={<Playlist />} />
             <Route path="/new-releases" element={<NewReleasesPage />} />
             <Route path="/live-recordings" element={<LiveRecordingsPage />} />
@@ -263,8 +270,8 @@ const AppContent: React.FC = () => {
         )}
       </main>
 
-      <Footer />
-      {currentProgram && (
+      {!isAppRoute && <Footer />}
+      {!isAppRoute && currentProgram && (
         <LivePlayerBar 
           isPlaying={isPlaying} 
           onTogglePlayback={togglePlayback} 
