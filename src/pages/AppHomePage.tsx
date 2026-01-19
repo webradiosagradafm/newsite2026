@@ -57,7 +57,7 @@ const AppHomePage: React.FC = () => {
         >
           {stations.map((s, i) => (
             <SwiperSlide key={i} className="flex flex-col items-center">
-              {({ isActive }) => (
+              {({ isActive }: { isActive: boolean }) => (
                 <div 
                   onClick={s.live && isActive ? handleTogglePlay : undefined}
                   className={`relative transition-all duration-700 ${isActive ? 'scale-110 -translate-y-4' : 'scale-75 opacity-30 grayscale'}`}

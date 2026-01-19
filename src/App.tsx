@@ -15,21 +15,17 @@ import AppHomePage from './pages/AppHomePage';
 import { SCHEDULES } from './constants';
 import { Program } from './types';
 
-// URLs Oficiais do Projeto
-const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv'; 
-const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv'; 
+const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv';
 
 const AppContent: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Detecta se o app está rodando de forma instalada (PWA) 
   useEffect(() => {
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
-                       || (window.navigator as any).standalone;
-
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     if (isStandalone && location.pathname === '/') {
       navigate('/app');
     }
@@ -47,24 +43,50 @@ const AppContent: React.FC = () => {
   };
 
   useEffect(() => {
-    audioRef.current = new Audio(STREAM_URL); 
+    audioRef.current = new Audio(STREAM_URL);
     audioRef.current.crossOrigin = "anonymous";
     return () => {
       if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
     };
   }, []);
 
+  const handleNavigateToProgram = (program: Program) => {
+    setSelectedProgram(program);
+    window.scrollTo(0, 0);
+  };
+
   const isAppRoute = location.pathname === '/app';
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-black dark:bg-[#000] dark:text-white">
-      {!isAppRoute && <Navbar theme="dark" onToggleTheme={() => {}} />} 
+    <div className="min-h-screen flex flex-col bg-white text-black dark:bg-[#000] dark:text-white transition-colors duration-300">
+      {!isAppRoute && (
+        <Navbar 
+          activeTab={location.pathname === '/' ? 'home' : location.pathname.split('/')[1]} 
+          theme="dark"
+          onToggleTheme={() => {}} 
+        />
+      )}
       
       <main className="flex-grow">
         <Routes>
-          <Route path="/" element={<Hero onListenClick={togglePlayback} isPlaying={isPlaying} />} />
+          <Route path="/" element={
+            <>
+              <Hero 
+                onListenClick={togglePlayback} 
+                isPlaying={isPlaying} 
+                liveMetadata={null} 
+                onNavigateToProgram={handleNavigateToProgram} 
+              />
+              <RecentlyPlayed tracks={[]} />
+            </>
+          } />
           <Route path="/app" element={<AppHomePage />} />
-          <Route path="/schedule" element={<ScheduleList onBack={() => navigate('/')} />} />
+          <Route path="/schedule" element={
+            <ScheduleList 
+              onNavigateToProgram={handleNavigateToProgram} 
+              onBack={() => navigate('/')} 
+            />
+          } />
           <Route path="/login" element={<LoginPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
