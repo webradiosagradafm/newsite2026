@@ -13,6 +13,24 @@
     <meta name="apple-mobile-web-app-title" content="Praise FM" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
 
+    <!-- Tailwind via CDN (temporário) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+            },
+            colors: {
+              'praise-accent': '#ff6600',
+            }
+          },
+        },
+      }
+    </script>
+
     <style>
       body {
         margin: 0;
