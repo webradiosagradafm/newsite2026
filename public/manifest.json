@@ -39,24 +39,7 @@
       "src": "/screenshot-mobile.png",
       "sizes": "390x844",
       "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Praise FM no Smartphone"
-    },
-    {
-      "src": "/screenshot-desktop.png",
-      "sizes": "1920x1080",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Praise FM no Desktop"
-    }
-  ],
-  "categories": ["music", "entertainment", "lifestyle"],
-  "shortcuts": [
-    {
-      "name": "Listen Live",
-      "short_name": "Live",
-      "url": "/#live",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "form_factor": "narrow"
     }
   ]
 }
