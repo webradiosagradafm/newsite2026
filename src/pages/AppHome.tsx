@@ -1,4 +1,4 @@
-import { ProgramCarousel } from '@/components/ProgramCarousel'
+import { ProgramCarousel } from '../components/ProgramCarousel'
 
 export default function AppHome() {
   const programs = [
