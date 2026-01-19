@@ -4,7 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Praise FM USA</title>
-    
+
+    <!-- ADICIONADO: controle de cache (não quebra nada) -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#ff6600" />
@@ -43,11 +48,18 @@
     <div id="root"></div>
 
     <script type="module" src="/src/main.tsx"></script>
-    
+
     <!-- Service Worker Registration -->
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
+        window.addEventListener('load', async () => {
+          // ADICIONADO: remove SW antigo (mobile)
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const reg of registrations) {
+            reg.unregister();
+          }
+
+          // mantém seu registro original
           navigator.serviceWorker.register('/sw.js')
             .then(reg => console.log('✅ Service Worker registered:', reg.scope))
             .catch(err => console.log('❌ Service Worker registration failed:', err));
