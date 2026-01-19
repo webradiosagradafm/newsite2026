@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './index.css';  // Adicionado para importar o CSS do Tailwind
 import App from './App';
 import { registerSW } from './registerSW';
 
