@@ -1,36 +1,117 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Praise FM USA</title>
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#ff6600" />
-    
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-      }
-    </script>
-  </head>
+<section class="praise-mobile-app">
+    <div class="bbc-container">
+        <h2 class="section-title">Schedule (Chicago Time)</h2>
+        <div class="program-carousel" id="dynamicCarousel">
+            </div>
+    </div>
+</section>
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+<style>
+    .praise-mobile-app {
+        background-color: #000;
+        padding: 20px 0;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+    .section-title {
+        color: #fff;
+        font-size: 18px;
+        margin-left: 20px;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+    .program-carousel {
+        display: flex;
+        overflow-x: auto;
+        gap: 20px;
+        padding: 0 20px 10px;
+        scrollbar-width: none;
+    }
+    .program-carousel::-webkit-scrollbar { display: none; }
     
-    <!-- Service Worker -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('✅ SW registered'))
-            .catch(err => console.log('❌ SW failed:', err));
-        });
-      }
-    </script>
-  </body>
-</html>
+    .program-item { flex: 0 0 110px; text-align: center; }
+    
+    .circle-wrap {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        padding: 3px;
+        background: #222;
+        position: relative;
+    }
+    /* Destaque para o programa AO VIVO */
+    .program-item.is-live .circle-wrap {
+        background: linear-gradient(180deg, #ff6600, #ffcc00);
+        box-shadow: 0 0 15px rgba(255, 102, 0, 0.4);
+    }
+    .circle-wrap img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #000;
+    }
+    .live-indicator {
+        display: none;
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #ff6600;
+        color: #fff;
+        font-size: 9px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    .program-item.is-live .live-indicator { display: block; }
+    .program-name { color: #fff; font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+    .program-time { color: #888; font-size: 10px; text-transform: uppercase; }
+</style>
+
+<script>
+    // Horários baseados no ficheiro NEW SCHEDULE PRAISE FM U.S. 
+    const radioSchedule = [
+        { start: 0, end: 6, display: "12:00 AM - 06:00 AM", name: "Midnight Grace", host: "Daniel Brooks", img: "daniel.jpg" },
+        { start: 6, end: 7, display: "06:00 AM - 07:00 AM", name: "Praise FM Worship", host: "Worship", img: "worship.jpg" },
+        { start: 7, end: 12, display: "07:00 AM - 12:00 PM", name: "Morning Show", host: "Stancy Cambpell", img: "stancy.jpg" },
+        { start: 12, end: 13, display: "12:00 PM - 01:00 PM", name: "Praise FM Worship", host: "Worship", img: "worship.jpg" },
+        { start: 13, end: 16, display: "01:00 PM - 04:00 PM", name: "Midday Grace", host: "Michael Ray", img: "michael.jpg" },
+        { start: 16, end: 17, display: "04:00 PM - 05:00 PM", name: "Praise FM Non Stop", host: "Non Stop", img: "worship.jpg" },
+        { start: 17, end: 18, display: "05:00 PM - 06:00 PM", name: "Future Artists", host: "Sarah Jordan", img: "sarah.jpg" },
+        { start: 18, end: 20, display: "06:00 PM - 08:00 PM", name: "Carpool", host: "Rachael Harris", img: "rachael.jpg" },
+        { start: 20, end: 21, display: "08:00 PM - 09:00 PM", name: "Praise FM POP", host: "Pop Music", img: "pop.jpg" },
+        { start: 21, end: 22, display: "09:00 PM - 10:00 PM", name: "Classics", host: "Scott Turner", img: "scott.jpg" },
+        { start: 22, end: 24, display: "10:00 PM - 12:00 AM", name: "Praise FM Worship", host: "Worship", img: "worship.jpg" }
+    ];
+
+    function buildCarousel() {
+        const carousel = document.getElementById('dynamicCarousel');
+        
+        // Obtém a hora atual em Chicago
+        const chicagoTime = new Intl.DateTimeFormat("en-US", {
+            timeZone: "America/Chicago",
+            hour: "numeric",
+            hour12: false
+        }).format(new Date());
+
+        const currentHour = parseInt(chicagoTime);
+
+        carousel.innerHTML = radioSchedule.map(prog => {
+            const isLive = currentHour >= prog.start && currentHour < prog.end;
+            return `
+                <div class="program-item ${isLive ? 'is-live' : ''}">
+                    <div class="circle-wrap">
+                        <img src="/images/${prog.img}" alt="${prog.name}" onerror="this.src='/images/default.jpg'">
+                        <div class="live-indicator">LIVE</div>
+                    </div>
+                    <div class="program-name">${prog.name}</div>
+                    <div class="program-time">${prog.display}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    buildCarousel();
+    setInterval(buildCarousel, 60000); // Atualiza a cada minuto
+</script>
