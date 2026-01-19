@@ -1,149 +1,140 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectCoverflow } from 'swiper/modules';
 
-// Se o seu App.tsx providencia o áudio via Contexto ou Props, 
-// aqui vamos simular a função de play para simplificar.
-// Se você quiser usar o player global, precisaremos de um Contexto.
+import 'swiper/css';
+import 'swiper/css/effect-coverflow';
 
 const AppHomePage: React.FC = () => {
   const navigate = useNavigate();
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  // Função para dar Play (Usando a mesma lógica do seu App.tsx)
-  const handlePlayLive = () => {
-    // Busca o elemento de áudio que o App.tsx criou globalmente ou cria um novo
-    let audio = document.querySelector('audio');
+  const stations = [
+    { name: 'Worship', host: 'Praise FM', img: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Worship_ypenw8.png' },
+    { name: 'Midday Grace', host: 'Michael Ray', img: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882821/Michael_Ray_u4bkfd.png', live: true },
+    { name: 'Non Stop', host: 'Praise FM', img: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Non_Stop_ipfman.png' },
+    { name: 'Morning Show', host: 'Sarah Jordan', img: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882821/Sarah_Jordan_uecxmi.png' }
+  ];
+
+  const handleTogglePlay = () => {
+    const audio = document.querySelector('audio');
     if (audio) {
-      if (audio.paused) {
-        audio.play();
-      } else {
-        audio.pause();
-      }
-    } else {
-      // Caso o áudio ainda não exista
-      const newAudio = new Audio('https://stream.zeno.fm/hvwifp8ezc6tv');
-      newAudio.play();
+      if (isPlaying) { audio.pause(); } else { audio.play(); }
+      setIsPlaying(!isPlaying);
     }
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white flex flex-col overflow-x-hidden font-sans">
       
-      {/* 1. HEADER (Espaçamento para Mobile) */}
-      <header className="flex justify-between items-center p-6 pt-12">
-        <div className="flex gap-2">
-          <span className="bg-[#ff6600] w-8 h-8 flex items-center justify-center rounded font-black text-sm">P</span>
-          <span className="bg-[#ff6600] w-8 h-8 flex items-center justify-center rounded font-black text-sm">F</span>
-          <span className="bg-[#ff6600] w-8 h-8 flex items-center justify-center rounded font-black text-sm">M</span>
-        </div>
-        <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold border-2 border-white/20">R</div>
+      {/* HEADER COM NOVO LOGO SVG */}
+      <header className="flex justify-between items-center p-6 pt-14">
+        <img 
+          src="https://res.cloudinary.com/dtecypmsh/image/upload/v1766869698/SVGUSA_lduiui.webp" 
+          alt="Praise FM USA" 
+          className="h-10 w-auto drop-shadow-[0_2px_4px_rgba(255,102,0,0.5)]"
+        />
+        <div className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center font-bold border border-white/20 shadow-lg">R</div>
       </header>
 
-      {/* 2. CARROSSEL EM ARCO (O segredo do visual BBC) */}
-      <section className="relative mt-4 mb-8">
-        <div className="flex items-center justify-center gap-2 px-4 h-64">
-          
-          {/* Estação Lateral Esquerda */}
-          <div className="opacity-30 scale-75 transform -translate-x-4 grayscale transition-all duration-500">
-            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20">
-              <img src="https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Worship_ypenw8.png" className="object-cover w-full h-full" alt="Worship" />
-            </div>
-            <p className="text-[10px] text-center mt-2 font-medium">Worship</p>
-          </div>
+      {/* CARROSSEL EM ARCO - ÍCONES ESTILO SVG */}
+      <section className="mt-4 mb-4 relative">
+        <Swiper
+          modules={[EffectCoverflow]}
+          effect={'coverflow'}
+          centeredSlides={true}
+          slidesPerView={2}
+          initialSlide={1}
+          coverflowEffect={{
+            rotate: 0,
+            stretch: 10,
+            depth: 150,
+            modifier: 2,
+            slideShadows: false,
+          }}
+          className="h-80"
+        >
+          {stations.map((s, i) => (
+            <SwiperSlide key={i} className="flex flex-col items-center">
+              {({ isActive }) => (
+                <div 
+                  onClick={s.live && isActive ? handleTogglePlay : undefined}
+                  className={`relative transition-all duration-700 ${isActive ? 'scale-110 -translate-y-4' : 'scale-75 opacity-30 grayscale'}`}
+                >
+                  {/* Moldura de vidro do ícone */}
+                  <div className={`relative p-1 rounded-full bg-gradient-to-tr from-white/20 to-transparent shadow-2xl`}>
+                    <div className={`rounded-full overflow-hidden border-[4px] ${isActive && s.live ? 'border-[#ff6600]' : 'border-white/10'}`}
+                         style={{ width: isActive ? '170px' : '130px', height: isActive ? '170px' : '130px' }}>
+                      <img src={s.img} className="object-cover w-full h-full" alt={s.name} />
+                    </div>
+                    
+                    {/* Badge LIVE estilo BBC */}
+                    {s.live && isActive && (
+                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white text-black text-[10px] font-black px-4 py-1 rounded shadow-xl">
+                        {isPlaying ? 'ON AIR' : 'LIVE'}
+                      </div>
+                    )}
+                  </div>
 
-          {/* ITEM CENTRAL (LIVE - O que você quer que toque) */}
-          <div 
-            onClick={handlePlayLive}
-            className="relative z-10 scale-125 transform -translate-y-4 transition-all duration-500 cursor-pointer group"
-          >
-            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[#ff6600] shadow-[0_10px_30px_rgba(255,102,0,0.3)] group-active:scale-95 transition-transform">
-              <img src="https://res.cloudinary.com/dtecypmsh/image/upload/v1766882821/Michael_Ray_u4bkfd.png" className="object-cover w-full h-full" alt="Michael Ray" />
-            </div>
-            
-            {/* Badge LIVE */}
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white text-black text-[10px] font-black px-3 py-0.5 rounded-sm tracking-tighter">
-              LIVE
-            </div>
-
-            <div className="text-center mt-6">
-              <h2 className="text-xl font-black tracking-tight">Midday Grace</h2>
-              <p className="text-xs text-gray-400 font-medium">with Michael Ray</p>
-            </div>
-          </div>
-
-          {/* Estação Lateral Direita */}
-          <div className="opacity-30 scale-75 transform translate-x-4 grayscale transition-all duration-500">
-            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20">
-              <img src="https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Non_Stop_ipfman.png" className="object-cover w-full h-full" alt="Non Stop" />
-            </div>
-            <p className="text-[10px] text-center mt-2 font-medium">Non Stop</p>
-          </div>
-
-        </div>
+                  {/* Legenda Ativa */}
+                  {isActive && (
+                    <div className="text-center mt-8 animate-[fadeIn_0.5s_ease-out]">
+                      <h2 className="text-2xl font-black tracking-tighter italic uppercase">{s.name}</h2>
+                      <p className="text-[#ff6600] text-[10px] font-black tracking-[0.2em] uppercase">{s.host}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </section>
 
-      {/* 3. TÍTULO PRINCIPAL E BOTÃO */}
-      <div className="px-8 text-center mt-4">
-        <h1 className="text-3xl font-black mb-6 leading-tight">Praise FM United States</h1>
-        
+      {/* BOTÃO PRINCIPAL */}
+      <div className="px-8 mb-10">
         <button 
           onClick={() => navigate('/schedule')}
-          className="w-full py-3.5 border border-white/30 rounded-lg flex justify-between items-center px-6 font-bold hover:bg-white/5 transition-colors"
+          className="w-full py-4 bg-[#111] border border-white/10 rounded-2xl flex justify-between items-center px-6 group active:scale-95 transition-all"
         >
-          Stations & schedules 
-          <span className="text-[#ff6600] text-2xl leading-none">›</span>
+          <span className="font-bold text-gray-200">Stations & schedules</span>
+          <span className="text-[#ff6600] text-3xl font-light">›</span>
         </button>
       </div>
 
-      {/* 4. RECENTLY PLAYED (Simulado para o visual) */}
-      <div className="mt-12 px-8">
-        <div className="flex justify-between items-end mb-4">
-          <h3 className="text-xl font-bold">Recently Played</h3>
-          <span className="text-gray-400 text-sm">View all</span>
-        </div>
-        
-        <div className="bg-[#1a1a1a] rounded-xl p-4 flex items-center gap-4">
-          <div className="w-16 h-16 bg-[#333] rounded-lg flex items-center justify-center">
-            <svg className="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+      {/* RECENTLY PLAYED ESTILO CARD */}
+      <div className="px-8 pb-32">
+        <h3 className="text-[11px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Recently Played</h3>
+        <div className="bg-gradient-to-r from-[#111] to-black border border-white/5 rounded-3xl p-5 flex items-center gap-5">
+          <div className="w-16 h-16 bg-[#222] rounded-2xl flex items-center justify-center shadow-inner">
+            <span className="text-3xl">🎵</span>
           </div>
           <div className="flex-grow">
-            <p className="font-bold text-sm">Morning Worship</p>
-            <p className="text-xs text-gray-500">Contemporary Christian</p>
-            <div className="w-full bg-gray-800 h-1 mt-2 rounded-full overflow-hidden">
-               <div className="bg-[#ff6600] w-1/3 h-full"></div>
-            </div>
+            <p className="text-sm font-black text-white">Morning Worship</p>
+            <p className="text-[10px] text-praise-accent font-bold uppercase">Praise FM USA</p>
           </div>
-          <div className="w-10 h-10 border-2 border-white rounded-full flex items-center justify-center">
-             <div className="ml-1 w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent"></div>
+          <div className="w-12 h-12 rounded-full border-2 border-white/20 flex items-center justify-center group-active:bg-white transition-all">
+            <div className="ml-1 w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent"></div>
           </div>
         </div>
       </div>
 
-      {/* 5. TAB BAR (Igual ao seu print) */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-[#0c0c0c] border-t border-white/10 flex justify-around p-3 pb-6">
-        <div className="flex flex-col items-center text-[#ff6600]" onClick={() => navigate('/')}>
-          <span className="text-xl">🏠</span>
-          <span className="text-[10px] mt-1">Home</span>
-        </div>
-        <div className="flex flex-col items-center text-gray-500" onClick={() => navigate('/music')}>
-          <span className="text-xl">♫</span>
-          <span className="text-[10px] mt-1">Music</span>
-        </div>
-        <div className="flex flex-col items-center text-gray-500" onClick={() => navigate('/schedule')}>
-          <span className="text-xl">📅</span>
-          <span className="text-[10px] mt-1">Schedule</span>
-        </div>
-        <div className="flex flex-col items-center text-gray-500" onClick={() => navigate('/my-sounds')}>
-          <span className="text-xl">👤</span>
-          <span className="text-[10px] mt-1">My Sounds</span>
-        </div>
-        <div className="flex flex-col items-center text-gray-500">
-          <span className="text-xl">🔍</span>
-          <span className="text-[10px] mt-1">Search</span>
-        </div>
+      {/* NAV BAR INFERIOR (FIXA) */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-xl border-t border-white/10 flex justify-around pt-4 pb-10 z-50">
+        <TabItem icon="🏠" label="Home" active onClick={() => navigate('/')} />
+        <TabItem icon="♫" label="Music" onClick={() => navigate('/music')} />
+        <TabItem icon="📅" label="Schedule" onClick={() => navigate('/schedule')} />
+        <TabItem icon="👤" label="My Sounds" onClick={() => navigate('/my-sounds')} />
       </nav>
-
     </div>
   );
 };
+
+const TabItem = ({ icon, label, active = false, onClick }: any) => (
+  <button onClick={onClick} className={`flex flex-col items-center ${active ? 'text-[#ff6600]' : 'text-gray-500'}`}>
+    <span className="text-2xl mb-1">{icon}</span>
+    <span className="text-[10px] font-black uppercase tracking-tighter">{label}</span>
+  </button>
+);
 
 export default AppHomePage;
