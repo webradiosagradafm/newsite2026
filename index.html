@@ -6,98 +6,125 @@
     <link rel="manifest" href="/manifest.json">
     <title>Praise FM USA</title>
     <style>
-        body, html { margin: 0; padding: 0; background: #000; font-family: sans-serif; }
+        body, html { margin: 0; padding: 0; background: #000; font-family: 'Segoe UI', sans-serif; }
         
-        /* INTERFACE DO SITE (VISÍVEL NO NAVEGADOR) */
-        #standard-site-interface { display: block; color: white; text-align: center; padding-top: 50px; }
-        .install-banner { background: #ff6600; padding: 20px; position: fixed; top: 0; width: 100%; z-index: 100; }
+        /* INTERFACE DO NAVEGADOR */
+        #site-view { display: block; color: white; text-align: center; }
+        .install-prompt { background: #ff6600; padding: 15px; display: none; justify-content: space-between; align-items: center; }
 
-        /* INTERFACE DO APP (SÓ NO MODO STANDALONE) */
-        #pwa-app-interface { display: none; background: #000; min-height: 100vh; }
-        .app-header { text-align: center; padding: 30px 0; }
-        .bbc-carousel { display: flex; overflow-x: auto; gap: 15px; padding: 20px; scrollbar-width: none; }
+        /* INTERFACE DO APP (STANDALONE) */
+        #app-view { display: none; min-height: 100vh; background: #000; color: white; }
+        .app-header { padding: 20px; text-align: center; border-bottom: 1px solid #222; }
+        .app-logo { height: 40px; }
+        
+        /* Carrossel Estilo BBC */
+        .bbc-carousel { display: flex; overflow-x: auto; gap: 20px; padding: 20px; scrollbar-width: none; }
         .bbc-carousel::-webkit-scrollbar { display: none; }
-        .bbc-item { flex: 0 0 115px; text-align: center; color: white; }
-        .circle-wrap { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 10px; padding: 3px; background: #333; position: relative; }
-        .is-live .circle-wrap { background: linear-gradient(180deg, #ff6600, #ffcc00); }
-        .circle-wrap img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #000; }
-        .live-badge { display: none; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ff6600; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
-        .is-live .live-badge { display: block; }
+        .program-card { flex: 0 0 110px; text-align: center; }
+        .img-circle { 
+            width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 10px; 
+            padding: 3px; background: #333; position: relative; 
+        }
+        .is-live .img-circle { background: linear-gradient(180deg, #ff6600, #ffcc00); }
+        .img-circle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #000; }
+        .live-tag { 
+            display: none; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+            background: #ff6600; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: bold;
+        }
+        .is-live .live-tag { display: block; }
     </style>
 </head>
 <body>
 
-    <div id="standard-site-interface">
-        <div id="install-banner" class="install-banner" style="display:none;">
-            <span>Install the Praise FM App for a better experience!</span>
-            <button onclick="installApp()" style="margin-left:15px; padding: 8px 16px; border-radius: 20px; border:none; font-weight:bold;">INSTALL</button>
+    <div id="site-view">
+        <div id="install-banner" class="install-prompt">
+            <span>Get the full experience!</span>
+            <button onclick="doInstall()" style="border-radius:20px; padding:5px 15px; border:none; font-weight:bold;">Install the App</button>
         </div>
-        <h1>Praise FM USA Website</h1>
-        <p>Visit us on your mobile browser to install our custom app interface.</p>
+        <div style="padding: 100px 20px;">
+            <h1>Praise FM USA</h1>
+            <p>Access our site from your mobile browser and install the app for the custom player view.</p>
+        </div>
     </div>
 
-    <div id="pwa-app-interface">
-        <div class="app-header">
-            <img src="/logo.png" alt="Praise FM" style="height: 50px;">
-        </div>
-        <div class="bbc-carousel" id="dynamicCarousel"></div>
-        <div style="text-align:center; margin-top:50px;">
-            <button style="background:#ff6600; color:white; border:none; padding:15px 50px; border-radius:30px; font-weight:bold;">PLAY LIVE</button>
+    <div id="app-view">
+        <header class="app-header">
+            <img src="/logo.png" class="app-logo" alt="Praise FM">
+        </header>
+        <div class="bbc-carousel" id="praiseCarousel"></div>
+        <div style="position:fixed; bottom:30px; width:100%; text-align:center;">
+             <button style="background:#ff6600; color:white; border:none; padding:15px 60px; border-radius:30px; font-weight:bold; font-size:18px;">PLAY LIVE</button>
         </div>
     </div>
 
     <script>
+        // Lógica de Programação baseada no arquivo NEW SCHEDULE 
         const schedule = [
-            { s: 0, e: 6, display: "12:00 AM - 06:00 AM", name: "Midnight Grace", host: "Daniel Brooks", img: "daniel.jpg" }, // 
-            { s: 6, e: 7, display: "06:00 AM - 07:00 AM", name: "Praise FM Worship", host: "Worship", img: "worship.jpg" }, // 
-            { s: 7, e: 12, display: "07:00 AM - 12:00 PM", name: "Morning Show", host: "Stancy Cambpell", img: "stancy.jpg" }, // 
-            { s: 12, e: 13, display: "12:00 PM - 01:00 PM", name: "Praise FM Worship", host: "Worship", img: "worship.jpg" }, // 
-            { s: 13, e: 16, display: "01:00 PM - 04:00 PM", name: "Midday Grace", host: "Michael Ray", img: "michael.jpg" }, // 
-            { s: 21, e: 22, display: "09:00 PM - 10:00 PM", name: "Classics", host: "Scott Turner", img: "scott.jpg" } // 
+            { h: 0, d: "12:00 AM", n: "Midnight Grace", host: "Daniel Brooks", img: "daniel.jpg" },
+            { h: 6, d: "06:00 AM", n: "Praise FM Worship", host: "Worship", img: "worship.jpg" },
+            { h: 7, d: "07:00 AM", n: "Morning Show", host: "Stancy Cambpell", img: "stancy.jpg" },
+            { h: 12, d: "12:00 PM", n: "Praise FM Worship", host: "Worship", img: "worship.jpg" },
+            { h: 13, d: "01:00 PM", n: "Midday Grace", host: "Michael Ray", img: "michael.jpg" },
+            { h: 16, d: "04:00 PM", n: "Praise FM Non Stop", host: "Non Stop", img: "worship.jpg" },
+            { h: 17, d: "05:00 PM", n: "Future Artists", host: "Sarah Jordan", img: "sarah.jpg" },
+            { h: 18, d: "06:00 PM", n: "Carpool", host: "Rachael Harris", img: "rachael.jpg" },
+            { h: 20, d: "08:00 PM", n: "Praise FM POP", host: "Music", img: "pop.jpg" },
+            { h: 21, d: "09:00 PM", n: "Classics", host: "Scott Turner", img: "scott.jpg" },
+            { h: 22, d: "10:00 PM", n: "Praise FM Worship", host: "Worship", img: "worship.jpg" }
         ];
 
-        function checkDisplayMode() {
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-            if (isStandalone) {
-                document.getElementById('pwa-app-interface').style.display = 'block';
-                document.getElementById('standard-site-interface').style.display = 'none';
-                renderApp();
-            }
-        }
-
         function renderApp() {
-            const container = document.getElementById('dynamicCarousel');
-            const chicagoHour = parseInt(new Intl.DateTimeFormat("en-US", {timeZone: "America/Chicago", hour: "numeric", hour12: false}).format(new Date()));
+            const container = document.getElementById('praiseCarousel');
+            const chicagoTime = new Intl.DateTimeFormat("en-US", {timeZone: "America/Chicago", hour: "numeric", hour12: false}).format(new Date());
+            const hour = parseInt(chicagoTime);
+            const day = new Date().getDay(); // 0 = Domingo, 3 = Quarta
 
-            container.innerHTML = schedule.map(item => {
-                const isLive = chicagoHour >= item.s && chicagoHour < item.e;
+            container.innerHTML = schedule.map((item, index) => {
+                let name = item.n;
+                // Ajuste Especial Quarta [cite: 1]
+                if(day === 3 && item.h === 20) name = "Praise FM Live Show";
+                // Ajuste Especial Domingo [cite: 2]
+                if(day === 0 && item.h === 7) name = "Sunday Morning With Christ";
+                if(day === 0 && item.h === 22) name = "Living The Message";
+
+                const nextHour = schedule[index + 1] ? schedule[index + 1].h : 24;
+                const isLive = hour >= item.h && hour < nextHour;
+
                 return `
-                    <div class="bbc-item ${isLive ? 'is-live' : ''}">
-                        <div class="circle-wrap">
+                    <div class="program-card ${isLive ? 'is-live' : ''}">
+                        <div class="img-circle">
                             <img src="/images/${item.img}" onerror="this.src='/images/default.jpg'">
-                            <div class="live-badge">LIVE</div>
+                            <div class="live-tag">LIVE</div>
                         </div>
-                        <div style="font-size:12px; font-weight:bold;">${item.name}</div>
-                        <div style="font-size:10px; color:#888;">${item.display}</div>
+                        <div style="font-size:12px; font-weight:bold;">${name}</div>
+                        <div style="font-size:10px; color:#888;">${item.d}</div>
                     </div>`;
             }).join('');
         }
 
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('install-banner').style.display = 'block';
-        });
-
-        async function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt = null;
+        // DETECTAR MODO STANDALONE
+        function init() {
+            const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            if (isPWA) {
+                document.getElementById('app-view').style.display = 'block';
+                document.getElementById('site-view').style.display = 'none';
+                renderApp();
             }
         }
 
-        window.onload = checkDisplayMode;
+        // INSTALAÇÃO
+        let promptEvt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            promptEvt = e;
+            document.getElementById('install-banner').style.display = 'flex';
+        });
+
+        function doInstall() {
+            if(promptEvt) { promptEvt.prompt(); promptEvt = null; }
+        }
+
+        window.onload = init;
     </script>
 </body>
 </html>
