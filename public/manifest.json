@@ -1,7 +1,7 @@
 {
   "short_name": "Praise FM",
   "name": "Praise FM USA",
-  "start_url": "/",
+  "start_url": "/", 
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#ff6600",
