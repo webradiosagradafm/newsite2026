@@ -280,11 +280,8 @@ const AppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <HashRouter>
-        <ScrollToTop />
-        <AppContent />
-      </HashRouter>
-    </AuthProvider>
+    <div className="min-h-screen">
+      {/* resto do site */}
+    </div>
   );
 }
