@@ -1,23 +1,18 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite';
-import { VitePWA } from 'vite-plugin-pwa';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-    tailwindcss(), // Ativa o motor do Tailwind v4 para processar seu CSS
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ['icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'Praise FM USA',
         short_name: 'Praise FM',
-        description: 'Praise FM USA Radio Station App',
+        description: 'Praise FM USA Radio',
         theme_color: '#ff6600',
-        background_color: '#000000',
-        display: 'standalone',
         icons: [
           {
             src: 'icon-192.png',
@@ -28,19 +23,9 @@ export default defineConfig({
             src: 'icon-512.png',
             sizes: '512x512',
             type: 'image/png'
-          },
-          {
-            src: 'icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable'
           }
         ]
       }
     })
-  ],
-  server: {
-    host: true,
-    port: 5173
-  }
-});
+  ]
+})
