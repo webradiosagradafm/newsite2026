@@ -1,7 +1,25 @@
 {
   "compilerOptions": {
-    "moduleResolution": "Bundler", // Mude de 'Node' para 'Bundler'
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Estritamente necessário para o erro da Imagem 6 */
+    "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
-    // ... resto das suas configurações
-  }
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting e Segurança */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src", "vite.config.ts"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
