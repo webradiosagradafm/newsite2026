@@ -4,17 +4,16 @@
   --color-praise-accent: #ff6600;
 }
 
-/* Em vez de @apply no body, use as classes no seu componente principal ou defina assim: */
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #fff;
-  color: #000;
+html,
+body,
+#root {
+  height: 100%;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #000;
-    color: #fff;
-  }
+body {
+  margin: 0;
+}
+
+#root {
+  @apply bg-white text-black dark:bg-black dark:text-white;
 }
