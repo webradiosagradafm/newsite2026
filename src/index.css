@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
-@theme {
-  --dark-mode: class;
+:root {
   --color-praise-accent: #ff6600;
 }
 
@@ -9,5 +8,13 @@
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  @apply bg-white text-black dark:bg-black dark:text-white;
+  background-color: #fff;
+  color: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #000;
+    color: #fff;
+  }
 }
