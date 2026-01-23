@@ -99,61 +99,72 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
 
   return (
     <>
-      {/* FULL SCREEN SCHEDULE VIEW (Mobile & Desktop) */}
+      {/* SCHEDULE DRAWER - Lateral Direita (Mobile & Desktop) */}
       <div 
-        className={`fixed inset-0 z-[100] bg-white dark:bg-[#121212] transition-transform duration-300 flex flex-col ${showSchedule ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`fixed top-0 right-0 bottom-0 w-full md:w-96 z-[100] bg-white dark:bg-[#121212] transition-transform duration-300 flex flex-col shadow-2xl ${showSchedule ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-white/10">
-          <h2 className="text-xl font-semibold uppercase tracking-tight text-black dark:text-white">Schedule</h2>
+          <h2 className="text-lg font-semibold text-black dark:text-white">Up Next</h2>
           <button 
             onClick={() => setShowSchedule(false)} 
             className="p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
           >
-            <X className="w-7 h-7 text-black dark:text-white" />
+            <X className="w-6 h-6 text-black dark:text-white" />
           </button>
         </div>
 
         <div className="flex-grow overflow-y-auto">
-          <div className="flex items-center p-4 border-b border-gray-100 dark:border-white/5 space-x-4 bg-gray-50/50 dark:bg-white/5">
-            <div className="w-16 h-16 flex-shrink-0">
-               <img src={program.image} className="w-full h-full object-cover" alt="" />
+          {/* Current Program */}
+          <div className="p-4 border-b border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5">
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-2 h-2 bg-[#ff6600] rounded-full animate-pulse"></div>
+              <span className="text-xs font-bold text-[#ff6600] uppercase tracking-wide">Live Now</span>
             </div>
-            <div className="flex flex-col min-w-0 flex-grow">
-              <span className="font-bold text-base text-black dark:text-white leading-tight mb-1 truncate">
-                {program.title} with {program.host}
-              </span>
-              <span className="text-gray-500 dark:text-gray-400 text-xs mb-0.5 truncate">
-                {program.host}
-              </span>
-              <div className="flex items-center space-x-2">
-                <span className="text-[10px] font-semibold text-[#ff6600] uppercase tracking-wide">Live Now</span>
-                <span className="text-gray-400 dark:text-gray-500 text-xs">{program.startTime} - {program.endTime}</span>
+            <div className="flex items-center space-x-3">
+              <div className="w-14 h-14 flex-shrink-0 rounded overflow-hidden">
+                <img src={program.image} className="w-full h-full object-cover" alt="" />
+              </div>
+              <div className="flex flex-col min-w-0 flex-grow">
+                <span className="font-bold text-base text-black dark:text-white leading-tight truncate">
+                  {program.title}
+                </span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                  {program.host}
+                </span>
+                <span className="text-xs text-gray-400 dark:text-gray-500">{program.startTime} - {program.endTime}</span>
               </div>
             </div>
           </div>
           
-          {queue && queue.slice(0, 6).map((prog) => (
-            <div key={prog.id} className="flex items-center p-4 border-b border-gray-100 dark:border-white/5 space-x-4 hover:bg-gray-50/30 dark:hover:bg-white/5 transition-colors">
-              <div className="w-16 h-16 flex-shrink-0">
-                <img src={prog.image} className="w-full h-full object-cover" alt="" />
-              </div>
-              <div className="flex flex-col min-w-0 flex-grow">
-                <span className="font-bold text-base text-black dark:text-white leading-tight mb-1 truncate">
-                  {prog.title}
-                </span>
-                <span className="text-gray-500 dark:text-gray-400 text-xs mb-0.5 truncate">
-                  {prog.host}
-                </span>
-                <span className="text-gray-400 dark:text-gray-500 text-xs">{prog.startTime} - {prog.endTime}</span>
+          {/* Next 3-4 Programs */}
+          {queue && queue.slice(0, 4).map((prog, index) => (
+            <div key={prog.id} className="p-4 border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+              <div className="flex items-center space-x-3">
+                <div className="w-14 h-14 flex-shrink-0 rounded overflow-hidden opacity-70">
+                  <img src={prog.image} className="w-full h-full object-cover" alt="" />
+                </div>
+                <div className="flex flex-col min-w-0 flex-grow">
+                  <span className="font-semibold text-sm text-black dark:text-white leading-tight truncate">
+                    {prog.title}
+                  </span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    {prog.host}
+                  </span>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">{prog.startTime} - {prog.endTime}</span>
+                </div>
               </div>
             </div>
           ))}
-          
-          <div className="p-6 text-center">
-            <p className="text-xs text-gray-400 dark:text-gray-500">End of schedule</p>
-          </div>
         </div>
       </div>
+
+      {/* Overlay quando drawer aberto */}
+      {showSchedule && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-[99]"
+          onClick={() => setShowSchedule(false)}
+        ></div>
+      )}
 
       {/* MOBILE COLLAPSED MINI-PLAYER - Só aparece quando isPlaying */}
       {isPlaying && (
