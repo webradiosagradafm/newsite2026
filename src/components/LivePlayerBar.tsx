@@ -226,10 +226,13 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         className={`fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 md:hidden transition-all duration-300 ${isExpanded ? 'h-auto' : 'h-[72px]'}`}
       >
         {!isExpanded ? (
-          // COLLAPSED VIEW - Só título sem foto
+          // COLLAPSED VIEW - Clica e abre player + Schedule junto
           <div 
             className="flex items-center justify-between px-5 py-3 h-[72px]"
-            onClick={() => setIsExpanded(true)}
+            onClick={() => {
+              setIsExpanded(true);
+              setShowSchedule(true); // Abre Schedule automaticamente
+            }}
           >
             <div className="flex flex-col min-w-0 flex-grow">
               <span className="text-base font-bold text-black dark:text-white leading-tight truncate">
