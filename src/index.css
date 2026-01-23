@@ -1,15 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-  /* Ativa o modo escuro via classe .dark no HTML */
   --dark-mode: class;
-
-  /* Registra sua cor laranja personalizada no v4 */
   --color-praise-accent: #ff6600;
 }
 
+/* Em vez de @apply no body, use as classes no seu componente principal ou defina assim: */
 body {
   margin: 0;
-  /* Garante que o fundo padrão mude com o tema */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   @apply bg-white text-black dark:bg-black dark:text-white;
 }
