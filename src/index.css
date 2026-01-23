@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
-/* Seus estilos customizados continuam abaixo */
+/* Isso resolve o erro "Unknown at rule" e ativa o Tailwind v4 corretamente */
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;

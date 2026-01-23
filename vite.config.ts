@@ -1,15 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite'; // Importe o plugin do v4
+import tailwindcss from '@tailwindcss/vite'; // Isso deve parar de dar erro agora
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   plugins: [
     react(),
-    tailwindcss(), // Adicione o plugin aqui
+    tailwindcss(), // O "motor" do Tailwind v4
     VitePWA({
       registerType: 'autoUpdate',
-      // suas outras configurações de PWA continuam aqui...
+      // suas configurações de PWA...
     })
   ],
 });
