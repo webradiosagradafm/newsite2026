@@ -1,6 +1,5 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
-  --font-family-sans: "Inter", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
-  --color-praise-accent: #ff6600;
-}
+/* Seus estilos customizados aqui */
