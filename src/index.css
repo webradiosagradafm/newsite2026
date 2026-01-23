@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Isso resolve o erro "Unknown at rule" e ativa o Tailwind v4 corretamente */
+/* O Tailwind v4 agora usa @import em vez de @tailwind */
 
 body {
   margin: 0;
