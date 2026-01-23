@@ -99,12 +99,12 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
 
   return (
     <>
-      {/* SCHEDULE DRAWER - Lateral Direita (Mobile & Desktop) */}
+      {/* SCHEDULE DRAWER - Só LIVE + próximos 4 */}
       <div 
         className={`fixed top-0 right-0 bottom-0 w-full md:w-96 z-[100] bg-white dark:bg-[#121212] transition-transform duration-300 flex flex-col shadow-2xl ${showSchedule ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-white/10">
-          <h2 className="text-lg font-semibold text-black dark:text-white">Up Next</h2>
+          <h2 className="text-lg font-semibold text-black dark:text-white">Schedule</h2>
           <button 
             onClick={() => setShowSchedule(false)} 
             className="p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
@@ -114,43 +114,43 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         </div>
 
         <div className="flex-grow overflow-y-auto">
-          {/* Current Program */}
-          <div className="p-4 border-b border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5">
-            <div className="flex items-center space-x-3 mb-2">
-              <div className="w-2 h-2 bg-[#ff6600] rounded-full animate-pulse"></div>
-              <span className="text-xs font-bold text-[#ff6600] uppercase tracking-wide">Live Now</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-14 h-14 flex-shrink-0 rounded overflow-hidden">
+          {/* Programa LIVE */}
+          <div className="p-4 border-b border-gray-100 dark:border-white/5">
+            <div className="flex items-start space-x-3">
+              <div className="w-20 h-20 flex-shrink-0 rounded overflow-hidden">
                 <img src={program.image} className="w-full h-full object-cover" alt="" />
               </div>
               <div className="flex flex-col min-w-0 flex-grow">
-                <span className="font-bold text-base text-black dark:text-white leading-tight truncate">
+                <span className="font-bold text-base text-black dark:text-white leading-tight mb-1">
                   {program.title}
                 </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                <span className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                   {program.host}
                 </span>
-                <span className="text-xs text-gray-400 dark:text-gray-500">{program.startTime} - {program.endTime}</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 mb-2">
+                  {program.startTime} - {program.endTime}
+                </span>
               </div>
             </div>
           </div>
           
-          {/* Next 3-4 Programs */}
-          {queue && queue.slice(0, 4).map((prog, index) => (
-            <div key={prog.id} className="p-4 border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-              <div className="flex items-center space-x-3">
-                <div className="w-14 h-14 flex-shrink-0 rounded overflow-hidden opacity-70">
+          {/* Próximos 4 programas */}
+          {queue && queue.slice(0, 4).map((prog) => (
+            <div key={prog.id} className="p-4 border-b border-gray-100 dark:border-white/5">
+              <div className="flex items-start space-x-3">
+                <div className="w-20 h-20 flex-shrink-0 rounded overflow-hidden">
                   <img src={prog.image} className="w-full h-full object-cover" alt="" />
                 </div>
                 <div className="flex flex-col min-w-0 flex-grow">
-                  <span className="font-semibold text-sm text-black dark:text-white leading-tight truncate">
+                  <span className="font-bold text-base text-black dark:text-white leading-tight mb-1">
                     {prog.title}
                   </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  <span className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                     {prog.host}
                   </span>
-                  <span className="text-xs text-gray-400 dark:text-gray-500">{prog.startTime} - {prog.endTime}</span>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                    {prog.startTime} - {prog.endTime}
+                  </span>
                 </div>
               </div>
             </div>
