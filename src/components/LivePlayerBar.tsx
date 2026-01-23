@@ -83,9 +83,9 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
   };
 
   const VolumeIcon = () => {
-    if (isMuted || volume === 0) return <VolumeX className="w-6 h-6" />;
-    if (volume < 0.5) return <Volume1 className="w-6 h-6" />;
-    return <Volume2 className="w-6 h-6" />;
+    if (isMuted || volume === 0) return <VolumeX className="w-5 h-5" />;
+    if (volume < 0.5) return <Volume1 className="w-5 h-5" />;
+    return <Volume2 className="w-5 h-5" />;
   };
 
   useEffect(() => {
@@ -166,244 +166,238 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         ></div>
       )}
 
-      {/* MOBILE COLLAPSED MINI-PLAYER - Só aparece quando isPlaying */}
+      {/* MOBILE MINI-PLAYER */}
       {isPlaying && (
-      <div 
-        className={`fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 md:hidden transition-all duration-300 ${isExpanded ? 'h-auto' : 'h-[72px]'}`}
-      >
-        {!isExpanded ? (
-          // COLLAPSED VIEW - Clica e abre player + Schedule junto
-          <div 
-            className="flex items-center justify-between px-5 py-3 h-[72px]"
-            onClick={() => {
-              setIsExpanded(true);
-              setShowSchedule(true); // Abre Schedule automaticamente
-            }}
-          >
-            <div className="flex flex-col min-w-0 flex-grow">
-              <span className="text-base font-bold text-black dark:text-white leading-tight truncate">
-                {program.title}
-              </span>
-              <span className="text-sm text-gray-500 dark:text-gray-400 truncate leading-tight">
-                {program.title} with {program.host}
-              </span>
-            </div>
-            
-            <button 
-              onClick={(e) => { e.stopPropagation(); onTogglePlayback(); }}
-              className="flex-shrink-0 w-12 h-12 rounded-full border-2 border-black dark:border-white flex items-center justify-center bg-white dark:bg-[#121212] ml-4"
+        <div 
+          className={`fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 md:hidden transition-all duration-300 ${isExpanded ? 'h-auto' : 'h-[72px]'}`}
+        >
+          {!isExpanded ? (
+            <div 
+              className="flex items-center justify-between px-5 py-3 h-[72px]"
+              onClick={() => {
+                setIsExpanded(true);
+                setShowSchedule(true);
+              }}
             >
-              {isPlaying ? (
-                <Pause className="w-5 h-5 text-black dark:text-white fill-current" />
-              ) : (
-                <Play className="w-5 h-5 text-black dark:text-white fill-current ml-0.5" />
-              )}
-            </button>
-          </div>
-        ) : (
-          // EXPANDED VIEW - Todos os controles
-          <div className="flex flex-col">
-            {/* Header com Schedule e X */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 dark:border-white/10">
-              <button 
-                onClick={() => setShowSchedule(true)}
-                className="text-sm font-semibold text-black dark:text-white"
-              >
-                Schedule
-              </button>
-              <button 
-                onClick={() => setIsExpanded(false)}
-                className="p-1"
-              >
-                <X className="w-6 h-6 text-black dark:text-white" />
-              </button>
-            </div>
-
-            {/* Program Info */}
-            <div className="flex items-center space-x-4 px-5 py-6 border-b border-gray-100 dark:border-white/5">
-              <div className="w-20 h-20 flex-shrink-0">
-                <img src={program.image} className="w-full h-full object-cover" alt="" />
-              </div>
               <div className="flex flex-col min-w-0 flex-grow">
-                <span className="font-bold text-lg text-black dark:text-white leading-tight mb-1 truncate">
+                <span className="text-base font-bold text-black dark:text-white leading-tight truncate">
+                  {program.title}
+                </span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 truncate leading-tight">
                   {program.title} with {program.host}
                 </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
-                  {program.host}
-                </span>
-                <span className="text-xs text-gray-400 dark:text-gray-500">
-                  {program.startTime} - {program.endTime}
-                </span>
+              </div>
+              
+              <button 
+                onClick={(e) => { 
+                  e.stopPropagation();
+                  onTogglePlayback(); 
+                }}
+                className="flex-shrink-0 w-12 h-12 rounded-full border-2 border-black dark:border-white flex items-center justify-center bg-white dark:bg-[#121212]"
+              >
+                {isPlaying ? (
+                  <Pause className="w-5 h-5 text-black dark:text-white fill-current" />
+                ) : (
+                  <Play className="w-5 h-5 text-black dark:text-white fill-current ml-0.5" />
+                )}
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 dark:border-white/10">
+                <span className="text-sm font-semibold text-black dark:text-white">Now Playing</span>
+                <button 
+                  onClick={() => {
+                    setIsExpanded(false);
+                    setShowSchedule(false);
+                  }}
+                  className="p-1"
+                >
+                  <X className="w-6 h-6 text-black dark:text-white" />
+                </button>
+              </div>
+
+              <div className="flex items-center space-x-4 px-5 py-6 border-b border-gray-100 dark:border-white/5">
+                <div className="w-20 h-20 flex-shrink-0">
+                  <img src={program.image} className="w-full h-full object-cover" alt="" />
+                </div>
+                <div className="flex flex-col min-w-0 flex-grow">
+                  <span className="font-bold text-lg text-black dark:text-white leading-tight mb-1 truncate">
+                    {program.title}
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
+                    with {program.host}
+                  </span>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                    {program.startTime} - {program.endTime}
+                  </span>
+                </div>
+              </div>
+
+              <div className="px-5 py-4">
+                <div className="w-full h-1 bg-gray-200 dark:bg-white/10 rounded-full relative">
+                  <div className="absolute top-0 left-0 h-full bg-[#ff6600] rounded-full transition-all" style={{ width: isPlaying ? '60%' : '0%' }}></div>
+                  <div className="absolute top-1/2 -translate-y-1/2 bg-[#ff6600] w-3 h-3 rounded-full" style={{ left: isPlaying ? '60%' : '0%' }}></div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center space-x-8 px-5 py-6">
+                <button 
+                  onClick={skip30Backward}
+                  className="relative w-12 h-12 flex items-center justify-center text-gray-700 dark:text-gray-300"
+                >
+                  <RotateCcw className="w-6 h-6" strokeWidth={2} />
+                  <span className="absolute text-[10px] font-bold mt-[3px]">30</span>
+                </button>
+
+                <button 
+                  onClick={onTogglePlayback}
+                  className="w-16 h-16 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center shadow-lg"
+                >
+                  {isPlaying ? <Pause className="w-7 h-7 fill-current" /> : <Play className="w-7 h-7 fill-current ml-0.5" />}
+                </button>
+
+                <button 
+                  onClick={skip30Forward}
+                  className="relative w-12 h-12 flex items-center justify-center text-gray-700 dark:text-gray-300"
+                >
+                  <RotateCw className="w-6 h-6" strokeWidth={2} />
+                  <span className="absolute text-[10px] font-bold mt-[3px]">30</span>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100 dark:border-white/5">
+                <div className="flex items-center space-x-3 flex-grow">
+                  <button onClick={toggleMute} className="p-2">
+                    <VolumeIcon />
+                  </button>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="1" 
+                    step="0.01"
+                    value={isMuted ? 0 : volume}
+                    onChange={handleVolumeChange}
+                    className="flex-grow h-1 bg-gray-200 dark:bg-white/20 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
+                  />
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 w-6 text-right">
+                    {Math.round((isMuted ? 0 : volume) * 10)}
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-4 ml-6">
+                  <button 
+                    onClick={cyclePlaybackRate}
+                    className="px-3 py-1.5 text-sm font-semibold text-black dark:text-white border border-gray-300 dark:border-white/30 rounded"
+                  >
+                    {playbackRate}×
+                  </button>
+
+                  <div className="flex items-center space-x-1.5">
+                    <div className="w-2 h-2 bg-[#00d9c9] rounded-full animate-pulse"></div>
+                    <span className="text-xs font-bold text-[#00d9c9] uppercase">LIVE</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* DESKTOP PLAYER BAR */}
+      {isPlaying && (
+        <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 hidden md:flex flex-col transition-colors duration-300">
+          <div className="w-full h-1 bg-gray-100 dark:bg-white/5 relative overflow-hidden">
+            <div className="absolute top-0 left-0 h-full bg-[#ff6600] transition-all duration-1000" style={{ width: isPlaying ? '100%' : '0%' }}></div>
+          </div>
+
+          <div className="flex items-center justify-between px-8 py-4">
+            <div className="flex items-center space-x-4 w-[30%] min-w-0">
+              <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-200 dark:border-white/10 shadow-sm">
+                <img src={program.image} alt="" className="w-full h-full object-cover" />
+              </div>
+              <div className="min-w-0">
+                <h4 className="font-semibold text-gray-900 dark:text-white tracking-tight leading-tight truncate text-[15px]">
+                  {program.title}
+                </h4>
+                <p className="text-[11px] font-normal text-gray-500 dark:text-gray-400 truncate tracking-tight mt-0.5">
+                  with {program.host}
+                </p>
               </div>
             </div>
 
-            {/* Progress Bar */}
-            <div className="px-5 py-4">
-              <div className="w-full h-1 bg-gray-200 dark:bg-white/10 rounded-full relative">
-                <div className="absolute top-0 left-0 h-full bg-[#ff6600] rounded-full transition-all" style={{ width: isPlaying ? '60%' : '0%' }}></div>
-                <div className="absolute top-1/2 -translate-y-1/2 bg-[#ff6600] w-3 h-3 rounded-full" style={{ left: isPlaying ? '60%' : '0%' }}></div>
-              </div>
-            </div>
-
-            {/* Controls */}
-            <div className="flex items-center justify-center space-x-8 px-5 py-6">
+            <div className="flex items-center justify-center space-x-6">
               <button 
                 onClick={skip30Backward}
-                className="relative w-12 h-12 flex items-center justify-center text-gray-700 dark:text-gray-300"
+                className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
               >
-                <RotateCcw className="w-6 h-6" strokeWidth={2} />
-                <span className="absolute text-[10px] font-bold mt-[3px]">30</span>
+                <RotateCcw className="w-5 h-5" strokeWidth={2} />
+                <span className="absolute text-[9px] font-bold mt-[2px]">30</span>
               </button>
 
               <button 
                 onClick={onTogglePlayback}
-                className="w-16 h-16 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center shadow-lg"
+                className="w-12 h-12 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center hover:scale-105 transition-all active:scale-95 shadow-md"
               >
-                {isPlaying ? <Pause className="w-7 h-7 fill-current" /> : <Play className="w-7 h-7 fill-current ml-0.5" />}
+                {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
               </button>
 
               <button 
                 onClick={skip30Forward}
-                className="relative w-12 h-12 flex items-center justify-center text-gray-700 dark:text-gray-300"
+                className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
               >
-                <RotateCw className="w-6 h-6" strokeWidth={2} />
-                <span className="absolute text-[10px] font-bold mt-[3px]">30</span>
+                <RotateCw className="w-5 h-5" strokeWidth={2} />
+                <span className="absolute text-[9px] font-bold mt-[2px]">30</span>
               </button>
             </div>
 
-            {/* Volume and Speed */}
-            <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100 dark:border-white/5">
-              <div className="flex items-center space-x-3 flex-grow">
-                <button onClick={toggleMute} className="p-2">
+            <div className="flex items-center justify-end space-x-4 w-[30%]">
+              <div 
+                className="flex items-center space-x-2 relative"
+                onMouseEnter={() => setShowVolumeSlider(true)}
+                onMouseLeave={() => setShowVolumeSlider(false)}
+              >
+                <button onClick={toggleMute} className="p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
                   <VolumeIcon />
                 </button>
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="1" 
-                  step="0.01"
-                  value={isMuted ? 0 : volume}
-                  onChange={handleVolumeChange}
-                  className="flex-grow h-1 bg-gray-200 dark:bg-white/20 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
-                />
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 w-6 text-right">
-                  {Math.round((isMuted ? 0 : volume) * 10)}
-                </span>
-              </div>
-
-              <div className="flex items-center space-x-4 ml-6">
-                <button 
-                  onClick={cyclePlaybackRate}
-                  className="px-3 py-1.5 text-sm font-semibold text-black dark:text-white border border-gray-300 dark:border-white/30 rounded"
-                >
-                  {playbackRate}×
-                </button>
-
-                <div className="flex items-center space-x-1.5">
-                  <div className="w-2 h-2 bg-[#00d9c9] rounded-full animate-pulse"></div>
-                  <span className="text-xs font-bold text-[#00d9c9] uppercase">LIVE</span>
+                
+                <div className={`flex items-center transition-all duration-200 overflow-hidden ${showVolumeSlider ? 'w-24 opacity-100' : 'w-0 opacity-0'}`}>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="1" 
+                    step="0.01"
+                    value={isMuted ? 0 : volume}
+                    onChange={handleVolumeChange}
+                    className="w-full h-1 bg-gray-200 dark:bg-white/20 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
+                  />
+                  <span className="ml-2 text-xs font-medium text-gray-600 dark:text-gray-400 w-6 text-right">
+                    {Math.round((isMuted ? 0 : volume) * 10)}
+                  </span>
                 </div>
               </div>
-            </div>
-          </div>
-        )}
-      </div>
-      )}
 
-      {/* DESKTOP PLAYER BAR - Só aparece quando isPlaying */}
-      {isPlaying && (
-      <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 hidden md:flex flex-col transition-colors duration-300">
-        <div className="w-full h-1 bg-gray-100 dark:bg-white/5 relative overflow-hidden">
-          <div className="absolute top-0 left-0 h-full bg-[#ff6600] transition-all duration-1000" style={{ width: isPlaying ? '100%' : '0%' }}></div>
-        </div>
-
-        <div className="flex items-center justify-between px-8 py-4">
-          <div className="flex items-center space-x-4 w-[30%] min-w-0">
-            <div className="w-14 h-14 rounded-sm overflow-hidden flex-shrink-0 border border-gray-200 dark:border-white/10 shadow-sm">
-              <img src={program.image} alt="" className="w-full h-full object-cover" />
-            </div>
-            <div className="min-w-0">
-              <h4 className="font-semibold text-gray-900 dark:text-white uppercase tracking-tight leading-tight truncate text-[15px]">
-                {program.title}
-              </h4>
-              <p className="text-[11px] font-normal text-gray-500 dark:text-gray-400 truncate tracking-tight mt-0.5">
-                {program.host}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center space-x-6">
-            <button 
-              onClick={skip30Backward}
-              className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
-            >
-              <RotateCcw className="w-5 h-5" strokeWidth={2} />
-              <span className="absolute text-[9px] font-bold mt-[2px]">30</span>
-            </button>
-
-            <button 
-              onClick={onTogglePlayback}
-              className="w-12 h-12 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center hover:scale-105 transition-all active:scale-95 shadow-md"
-            >
-              {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
-            </button>
-
-            <button 
-              onClick={skip30Forward}
-              className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
-            >
-              <RotateCw className="w-5 h-5" strokeWidth={2} />
-              <span className="absolute text-[9px] font-bold mt-[2px]">30</span>
-            </button>
-          </div>
-
-          <div className="flex items-center justify-end space-x-4 w-[30%]">
-            <div 
-              className="flex items-center space-x-2 relative"
-              onMouseEnter={() => setShowVolumeSlider(true)}
-              onMouseLeave={() => setShowVolumeSlider(false)}
-            >
-              <button onClick={toggleMute} className="p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
-                <VolumeIcon />
+              <button 
+                onClick={cyclePlaybackRate}
+                className="px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white border border-gray-300 dark:border-white/20 rounded hover:border-black dark:hover:border-white transition-all"
+              >
+                {playbackRate}×
               </button>
-              
-              <div className={`flex items-center transition-all duration-200 overflow-hidden ${showVolumeSlider ? 'w-24 opacity-100' : 'w-0 opacity-0'}`}>
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="1" 
-                  step="0.01"
-                  value={isMuted ? 0 : volume}
-                  onChange={handleVolumeChange}
-                  className="w-full h-1 bg-gray-200 dark:bg-white/20 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
-                />
-                <span className="ml-2 text-xs font-medium text-gray-600 dark:text-gray-400 w-6 text-right">
-                  {Math.round((isMuted ? 0 : volume) * 10)}
-                </span>
+
+              <button 
+                onClick={() => setShowSchedule(true)}
+                className="p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
+              >
+                <List className="w-6 h-6" strokeWidth={2} />
+              </button>
+
+              <div className="flex items-center space-x-1.5 px-2">
+                <div className="w-2 h-2 bg-[#00d9c9] rounded-full animate-pulse"></div>
+                <span className="text-xs font-bold text-[#00d9c9] uppercase tracking-wider">LIVE</span>
               </div>
             </div>
-
-            <button 
-              onClick={cyclePlaybackRate}
-              className="px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white border border-gray-300 dark:border-white/20 rounded hover:border-black dark:hover:border-white transition-all"
-            >
-              {playbackRate}×
-            </button>
-
-            <button 
-              onClick={() => setShowSchedule(true)}
-              className="p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
-            >
-              <List className="w-6 h-6" strokeWidth={2} />
-            </button>
-
-            <div className="flex items-center space-x-1.5 px-2">
-              <div className="w-2 h-2 bg-[#00d9c9] rounded-full animate-pulse"></div>
-              <span className="text-xs font-bold text-[#00d9c9] uppercase tracking-wider">LIVE</span>
-            </div>
           </div>
         </div>
-      </div>
       )}
     </>
   );
