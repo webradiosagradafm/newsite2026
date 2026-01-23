@@ -157,60 +157,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
           ))}
         </div>
       </div>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-white/10">
-          <h2 className="text-lg font-semibold text-black dark:text-white">Schedule</h2>
-          <button 
-            onClick={() => setShowSchedule(false)} 
-            className="p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
-          >
-            <X className="w-6 h-6 text-black dark:text-white" />
-          </button>
-        </div>
-
-        <div className="flex-grow overflow-y-auto">
-          {/* Programa LIVE */}
-          <div className="p-4 border-b border-gray-100 dark:border-white/5">
-            <div className="flex items-start space-x-3">
-              <div className="w-20 h-20 flex-shrink-0 rounded overflow-hidden">
-                <img src={program.image} className="w-full h-full object-cover" alt="" />
-              </div>
-              <div className="flex flex-col min-w-0 flex-grow">
-                <span className="font-bold text-base text-black dark:text-white leading-tight mb-1">
-                  {program.title}
-                </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                  {program.host}
-                </span>
-                <span className="text-xs text-gray-400 dark:text-gray-500 mb-2">
-                  {program.startTime} - {program.endTime}
-                </span>
-              </div>
-            </div>
-          </div>
-          
-          {/* Próximos 4 programas */}
-          {queue && queue.slice(0, 4).map((prog) => (
-            <div key={prog.id} className="p-4 border-b border-gray-100 dark:border-white/5">
-              <div className="flex items-start space-x-3">
-                <div className="w-20 h-20 flex-shrink-0 rounded overflow-hidden">
-                  <img src={prog.image} className="w-full h-full object-cover" alt="" />
-                </div>
-                <div className="flex flex-col min-w-0 flex-grow">
-                  <span className="font-bold text-base text-black dark:text-white leading-tight mb-1">
-                    {prog.title}
-                  </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                    {prog.host}
-                  </span>
-                  <span className="text-xs text-gray-400 dark:text-gray-500">
-                    {prog.startTime} - {prog.endTime}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* Overlay quando drawer aberto */}
       {showSchedule && (
