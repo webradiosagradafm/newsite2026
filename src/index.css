@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  /* Define que o modo escuro será ativado pela presença da classe .dark */
+  /* Ativa o modo escuro via classe .dark no HTML */
   --dark-mode: class;
-  
-  /* Se você tiver cores personalizadas no seu tailwind.config.js, 
-     você pode defini-las aqui também para garantir que funcionem */
+
+  /* Registra sua cor laranja personalizada no v4 */
   --color-praise-accent: #ff6600;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Garante que o fundo padrão mude com o tema */
+  @apply bg-white text-black dark:bg-black dark:text-white;
 }
