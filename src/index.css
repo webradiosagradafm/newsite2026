@@ -1,21 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
+@theme {
+  --font-family-sans: "Inter", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
   --color-praise-accent: #ff6600;
-}
-
-html,
-body,
-#root {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-}
-
-#root {
-  @apply bg-white text-black dark:bg-black dark:text-white;
 }
