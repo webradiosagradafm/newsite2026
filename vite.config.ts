@@ -39,8 +39,8 @@ export default defineConfig({
       }
     })
   ],
-  // Garante que o build resolva os módulos corretamente para o GitHub Codespaces
-  resolve: {
-    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
+  server: {
+    host: true,
+    port: 5173
   }
 });
