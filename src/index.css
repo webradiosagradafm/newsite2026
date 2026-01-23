@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
-/* O Tailwind v4 agora usa @import em vez de @tailwind */
+@theme {
+  /* Define que o modo escuro será ativado pela presença da classe .dark */
+  --dark-mode: class;
+  
+  /* Se você tiver cores personalizadas no seu tailwind.config.js, 
+     você pode defini-las aqui também para garantir que funcionem */
+  --color-praise-accent: #ff6600;
+}
 
 body {
   margin: 0;
