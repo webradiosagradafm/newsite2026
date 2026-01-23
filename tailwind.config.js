@@ -8,14 +8,12 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: [
-          "Inter",
-          "Helvetica Neue",
-          "Helvetica",
-          "Arial",
-          "sans-serif",
-        ],
+        sans: ["Inter", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
       },
+      colors: {
+        // Adicionando a cor que estava no HTML
+        'praise-accent': '#ff6600',
+      }
     },
   },
   plugins: [],
