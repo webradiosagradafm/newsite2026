@@ -5,19 +5,22 @@ interface SEOProps {
   description: string;
 }
 
-export default function SEO({ title, description }: SEOProps) {
+const SEO: React.FC<SEOProps> = ({ title, description }) => {
   useEffect(() => {
+    // Title
     document.title = title;
 
+    // Meta description
     let meta = document.querySelector('meta[name="description"]');
     if (!meta) {
       meta = document.createElement("meta");
       meta.setAttribute("name", "description");
       document.head.appendChild(meta);
     }
-
     meta.setAttribute("content", description);
   }, [title, description]);
 
   return null;
-}
+};
+
+export default SEO;
