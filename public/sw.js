@@ -9,7 +9,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = event.request.url;
 
-  // 🚫 nunca interceptar streaming
+  // não tocar no stream
   if (
     url.includes("zeno.fm") ||
     url.includes("stream") ||
