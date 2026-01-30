@@ -1,7 +1,13 @@
-import { createBrowserRouter } from 'react-router-dom'
-import SiteHome from './pages/AppHomePage'
+import { createBrowserRouter } from "react-router-dom";
+import App from "./pages/App";
 
 export const router = createBrowserRouter([
-  { path: '/', element: <SiteHome /> },
-  { path: '/app', element: <SiteHome /> }
-])
+  {
+    path: "/",
+    element: <App />,
+  },
+  {
+    path: "/app",
+    element: <App />,
+  },
+]);

@@ -1,11 +1,22 @@
-self.addEventListener('install', () => {
+self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', () => {
-  // fetch pass-through (não cacheia nada ainda)
+self.addEventListener("fetch", (event) => {
+  const url = event.request.url;
+
+  // 🚫 nunca interceptar streaming
+  if (
+    url.includes("zeno.fm") ||
+    url.includes("stream") ||
+    url.endsWith(".mp3")
+  ) {
+    return;
+  }
+
+  event.respondWith(fetch(event.request));
 });
