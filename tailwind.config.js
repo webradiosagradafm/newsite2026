@@ -1,19 +1,12 @@
 /** @type {import('tailwindcss').Config} */
-export default {
-  darkMode: 'class',
+module.exports = {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{vue,js,ts,jsx,tsx}",
+    // Add other paths to your templates/components here
   ],
   theme: {
-    extend: {
-      fontFamily: {
-        sans: ["Inter", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
-      },
-      colors: {
-        'praise-accent': '#ff6600',
-      }
-    },
+    extend: {},
   },
   plugins: [],
-};
+}
