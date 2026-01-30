@@ -1,19 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: "class",
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}"
+    "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
-    extend: {
-      fontFamily: {
-        sans: ["Inter", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
-      },
-      colors: {
-        "praise-accent": "#ff6600",
-      },
-    },
+    extend: {},
   },
   plugins: [],
-};
+}
