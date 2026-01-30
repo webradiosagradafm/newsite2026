@@ -1,4 +1,4 @@
-import Player from "./components/Player";
+import LivePlayerBar from "./components/LivePlayerBar";
 
 export default function App() {
   return (
@@ -8,13 +8,13 @@ export default function App() {
         <h1 className="text-lg font-semibold">Praise FM USA</h1>
       </header>
 
-      {/* Main */}
+      {/* Main content */}
       <main className="flex-1 flex items-center justify-center text-white/60">
-        Loading radio experience…
+        Radio experience loading…
       </main>
 
-      {/* Player */}
-      <Player />
+      {/* Live Player (Spotify/BBC style bar) */}
+      <LivePlayerBar />
     </div>
   );
 }
