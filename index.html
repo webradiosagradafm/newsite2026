@@ -3,17 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Praise FM USA</title>
-
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Praise FM USA - 24/7 Gospel Radio Station with Christian music, worship, and praise. Listen live to quality broadcasts and strengthen your faith." />
+    <meta name="keywords" content="gospel radio, praise fm, christian music, worship, praise, online radio, gospel usa" />
+    <meta name="author" content="Praise FM USA" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://praisefmradio.vercel.app" />
+    <meta property="og:title" content="Praise FM USA - 24/7 Gospel Radio Station" />
+    <meta property="og:description" content="24/7 Gospel Radio with Christian music, worship, and praise. Listen live now!" />
+    <meta property="og:image" content="https://praisefmradio.vercel.app/icon-512.png" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://praisefmradio.vercel.app" />
+    <meta name="twitter:title" content="Praise FM USA - 24/7 Gospel Radio Station" />
+    <meta name="twitter:description" content="24/7 Gospel Radio with Christian music, worship, and praise." />
+    <meta name="twitter:image" content="https://praisefmradio.vercel.app/icon-512.png" />
+    
+    <title>Praise FM USA - 24/7 Gospel Radio Station</title>
+    
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#ff6600" />
     <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Praise FM USA" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
-
-    <!-- Fonts (opcional, mas recomendado) -->
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -21,10 +46,8 @@
       rel="stylesheet"
     />
   </head>
-
   <body>
     <div id="root"></div>
-
     <!-- Vite entry -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
