@@ -1,22 +1,26 @@
-self.addEventListener("install", () => {
+/* Praise FM USA – Production PWA Service Worker */
+
+self.addEventListener('install', () => {
   self.skipWaiting();
 });
 
-self.addEventListener("activate", (event) => {
+self.addEventListener('activate', event => {
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener("fetch", (event) => {
-  const url = event.request.url;
+/**
+ * Spotify/BBC pattern:
+ * - não cacheia HTML
+ * - não cacheia áudio
+ * - apenas mantém controle do lifecycle
+ */
+self.addEventListener('fetch', event => {
+  const { request } = event;
 
-  // 🚫 nunca interceptar streaming
-  if (
-    url.includes("zeno.fm") ||
-    url.includes("stream") ||
-    url.endsWith(".mp3")
-  ) {
+  // Nunca intercepta stream de áudio
+  if (request.destination === 'audio') {
     return;
   }
 
-  event.respondWith(fetch(event.request));
+  // Pass-through network
 });
