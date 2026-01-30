@@ -117,7 +117,7 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     const audio = new Audio(STREAM_URL);
     audio.crossOrigin = 'anonymous';
-    audio.playsInline = true;
+    (audio as any).playsInline = true;
     audio.preload = 'none';
     audio.volume = parseFloat(localStorage.getItem('praise-volume') || '0.8');
 
@@ -175,7 +175,7 @@ const AppContent: React.FC = () => {
         ) return;
 
         setLiveMetadata(prev => {
-          if (prev?.title === title && prev.artist === artist) return prev;
+          if (prev && prev.title === title && prev.artist === artist) return prev;
           const meta = { artist, title, playedAt: new Date(), isMusic: true };
           setTrackHistory(h => [meta, ...h].slice(0, 10));
           return meta;
@@ -211,14 +211,75 @@ const AppContent: React.FC = () => {
           />
         ) : (
           <Routes>
-            <Route path="/" element={<><Hero onListenClick={togglePlayback} isPlaying={isPlaying} liveMetadata={liveMetadata} /><RecentlyPlayed tracks={trackHistory} /></>} />
+            {/* Página inicial */}
+            <Route 
+              path="/" 
+              element={
+                <>
+                  <Hero 
+                    onListenClick={togglePlayback} 
+                    isPlaying={isPlaying} 
+                    liveMetadata={liveMetadata}
+                    onNavigateToProgram={setSelectedProgram}
+                  />
+                  <RecentlyPlayed tracks={trackHistory} />
+                </>
+              } 
+            />
+            
+            {/* App Home */}
             <Route path="/app" element={<AppHomePage />} />
+            
+            {/* Music & Schedule */}
             <Route path="/music" element={<Playlist />} />
-            <Route path="/schedule" element={<ScheduleList onNavigateToProgram={setSelectedProgram} onBack={() => navigate('/')} />} />
+            <Route 
+              path="/schedule" 
+              element={
+                <ScheduleList 
+                  onNavigateToProgram={setSelectedProgram} 
+                  onBack={() => navigate('/')} 
+                />
+              } 
+            />
+            
+            {/* Páginas de conteúdo */}
+            <Route path="/devotional" element={<DevotionalPage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/new-releases" element={<NewReleasesPage />} />
+            <Route path="/artists" element={<FeaturedArtistsPage />} />
+            <Route path="/presenters" element={<PresentersPage onNavigateToProgram={setSelectedProgram} />} />
+            <Route path="/live-recordings" element={<LiveRecordingsPage />} />
+            <Route path="/help" element={<HelpCenterPage />} />
+            <Route path="/feedback" element={<FeedbackPage />} />
+            
+            {/* Autenticação */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/my-sounds" element={<ProtectedRoute><MySoundsPage /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            
+            {/* Rotas protegidas */}
+            <Route 
+              path="/my-sounds" 
+              element={
+                <ProtectedRoute>
+                  <MySoundsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Páginas legais */}
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsOfUsePage />} />
+            <Route path="/cookies" element={<CookiesPolicyPage />} />
+            
+            {/* Fallback - redireciona para home */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         )}
@@ -251,4 +312,3 @@ export default function App() {
     </AuthProvider>
   );
 }
-
