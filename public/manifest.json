@@ -2,7 +2,7 @@
   "name": "Praise FM USA",
   "short_name": "Praise FM",
   "description": "Praise FM USA – Christian Radio",
-  "start_url": "/",
+  "start_url": "/app",
   "scope": "/",
   "display": "standalone",
   "background_color": "#000000",
