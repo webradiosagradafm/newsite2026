@@ -192,6 +192,9 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col pb-[120px] bg-white dark:bg-[#121212] transition-colors">
+      {/* H1 oculto para SEO */}
+      <h1 className="sr-only">Praise FM USA - 24/7 Gospel Radio Station</h1>
+      
       {!isAppRoute && (
         <Navbar
           activeTab={location.pathname === '/' ? 'home' : location.pathname.split('/')[1]}
