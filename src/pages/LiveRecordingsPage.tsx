@@ -18,7 +18,7 @@ const LIVE_SESSIONS: LiveSession[] = [
     artist: 'Brandon Lake',
     location: 'Studio A - Chicago, IL',
     date: 'Oct 15, 2025',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1767583738/BRANDON_LAKE_nf7pyj.jpg',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823362/BRANDON_LAKE_pirbp8.webp',
     songs: ['Gratitude', 'Praise', 'Trust In God'],
     description: 'An acoustic afternoon captured in our main studio. Brandon strips down his biggest hits for an intimate worship experience.'
   },
@@ -27,7 +27,7 @@ const LIVE_SESSIONS: LiveSession[] = [
     artist: 'Elevation Worship',
     location: 'Worship Night Live - Miami',
     date: 'Sep 28, 2025',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1767998578/ELEVATION_WORSHIP_olxxoe.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823362/BRANDON_LAKE_pirbp8.webp',
     songs: ['More Than Able', 'LION', 'What I See'],
     description: 'Captured during the sold-out Miami leg of their tour. The energy and spontaneous moments are unlike anything recorded in a studio.'
   },
@@ -36,7 +36,7 @@ const LIVE_SESSIONS: LiveSession[] = [
     artist: 'Maverick City Music',
     location: 'The Warehouse Sessions',
     date: 'Aug 12, 2025',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1767998578/MAVERICK_CITY_MUSIC_bboqfi.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823362/MAVERICK_CITY_MUSIC_qh1a2r.webp',
     songs: ['Jireh', 'Promises', 'Man Of Your Word'],
     description: 'A raw, unedited session featuring the full choir. We turned an old industrial warehouse into a sanctuary for one night.'
   },
@@ -45,7 +45,7 @@ const LIVE_SESSIONS: LiveSession[] = [
     artist: 'Lauren Daigle',
     location: 'Orchestra Hall - Nashville',
     date: 'July 05, 2025',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1767998578/LAUREN_DAIGLE_xe9ops.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823362/LAUREN_DAIGLE_cjqazt.webp',
     songs: ['You Say', 'Rescue', 'Hold On To Me'],
     description: 'Lauren joins a 60-piece orchestra for a cinematic reimagining of her most beloved tracks. Epic and moving.'
   }
