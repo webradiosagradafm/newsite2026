@@ -11,37 +11,37 @@ interface PresentersPageProps {
 const PRESENTERS_DATA = [
   {
     name: 'Stancy Campbell',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882823/Stancy_Campbell_oair1x.png',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820659/Stancy_Campbell_mthzer.webp',
     bio: 'The energetic voice behind the Morning Show. Stancy brings hope and high energy to your start of the day with a perfect mix of chart-toppers and heartfelt talk.',
     programTitle: 'Morning Show'
   },
   {
     name: 'Michael Ray',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882821/Michael_Ray_u4bkfd.png',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Michael_Ray_uu6qt4.webp',
     bio: 'Michael Ray is your midday companion, curating soul-stirring worship for your work hours. His Midday Grace segment is a favorite for those seeking peace during a busy day.',
     programTitle: 'Midday Grace'
   },
   {
     name: 'Sarah Jordan',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882821/Sarah_Jordan_uecxmi.png',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820659/Sarah_Jordan_qpkmh6.webp',
     bio: 'A champion for the new generation, Sarah hosts Future Artists, where she discovers and promotes independent faith-filled talent from all over the world.',
     programTitle: 'Future Artists'
   },
   {
     name: 'Daniel Brooks',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882820/Daniel_Brooks_bcammc.png',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Daniel_Brooks_u0in3j.webp',
     bio: 'The voice of the night. Daniel leads Midnight Grace, providing a tranquil atmosphere for reflection, prayer, and peaceful sleep through chosen worship melodies.',
     programTitle: 'Midnight Grace'
   },
   {
     name: 'Rachel Harris',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Rachel_Harris_kxjpa1.png',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820659/Rachel_Harris_wxw9bl.web',
     bio: 'Rachel makes your commute feel shorter. With Carpool, she mixes the biggest hits with listener stories, making sure you get home with a smile on your face.',
     programTitle: 'Carpool'
   },
   {
     name: 'Scott Turner',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882823/Scott_Turner_hxkuxd.png',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820659/Scott_Turner_z6nqbq.webp',
     bio: 'A historian of worship music. Scott hosts Classics, taking us back to the heritage hymns and hits that built the foundation of contemporary faith music.',
     programTitle: 'Classics'
   }

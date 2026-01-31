@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Loader2, ArrowRight } from 'lucide-react';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -22,7 +23,7 @@ const SignUpPage: React.FC = () => {
     setLoading(true);
     setError(null);
     
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await SupabaseClient.auth.signUp({ email, password });
     if (error) {
       setError(error.message);
       setLoading(false);
@@ -36,7 +37,7 @@ const SignUpPage: React.FC = () => {
       <div className="w-full max-w-md bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-xl p-8 transition-colors">
         <div className="text-center mb-8">
           <img 
-            src="https://res.cloudinary.com/dtecypmsh/image/upload/v1766869698/SVGUSA_lduiui.webp" 
+            src="https://res.cloudinary.com/dtecypmsh/image/upload/v1769820657/logo_hochsa.webp" 
             alt="Praise FM USA" 
             className="h-10 mx-auto mb-6 dark:invert"
           />
