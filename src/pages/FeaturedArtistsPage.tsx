@@ -17,42 +17,42 @@ const FEATURED_ARTISTS: Artist[] = [
     id: 'art_1', 
     name: 'Brandon Lake', 
     genre: 'Contemporary Worship', 
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1767583738/BRANDON_LAKE_nf7pyj.jpg', 
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823362/BRANDON_LAKE_pirbp8.webp', 
     hits: ['Gratitude', 'Trust In God', 'Praise'] 
   },
   { 
     id: 'art_2', 
     name: 'Tauren Wells', 
     genre: 'Christian Pop / R&B', 
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1767583739/TAUREN_WELLS_jtxknp.jpg', 
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823979/TAUREN_WELLS_elfhyd.webp', 
     hits: ['Known', 'Joy In The Morning', 'Take It All Back'] 
   },
   { 
     id: 'art_3', 
     name: 'Forrest Frank', 
     genre: 'Indie Pop', 
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1767583738/FORREST_FRANK_yyn2kz.jpg', 
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769824459/FORREST_FRANK_jolxny.webp', 
     hits: ['Good Day', 'No Longer Bound', 'UP!'] 
   },
   { 
     id: 'art_4', 
     name: 'Ben Fuller', 
     genre: 'Country / Soul', 
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1767583739/BEN_FULLER_liiys5.jpg', 
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769824684/BEN_FULLER_pulwau.webp', 
     hits: ['Who I Am', 'If I Got Jesus', 'But the Cross'] 
   },
   { 
     id: 'art_5', 
     name: 'Lauren Daigle', 
     genre: 'Christian Pop', 
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1767998578/LAUREN_DAIGLE_xe9ops.webp', 
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823362/LAUREN_DAIGLE_cjqazt.webp', 
     hits: ['You Say', 'Rescue', 'Thank God I Do'] 
   },
   { 
     id: 'art_6', 
     name: 'Elevation Worship', 
     genre: 'Modern Worship', 
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1767998578/ELEVATION_WORSHIP_olxxoe.webp', 
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823362/ELEVATION_WORSHIP_hyuqfg.webp', 
     hits: ['LION', 'Trust In God', 'More Than Able'] 
   }
 ];
