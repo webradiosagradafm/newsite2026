@@ -8,18 +8,18 @@ export const COLORS = {
 };
 
 const IMAGES = {
-  DANIEL_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882820/Daniel_Brooks_bcammc.png',
-  JORDAN_REYS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882821/Jordan_Reyes_drufeg.png',
-  LIVING_THE_MESSAGE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882820/Living_the_Message_x7hmwc.png',
-  MAT_RILEY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882820/Matt_Riley_b2n8fi.png',
-  MICHAEL_RAY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882821/Michael_Ray_u4bkfd.png',
-  LIVE_SHOW: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882820/Praise_FM_Live_Show_lgb7jm.png',
-  NON_STOP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Non_Stop_ipfman.png',
-  WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Praise_FM_Worship_ypenw8.png',
-  RACHEL_HARRIS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882822/Rachel_Harris_kxjpa1.png',
-  SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882821/Sarah_Jordan_uecxmi.png',
-  SCOTT_TURNER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882823/Scott_Turner_hxkuxd.png',
-  STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1766882823/Stancy_Campbell_oair1x.png'
+  DANIEL_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Daniel_Brooks_u0in3j.webp',
+  JORDAN_REYS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Jordan_Reyes_r0rioq.webp',
+  LIVING_THE_MESSAGE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Living_the_Message_jxvd6v.webp',
+  MAT_RILEY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Matt_Riley_uduuzk.webp',
+  MICHAEL_RAY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Michael_Ray_uu6qt4.webp',
+  LIVE_SHOW: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Praise_FM_Live_Show_r5xhug.webp',
+  NON_STOP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Praise_FM_Non_Stop_hrvbim.webp',
+  WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Praise_FM_Worship_gz29id.webp',
+  RACHEL_HARRIS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820659/Rachel_Harris_wxw9bl.webp',
+  SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820659/Sarah_Jordan_qpkmh6.webp',
+  SCOTT_TURNER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820659/Scott_Turner_z6nqbq.webp',
+  STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820659/Stancy_Campbell_mthzer.webp'
 };
 
 const commonDaily: Program[] = [
