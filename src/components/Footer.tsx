@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
           <div className="col-span-2">
             <div className="flex items-center mb-6 cursor-pointer" onClick={() => navigate('/')}>
               <img 
-                src="https://res.cloudinary.com/dtecypmsh/image/upload/v1766869698/SVGUSA_lduiui.webp" 
+                src="https://res.cloudinary.com/dtecypmsh/image/upload/v1769820657/logo_hochsa.webp" 
                 alt="Praise FM USA Logo" 
                 className="h-10 w-auto object-contain"
                 style={{ filter: 'invert(1) hue-rotate(180deg)' }}

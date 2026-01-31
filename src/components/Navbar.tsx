@@ -61,7 +61,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
             onClick={() => navigate('/')}
           >
             <img
-              src="https://res.cloudinary.com/dtecypmsh/image/upload/v1766869698/SVGUSA_lduiui.webp"
+              src="https://res.cloudinary.com/dtecypmsh/image/upload/v1769820657/logo_hochsa.webp"
               alt="Praise FM USA Logo"
               className={`h-7 w-auto object-contain transition-all ${
                 theme === 'dark' ? 'brightness-0 invert' : ''
