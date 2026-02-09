@@ -33,7 +33,7 @@ const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6t
 
 const BLOCKED_METADATA_KEYWORDS = [
   'praise fm', 'praisefm', 'commercial', 'spot', 'promo', 'ident', 'sweeper',
-  'intro', 'outro', 'announcement', 'station id', 'jingle', 'bumper'
+  'intro', 'program', 'announcement', 'station id', 'jingle', 'bumper'
 ];
 
 interface LiveMetadata {
