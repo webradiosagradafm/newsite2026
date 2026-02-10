@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Volume2, VolumeX, Volume1, List, X, RotateCcw, RotateCw } from 'lucide-react';
 import { Program } from '../types';
 import { supabase } from '../lib/supabase';
+import LiveListenersCounter from './LiveListenersCounter';
 
 interface LivePlayerBarProps {
   isPlaying: boolean;
@@ -314,19 +315,26 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                 </span>
               </div>
               
-              <button 
-                onClick={(e) => { 
-                  e.stopPropagation();
-                  onTogglePlayback(); 
-                }}
-                className="flex-shrink-0 w-12 h-12 rounded-full border-2 border-black dark:border-white flex items-center justify-center bg-white dark:bg-[#121212]"
-              >
-                {isPlaying ? (
-                  <Pause className="w-5 h-5 text-black dark:text-white fill-current" />
-                ) : (
-                  <Play className="w-5 h-5 text-black dark:text-white fill-current ml-0.5" />
-                )}
-              </button>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={(e) => { 
+                    e.stopPropagation();
+                    onTogglePlayback(); 
+                  }}
+                  className="flex-shrink-0 w-12 h-12 rounded-full border-2 border-black dark:border-white flex items-center justify-center bg-white dark:bg-[#121212]"
+                >
+                  {isPlaying ? (
+                    <Pause className="w-5 h-5 text-black dark:text-white fill-current" />
+                  ) : (
+                    <Play className="w-5 h-5 text-black dark:text-white fill-current ml-0.5" />
+                  )}
+                </button>
+
+                {/* Listeners Counter Mobile */}
+                <div onClick={(e) => e.stopPropagation()}>
+                  <LiveListenersCounter variant="minimal" />
+                </div>
+              </div>
             </div>
           ) : (
             <div className="flex flex-col">
@@ -475,6 +483,11 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                 <RotateCw className="w-5 h-5" strokeWidth={2} />
                 <span className="absolute text-[9px] font-bold mt-[2px]">30</span>
               </button>
+
+              {/* Listeners Counter Desktop - ao lado do botão play */}
+              <div className="ml-2">
+                <LiveListenersCounter variant="minimal" />
+              </div>
             </div>
 
             <div className="flex items-center justify-end space-x-4 w-[30%]">
