@@ -23,6 +23,54 @@ const getListenerId = (): string => {
   return listenerId;
 };
 
+// Função para obter informações do ouvinte
+const getListenerInfo = async () => {
+  const userAgent = navigator.userAgent;
+  
+  // Detectar device
+  const isMobile = /Mobile|Android|iPhone|iPad|iPod/i.test(userAgent);
+  const isTablet = /iPad|Android(?!.*Mobile)/i.test(userAgent);
+  let device = 'Desktop';
+  if (isMobile) device = 'Mobile';
+  if (isTablet) device = 'Tablet';
+  
+  // Detectar browser
+  let browser = 'Unknown';
+  if (userAgent.includes('Chrome')) browser = 'Chrome';
+  else if (userAgent.includes('Firefox')) browser = 'Firefox';
+  else if (userAgent.includes('Safari')) browser = 'Safari';
+  else if (userAgent.includes('Edge')) browser = 'Edge';
+  
+  // Pegar referrer (de onde veio)
+  const referrer = document.referrer || 'Direct';
+  
+  // Buscar IP e localização (usando API gratuita)
+  let ipData = {
+    ip: 'Unknown',
+    country: 'Unknown',
+    city: 'Unknown'
+  };
+  
+  try {
+    const response = await fetch('https://ipapi.co/json/');
+    const data = await response.json();
+    ipData = {
+      ip: data.ip || 'Unknown',
+      country: data.country_name || 'Unknown',
+      city: data.city || 'Unknown'
+    };
+  } catch (error) {
+    console.log('Não conseguiu obter localização:', error);
+  }
+  
+  return {
+    device,
+    browser,
+    referrer,
+    ...ipData
+  };
+};
+
 const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayback, program, liveMetadata, queue = [], audioRef }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
@@ -47,24 +95,47 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
     sessionIdRef.current = sessionId;
     startTimeRef.current = Date.now();
 
+    // Obter informações do ouvinte
+    const listenerInfo = await getListenerInfo();
+
+    // DEBUG: Ver o que está no program
+    console.log('🔍 DEBUG - Program data:', {
+      title: program.title,
+      id: program.id,
+      host: program.host,
+      fullProgram: program
+    });
+
+    console.log('🌍 DEBUG - Listener info:', listenerInfo);
+
     try {
+      const dataToInsert = {
+        user_id: listenerId,
+        session_id: sessionId,
+        audio_id: program.title || program.host || `Program ${program.id}` || 'Unknown Program',
+        duration_seconds: 0,
+        completed: false,
+        ip_address: listenerInfo.ip,
+        country: listenerInfo.country,
+        city: listenerInfo.city,
+        device: listenerInfo.device,
+        browser: listenerInfo.browser,
+        referrer: listenerInfo.referrer
+      };
+
+      console.log('📤 Enviando para Supabase:', dataToInsert);
+
       const { error } = await supabase
         .from('listeners')
-        .insert({
-          user_id: listenerId,
-          session_id: sessionId,
-          audio_id: program.title || `Program ${program.id}`,
-          duration_seconds: 0,
-          completed: false
-        });
+        .insert(dataToInsert);
 
       if (error) {
-        console.error('Erro ao registrar ouvinte:', error);
+        console.error('❌ Erro ao registrar ouvinte:', error);
       } else {
-        console.log('✅ Ouvinte registrado com sucesso!');
+        console.log('✅ Ouvinte registrado com sucesso!', dataToInsert);
       }
     } catch (err) {
-      console.error('Erro ao conectar com Supabase:', err);
+      console.error('❌ Erro ao conectar com Supabase:', err);
     }
   };
 
