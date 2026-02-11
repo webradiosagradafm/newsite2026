@@ -53,7 +53,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         .insert({
           user_id: listenerId,
           session_id: sessionId,
-          audio_id: program.id || program.title,
+          audio_id: program.title || `Program ${program.id}`,
           duration_seconds: 0,
           completed: false
         });
