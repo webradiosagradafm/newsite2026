@@ -3,6 +3,36 @@ import { Play, Pause, Volume2, VolumeX, Volume1, List, X, RotateCcw, RotateCw } 
 import { Program } from '../types';
 import { supabase } from '../lib/supabase';
 
+// Add global CSS for the live pulse animation
+const LivePulseAnimation = () => {
+  useEffect(() => {
+    // Inject animation CSS into the document
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes live-pulse {
+        0%, 100% { 
+          opacity: 0.7; 
+          transform: translate(-50%, -50%) scale(0.9); 
+        }
+        50% { 
+          opacity: 1; 
+          transform: translate(-50%, -50%) scale(1.3); 
+        }
+      }
+      .animate-live-pulse {
+        animation: live-pulse 1.8s infinite;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+  
+  return null;
+};
+
 interface LivePlayerBarProps {
   isPlaying: boolean;
   onTogglePlayback: () => void;
@@ -122,7 +152,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
     const listenerInfo = await getListenerInfo();
 
     // DEBUG: Ver o que está no program
-    console.log('🔍 DEBUG - Program data:', {
+    console.log('🔍 DEBUG - Program ', {
       title: program.title,
       id: program.id,
       host: program.host,
@@ -320,6 +350,9 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
 
   return (
     <>
+      {/* Inject animation CSS globally */}
+      <LivePulseAnimation />
+
       {/* SCHEDULE DRAWER - LIVE + next 4 */}
       <div 
         className={`fixed top-0 right-0 bottom-0 w-full md:w-96 z-[100] bg-white dark:bg-[#121212] transition-transform duration-300 flex flex-col shadow-2xl ${showSchedule ? 'translate-x-0' : 'translate-x-full'}`}
@@ -491,10 +524,17 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                 </div>
               </div>
 
+              {/* REALISTIC LIVE INDICATOR - REPLACED STATIC BAR */}
               <div className="px-4 py-3">
-                <div className="w-full h-1 bg-gray-200 dark:bg-white/10 rounded-full relative">
-                  <div className="absolute top-0 left-0 h-full bg-[#ff6600] rounded-full transition-all" style={{ width: '100%' }}></div>
-                  <div className="absolute top-1/2 -translate-y-1/2 bg-[#ff6600] w-2 h-2 rounded-full" style={{ left: '100%' }}></div>
+                <div className="w-full h-1 bg-gray-200 dark:bg-white/10 rounded-full relative overflow-hidden">
+                  {/* Moving pulse dot for live streams */}
+                  <div 
+                    className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#ff6600] shadow-[0_0_8px_rgba(255,102,0,0.8)] animate-live-pulse"
+                    style={{ 
+                      left: `${((Date.now() / 500) % 100)}%`,
+                      transition: 'left 0.5s linear'
+                    }}
+                  />
                 </div>
               </div>
 
@@ -564,8 +604,16 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
       {/* DESKTOP PLAYER BAR */}
       {isPlaying && (
         <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 hidden md:flex flex-col transition-colors duration-300">
-          <div className="w-full h-1 bg-gray-100 dark:bg-white/5 relative overflow-hidden">
-            <div className="absolute top-0 left-0 h-full bg-[#ff6600] transition-all duration-1000" style={{ width: isPlaying ? '100%' : '0%' }}></div>
+          {/* REALISTIC LIVE INDICATOR - REPLACED STATIC BAR */}
+          <div className="w-full h-1.5 bg-gray-100 dark:bg-white/5 relative overflow-hidden">
+            {/* Moving pulse dot for live streams */}
+            <div 
+              className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#ff6600] shadow-[0_0_10px_rgba(255,102,0,0.9)] animate-live-pulse"
+              style={{ 
+                left: `${((Date.now() / 400) % 100)}%`,
+                transition: 'left 0.4s linear'
+              }}
+            />
           </div>
 
           <div className="flex items-center justify-between px-8 py-4">
