@@ -12,6 +12,30 @@ interface LivePlayerBarProps {
   audioRef: React.RefObject<HTMLAudioElement | null>;
 }
 
+// Helper function to format time to AM/PM
+const formatTimeToAmPm = (timeString: string): string => {
+  try {
+    // If it's already formatted (like "10:00 AM"), return as is
+    if (timeString.includes('AM') || timeString.includes('PM')) {
+      return timeString;
+    }
+    
+    // Parse time string (assuming format like "14:30" or "2:30 PM")
+    const [hours, minutes] = timeString.split(':');
+    let hour = parseInt(hours);
+    const period = hour >= 12 ? 'PM' : 'AM';
+    
+    // Convert to 12-hour format
+    hour = hour % 12;
+    hour = hour ? hour : 12; // 0 should be 12
+    
+    return `${hour}:${minutes || '00'} ${period}`;
+  } catch (error) {
+    console.error('Error formatting time:', error);
+    return timeString;
+  }
+};
+
 // Função para gerar/pegar ID único do ouvinte
 const getListenerId = (): string => {
   let listenerId = localStorage.getItem('listener_id');
@@ -59,7 +83,7 @@ const getListenerInfo = async () => {
       city: data.city || 'Unknown'
     };
   } catch (error) {
-    console.log('Não conseguiu obter localização:', error);
+    console.log('Could not get location:', error);
   }
   
   return {
@@ -122,19 +146,19 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         referrer: listenerInfo.referrer
       };
 
-      console.log('📤 Enviando para Supabase:', dataToInsert);
+      console.log('📤 Sending to Supabase:', dataToInsert);
 
       const { error } = await supabase
         .from('listeners')
         .insert(dataToInsert);
 
       if (error) {
-        console.error('❌ Erro ao registrar ouvinte:', error);
+        console.error('❌ Error registering listener:', error);
       } else {
-        console.log('✅ Ouvinte registrado com sucesso!', dataToInsert);
+        console.log('✅ Listener registered successfully!', dataToInsert);
       }
     } catch (err) {
-      console.error('❌ Erro ao conectar com Supabase:', err);
+      console.error('❌ Error connecting to Supabase:', err);
     }
   };
 
@@ -150,7 +174,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         .update({ duration_seconds: durationSeconds })
         .eq('session_id', sessionIdRef.current);
     } catch (err) {
-      console.error('Erro ao atualizar duração:', err);
+      console.error('Error updating duration:', err);
     }
   };
 
@@ -169,9 +193,9 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         })
         .eq('session_id', sessionIdRef.current);
 
-      console.log('✅ Sessão marcada como completa');
+      console.log('✅ Session marked as complete');
     } catch (err) {
-      console.error('Erro ao marcar como completado:', err);
+      console.error('Error marking as completed:', err);
     }
   };
 
@@ -296,12 +320,12 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
 
   return (
     <>
-      {/* SCHEDULE DRAWER - Só LIVE + próximos 4 */}
+      {/* SCHEDULE DRAWER - LIVE + next 4 */}
       <div 
         className={`fixed top-0 right-0 bottom-0 w-full md:w-96 z-[100] bg-white dark:bg-[#121212] transition-transform duration-300 flex flex-col shadow-2xl ${showSchedule ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
-          <h2 className="text-lg font-semibold text-black dark:text-white">Programação</h2>
+          <h2 className="text-lg font-semibold text-black dark:text-white">Schedule</h2>
           <button 
             onClick={() => setShowSchedule(false)} 
             className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
@@ -311,7 +335,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         </div>
 
         <div className="flex-grow overflow-y-auto pb-20 md:pb-0">
-          {/* Programa LIVE */}
+          {/* LIVE Program */}
           <div className="p-3 border-b border-gray-100 dark:border-white/5">
             <div className="flex items-start space-x-3">
               <div className="w-16 h-16 flex-shrink-0 rounded overflow-hidden">
@@ -325,13 +349,13 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                   {program.host}
                 </span>
                 <span className="text-xs text-gray-400 dark:text-gray-500 truncate">
-                  {program.startTime} - {program.endTime} • AO VIVO
+                  {formatTimeToAmPm(program.startTime)} - {formatTimeToAmPm(program.endTime)} • LIVE
                 </span>
               </div>
             </div>
           </div>
           
-          {/* Próximos 4 programas */}
+          {/* Next 4 programs */}
           {queue && queue.slice(0, 4).map((prog, index) => (
             <div key={prog.id} className="p-3 border-b border-gray-100 dark:border-white/5">
               <div className="flex items-start space-x-3">
@@ -346,7 +370,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                     {prog.host}
                   </span>
                   <span className="text-xs text-gray-400 dark:text-gray-500 truncate">
-                    {prog.startTime} - {prog.endTime}
+                    {formatTimeToAmPm(prog.startTime)} - {formatTimeToAmPm(prog.endTime)}
                   </span>
                 </div>
                 <span className="text-xs font-medium text-[#00d9c9] mt-1">
@@ -356,7 +380,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
             </div>
           ))}
           
-          {/* Placeholder para garantir 5 programas */}
+          {/* Placeholder to ensure 5 programs */}
           {queue && queue.slice(0, 4).length < 4 && (
             <>
               {Array.from({ length: 4 - queue.slice(0, 4).length }).map((_, index) => (
@@ -379,7 +403,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         </div>
       </div>
 
-      {/* Overlay quando drawer aberto */}
+      {/* Overlay when drawer is open */}
       {showSchedule && (
         <div 
           className="fixed inset-0 bg-black/50 z-[99] md:hidden"
@@ -405,7 +429,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                   {program.title}
                 </span>
                 <span className="text-sm text-gray-500 dark:text-gray-400 truncate leading-tight">
-                  {program.host} • AO VIVO
+                  {program.host} • LIVE
                 </span>
               </div>
               
@@ -438,7 +462,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
           ) : (
             <div className="flex flex-col">
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
-                <span className="text-sm font-semibold text-black dark:text-white">Programação</span>
+                <span className="text-sm font-semibold text-black dark:text-white">Schedule</span>
                 <button 
                   onClick={() => {
                     setIsExpanded(false);
@@ -459,10 +483,10 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                     {program.title}
                   </span>
                   <span className="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
-                    com {program.host}
+                    with {program.host}
                   </span>
                   <span className="text-xs text-gray-400 dark:text-gray-500">
-                    {program.startTime} - {program.endTime} • AO VIVO
+                    {formatTimeToAmPm(program.startTime)} - {formatTimeToAmPm(program.endTime)} • LIVE
                   </span>
                 </div>
               </div>
@@ -528,7 +552,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
 
                   <div className="flex items-center space-x-1.5">
                     <div className="w-2 h-2 bg-[#00d9c9] rounded-full animate-pulse"></div>
-                    <span className="text-xs font-bold text-[#00d9c9] uppercase">AO VIVO</span>
+                    <span className="text-xs font-bold text-[#00d9c9] uppercase">LIVE</span>
                   </div>
                 </div>
               </div>
@@ -554,7 +578,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                   {program.title}
                 </h4>
                 <p className="text-[11px] font-normal text-gray-500 dark:text-gray-400 truncate tracking-tight mt-0.5">
-                  com {program.host}
+                  with {program.host}
                 </p>
               </div>
             </div>
@@ -630,7 +654,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
 
               <div className="flex items-center space-x-1.5 px-2">
                 <div className="w-2 h-2 bg-[#00d9c9] rounded-full animate-pulse"></div>
-                <span className="text-xs font-bold text-[#00d9c9] uppercase tracking-wider">AO VIVO</span>
+                <span className="text-xs font-bold text-[#00d9c9] uppercase tracking-wider">LIVE</span>
               </div>
             </div>
           </div>
