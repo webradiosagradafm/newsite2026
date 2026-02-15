@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Volume2, VolumeX, Volume1, List, X, RotateCcw, RotateCw } from 'lucide-react';
 import { Program } from '../types';
 import { supabase } from '../lib/supabase';
-import LiveListenersCounter from './LiveListenersCounter'; // Certifique-se que o arquivo existe!
 
 interface LivePlayerBarProps {
   isPlaying: boolean;
@@ -403,7 +402,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
 
                 {/* Listeners Counter Mobile */}
                 <div onClick={(e) => e.stopPropagation()}>
-                  <LiveListenersCounter variant="minimal" />
                 </div>
               </div>
             </div>
@@ -557,7 +555,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
 
               {/* Listeners Counter Desktop - ao lado do botão play */}
               <div className="ml-2">
-                <LiveListenersCounter variant="minimal" />
               </div>
             </div>
 
