@@ -3,6 +3,7 @@ import { Play, Pause, ChevronRight, Zap, ArrowRight } from 'lucide-react';
 import { SCHEDULES } from '../constants';
 import { Program } from '../types';
 import { useNavigate } from 'react-router-dom';
+import DaySelector from '../DaySelector';
 
 const getChicagoInfo = () => {
   const now = new Date();
