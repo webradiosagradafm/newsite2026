@@ -47,9 +47,14 @@ const Hero: React.FC<HeroProps> = ({
   }, []);
 
   const chicago = useMemo(() => getChicagoInfo(), [tick]);
+  const [selectedDay, setSelectedDay] = useState(chicago.day);
+
+  useEffect(() => {
+    setSelectedDay(chicago.day);
+  }, [chicago.day]);
 
   const { currentProgram, upNextPrograms } = useMemo(() => {
-    const schedule = SCHEDULES[chicago.day] || SCHEDULES[1];
+    const schedule = SCHEDULES[selectedDay] || SCHEDULES[1];
 
     const currentIndex = schedule.findIndex((p) => {
       const [sH, sM] = p.startTime.split(':').map(Number);
@@ -64,12 +69,13 @@ const Hero: React.FC<HeroProps> = ({
     });
 
     const current = currentIndex !== -1 ? schedule[currentIndex] : schedule[0];
-    const next = currentIndex !== -1
-      ? schedule.slice(currentIndex + 1, currentIndex + 3)
-      : schedule.slice(1, 3);
+    const next =
+      currentIndex !== -1
+        ? schedule.slice(currentIndex + 1, currentIndex + 3)
+        : schedule.slice(1, 3);
 
     return { currentProgram: current, upNextPrograms: next };
-  }, [chicago]);
+  }, [chicago, selectedDay]);
 
   const progress = useMemo(() => {
     if (!currentProgram) return 0;
@@ -100,6 +106,8 @@ const Hero: React.FC<HeroProps> = ({
   return (
     <section className="bg-white dark:bg-[#000000] py-10 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4">
+        <DaySelector selectedDay={selectedDay} onChange={setSelectedDay} />
+
         <div className="flex flex-col md:flex-row items-center md:items-start gap-12">
           <div
             className="relative flex-shrink-0 group cursor-pointer"
