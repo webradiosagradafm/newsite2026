@@ -20,7 +20,6 @@ const IMAGES = {
   SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/SARAH_JORDAN_oehx8m.webp',
 
   WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Praise_FM_Worship_gz29id.webp',
-  LIVE_SHOW: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Praise_FM_Live_Show_r5xhug.webp',
 };
 
 const commonDaily: Program[] = [
@@ -32,27 +31,25 @@ const commonDaily: Program[] = [
 
   { id: '4', title: 'Praise FM Worship', host: 'Praise FM Team', startTime: '12:00', endTime: '13:00', description: 'Midday reflection and worship.', image: IMAGES.WORSHIP },
 
-  { id: '5', title: 'Midday Grace', host: 'Michael Ray', startTime: '13:00', endTime: '14:00', description: 'Soulful sounds for your afternoon.', image: IMAGES.MICHAEL_RAY },
+  { id: '5', title: 'Midday Grace', host: 'Michael Ray', startTime: '13:00', endTime: '16:00', description: 'Soulful sounds for your afternoon.', image: IMAGES.MICHAEL_RAY },
 
-  { id: '6', title: 'Midday Grace: Flow Hour', host: 'DJ Zion', startTime: '14:00', endTime: '15:00', description: 'Urban gospel, rap and rhythm.', image: IMAGES.DJ_ZION },
+  { id: '6', title: 'Praise FM Flow', host: 'DJ Zion', startTime: '16:00', endTime: '17:00', description: 'Urban gospel, rap and rhythm.', image: IMAGES.DJ_ZION },
 
-  { id: '7', title: 'Midday Grace', host: 'Michael Ray', startTime: '15:00', endTime: '17:00', description: 'Soulful sounds for your afternoon.', image: IMAGES.MICHAEL_RAY },
+  { id: '7', title: 'Future Artists', host: 'Sarah Jordan', startTime: '17:00', endTime: '18:00', description: 'Discover the next generation.', image: IMAGES.SARAH_JORDAN },
 
-  { id: '8', title: 'Future Artists', host: 'Sarah Jordan', startTime: '17:00', endTime: '18:00', description: 'Discover the next generation.', image: IMAGES.SARAH_JORDAN },
+  { id: '8', title: 'Carpool', host: 'Rachel Harris', startTime: '18:00', endTime: '20:00', description: 'Drive home companion.', image: IMAGES.RACHEL_HARRIS },
 
-  { id: '9', title: 'Carpool', host: 'Rachel Harris', startTime: '18:00', endTime: '20:00', description: 'Drive home companion.', image: IMAGES.RACHEL_HARRIS },
+  { id: '9', title: 'Praise FM Rock', host: 'Jake Hunter', startTime: '20:00', endTime: '21:00', description: 'Energy, guitars and faith.', image: IMAGES.JAKE_HUNTER },
 
-  { id: '10', title: 'Praise FM Rock', host: 'Jake Hunter', startTime: '20:00', endTime: '21:00', description: 'Energy, guitars and faith.', image: IMAGES.JAKE_HUNTER },
+  { id: '10', title: 'Praise FM Classics', host: 'Scott Turner', startTime: '21:00', endTime: '22:00', description: 'Timeless hits.', image: IMAGES.SCOTT_TURNER },
 
-  { id: '11', title: 'Praise FM Classics', host: 'Scott Turner', startTime: '21:00', endTime: '22:00', description: 'Timeless hits.', image: IMAGES.SCOTT_TURNER },
-
-  { id: '12', title: 'Praise FM Chill', host: 'Ava Brooks', startTime: '22:00', endTime: '00:00', description: 'Relax and unwind.', image: IMAGES.AVA_BROOKS },
+  { id: '11', title: 'Praise FM Chill', host: 'Ava Brooks', startTime: '22:00', endTime: '00:00', description: 'Relax and unwind.', image: IMAGES.AVA_BROOKS },
 ];
 
 export const SCHEDULES: Record<number, Program[]> = {
   1: commonDaily,
   2: commonDaily,
-  3: commonDaily, // se quiser Live Show depois a gente reativa
+  3: commonDaily,
   4: commonDaily,
   5: commonDaily,
   6: commonDaily,
