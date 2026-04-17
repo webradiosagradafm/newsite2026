@@ -36,7 +36,7 @@ const commonDaily: Program[] = [
 
   { id: '6', title: 'Midday Grace: Flow Hour', host: 'DJ Zion', startTime: '14:00', endTime: '15:00', description: 'Urban gospel, rap and rhythm.', image: IMAGES.DJ_ZION },
 
-  { id: '7', title: 'Midday Grace', host: 'Michael Ray', startTime: '15:00', endTime: '16:00', description: 'Soulful sounds for your afternoon.', image: IMAGES.MICHAEL_RAY },
+  { id: '7', title: 'Midday Grace', host: 'Michael Ray', startTime: '15:00', endTime: '17:00', description: 'Soulful sounds for your afternoon.', image: IMAGES.MICHAEL_RAY },
 
   { id: '8', title: 'Future Artists', host: 'Sarah Jordan', startTime: '17:00', endTime: '18:00', description: 'Discover the next generation.', image: IMAGES.SARAH_JORDAN },
 
@@ -52,11 +52,10 @@ const commonDaily: Program[] = [
 export const SCHEDULES: Record<number, Program[]> = {
   1: commonDaily,
   2: commonDaily,
-  3: commonDaily,
+  3: commonDaily, // se quiser Live Show depois a gente reativa
   4: commonDaily,
   5: commonDaily,
   6: commonDaily,
-
   0: commonDaily
 };
 
