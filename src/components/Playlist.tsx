@@ -52,9 +52,7 @@ const MASTER_ARTISTS = [
                                                                     toggleFavorite({ 
                                                                           id: track.trackId.toString(), 
                                                                                 title: track.trackName, 
-                                                                                      host: track.artistName, 
-                                                                                            image: track.artworkUrl100.replace("100x100", "600x600"),
-                                                                                                  type: 'track' 
+                                                                                            image: track.artworkUrl100.replace("100x100", "600x600")
                                                                                                       });
                                                                                                         };
 

@@ -19,8 +19,7 @@ const DevotionalSection: React.FC = () => {
       id: podcast.id,
       title: podcast.title,
       subtitle: podcast.author,
-      image: podcast.image,
-      type: 'devotional'
+      image: podcast.image
     });
   };
 
