@@ -249,9 +249,9 @@ const NewReleasesPage: React.FC = () => {
     toggleFavorite({
       id: release.id,
       title: release.title,
-      host: release.artist,
+      subtitle: release.artist,
       image: release.image,
-      type: 'track'
+      item_type: 'track'
     });
   };
 

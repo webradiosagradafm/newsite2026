@@ -81,8 +81,7 @@ const FeaturedArtistsPage: React.FC = () => {
       id: artist.id,
       title: artist.name,
       subtitle: artist.genre,
-      image: artist.image,
-      type: 'artist'
+      image: artist.image
     });
   };
 
