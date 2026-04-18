@@ -25,6 +25,10 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfUsePage from './pages/TermsOfUsePage';
 import CookiesPolicyPage from './pages/CookiesPolicyPage';
 import AppHomePage from './pages/AppHomePage';
+import ProgramsPage from './pages/ProgramsPage';
+import ChristianRadioPage from './pages/ChristianRadioPage';
+import GospelRadioPage from './pages/GospelRadioPage';
+import WorshipRadioPage from './pages/WorshipRadioPage';
 import { SCHEDULES } from './constants';
 import { Program } from './types';
 
@@ -42,8 +46,6 @@ interface LiveMetadata {
   playedAt?: Date;
   isMusic?: boolean;
 }
-
-/* -------------------- HELPERS -------------------- */
 
 const getChicagoDayAndTotalMinutes = () => {
   const now = new Date();
@@ -68,8 +70,6 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return user ? <>{children}</> : <Navigate to="/login" />;
 };
 
-/* -------------------- APP CONTENT -------------------- */
-
 const AppContent: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [liveMetadata, setLiveMetadata] = useState<LiveMetadata | null>(null);
@@ -84,8 +84,6 @@ const AppContent: React.FC = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
-
-  /* -------------------- SCHEDULE -------------------- */
 
   const { day, total } = getChicagoDayAndTotalMinutes();
 
@@ -105,14 +103,10 @@ const AppContent: React.FC = () => {
     };
   }, [day, total]);
 
-  /* -------------------- THEME -------------------- */
-
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
     localStorage.setItem('praise-theme', theme);
   }, [theme]);
-
-  /* -------------------- AUDIO -------------------- */
 
   useEffect(() => {
     const audio = new Audio(STREAM_URL);
@@ -138,8 +132,6 @@ const AppContent: React.FC = () => {
     isPlaying ? audioRef.current.pause() : audioRef.current.play().catch(() => {});
   };
 
-  /* -------------------- MEDIA SESSION (SPOTIFY STYLE) -------------------- */
-
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
 
@@ -152,8 +144,6 @@ const AppContent: React.FC = () => {
     navigator.mediaSession.setActionHandler('play', togglePlayback);
     navigator.mediaSession.setActionHandler('pause', togglePlayback);
   }, [liveMetadata, isPlaying]);
-
-  /* -------------------- METADATA -------------------- */
 
   useEffect(() => {
     const es = new EventSource(METADATA_URL, { withCredentials: false });
@@ -188,13 +178,10 @@ const AppContent: React.FC = () => {
 
   const isAppRoute = location.pathname === '/app';
 
-  /* -------------------- RENDER -------------------- */
-
   return (
     <div className="min-h-screen flex flex-col pb-[120px] bg-white dark:bg-[#121212] transition-colors">
-      {/* H1 oculto para SEO */}
       <h1 className="sr-only">Praise FM USA - 24/7 Gospel Radio Station</h1>
-      
+
       {!isAppRoute && (
         <Navbar
           activeTab={location.pathname === '/' ? 'home' : location.pathname.split('/')[1]}
@@ -214,38 +201,34 @@ const AppContent: React.FC = () => {
           />
         ) : (
           <Routes>
-            {/* Página inicial */}
-            <Route 
-              path="/" 
+            <Route
+              path="/"
               element={
                 <>
-                  <Hero 
-                    onListenClick={togglePlayback} 
-                    isPlaying={isPlaying} 
+                  <Hero
+                    onListenClick={togglePlayback}
+                    isPlaying={isPlaying}
                     liveMetadata={liveMetadata}
                     onNavigateToProgram={setSelectedProgram}
                   />
                   <RecentlyPlayed tracks={trackHistory} />
                 </>
-              } 
+              }
             />
-            
-            {/* App Home */}
+
             <Route path="/app" element={<AppHomePage />} />
-            
-            {/* Music & Schedule */}
+
             <Route path="/music" element={<Playlist />} />
-            <Route 
-              path="/schedule" 
+            <Route
+              path="/schedule"
               element={
-                <ScheduleList 
-                  onNavigateToProgram={setSelectedProgram} 
-                  onBack={() => navigate('/')} 
+                <ScheduleList
+                  onNavigateToProgram={setSelectedProgram}
+                  onBack={() => navigate('/')}
                 />
-              } 
+              }
             />
-            
-            {/* Páginas de conteúdo */}
+
             <Route path="/devotional" element={<DevotionalPage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/new-releases" element={<NewReleasesPage />} />
@@ -254,35 +237,36 @@ const AppContent: React.FC = () => {
             <Route path="/live-recordings" element={<LiveRecordingsPage />} />
             <Route path="/help" element={<HelpCenterPage />} />
             <Route path="/feedback" element={<FeedbackPage />} />
-            
-            {/* Autenticação */}
+
+            <Route path="/programs" element={<ProgramsPage />} />
+            <Route path="/christian-radio" element={<ChristianRadioPage />} />
+            <Route path="/gospel-radio" element={<GospelRadioPage />} />
+            <Route path="/worship-radio" element={<WorshipRadioPage />} />
+
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
-            
-            {/* Rotas protegidas */}
-            <Route 
-              path="/my-sounds" 
+
+            <Route
+              path="/my-sounds"
               element={
                 <ProtectedRoute>
                   <MySoundsPage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/profile" 
+            <Route
+              path="/profile"
               element={
                 <ProtectedRoute>
                   <ProfilePage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            
-            {/* Páginas legais */}
+
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfUsePage />} />
             <Route path="/cookies" element={<CookiesPolicyPage />} />
-            
-            {/* Fallback - redireciona para home */}
+
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         )}
@@ -302,8 +286,6 @@ const AppContent: React.FC = () => {
     </div>
   );
 };
-
-/* -------------------- ROOT -------------------- */
 
 export default function App() {
   return (
