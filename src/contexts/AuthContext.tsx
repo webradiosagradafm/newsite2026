@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import type { User, Session } from '@supabase/supabase-js';
 
 interface FavoriteItem {
   id?: string | number;
@@ -22,8 +21,8 @@ interface ToggleFavoriteInput {
 }
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: any | null;
+  session: any | null;
   loading: boolean;
   favorites: FavoriteItem[];
   toggleFavorite: (item: ToggleFavoriteInput) => Promise<void>;
@@ -35,10 +34,12 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<any | null>(null);
+  const [session, setSession] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+
+  const auth = (supabase as any).auth;
 
   const fetchFavorites = async (userId: string) => {
     try {
@@ -57,9 +58,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       setFavorites((data as FavoriteItem[]) || []);
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : String(e);
-      console.error('Unexpected error fetching favorites:', message);
+    } catch (e: any) {
+      console.error('Unexpected error fetching favorites:', e?.message || String(e));
     }
   };
 
@@ -68,21 +68,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const initAuth = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        const response = await auth.getSession();
+        const currentSession = response?.data?.session ?? null;
 
         if (!isMounted) return;
 
-        setSession(session);
-        setUser(session?.user ?? null);
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
 
-        if (session?.user?.id) {
-          await fetchFavorites(session.user.id);
+        if (currentSession?.user?.id) {
+          await fetchFavorites(currentSession.user.id);
         }
-      } catch (e: unknown) {
-        const message = e instanceof Error ? e.message : String(e);
-        console.error('Auth init error:', message);
+      } catch (e: any) {
+        console.error('Auth init error:', e?.message || String(e));
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -90,24 +88,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initAuth();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
-      setSession(nextSession);
-      setUser(nextSession?.user ?? null);
+    const authListener = auth.onAuthStateChange(
+      async (_event: any, nextSession: any) => {
+        setSession(nextSession ?? null);
+        setUser(nextSession?.user ?? null);
 
-      if (nextSession?.user?.id) {
-        await fetchFavorites(nextSession.user.id);
-      } else {
-        setFavorites([]);
+        if (nextSession?.user?.id) {
+          await fetchFavorites(nextSession.user.id);
+        } else {
+          setFavorites([]);
+        }
+
+        setLoading(false);
       }
-
-      setLoading(false);
-    });
+    );
 
     return () => {
       isMounted = false;
-      subscription.unsubscribe();
+      authListener?.data?.subscription?.unsubscribe?.();
     };
   }, []);
 
@@ -164,9 +162,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setFavorites((prev) => [...prev, data[0] as FavoriteItem]);
         }
       }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error('Toggle favorite failed:', message);
+    } catch (err: any) {
+      console.error('Toggle favorite failed:', err?.message || String(err));
     }
   };
 
@@ -177,10 +174,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : String(e);
-      console.error('Sign out error:', message);
+      await auth.signOut();
+    } catch (e: any) {
+      console.error('Sign out error:', e?.message || String(e));
     } finally {
       setUser(null);
       setSession(null);
