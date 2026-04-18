@@ -2,7 +2,7 @@ import SEO from "../components/SEO";
 
 export default function ProgramsPage() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className="mx-auto max-w-4xl px-4 py-10 text-black dark:text-white">
       <SEO
         title="Praise FM Programs | Christian Radio Shows"
         description="Discover all programs on Praise FM United States. Christian radio shows, worship music, gospel, and inspirational content 24/7."
