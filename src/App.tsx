@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { HashRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -290,10 +290,10 @@ const AppContent: React.FC = () => {
 export default function App() {
   return (
     <AuthProvider>
-      <HashRouter>
+      <BrowserRouter>
         <ScrollToTop />
         <AppContent />
-      </HashRouter>
+      </<BrowserRouter>>
     </AuthProvider>
   );
 }
