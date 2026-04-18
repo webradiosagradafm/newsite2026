@@ -1,19 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
 import App from './App';
 
 // 👇 IMPORTANTE
-import { registerSW } from 'virtual:pwa-register';
+if ('serviceWorker' in navigator) {
+  try {
+    const { registerSW } = await import('virtual:pwa-register' as any);
 
-const updateSW = registerSW({
-  onNeedRefresh() {
-    console.log('🔄 New version available');
-  },
-  onOfflineReady() {
-    console.log('✅ App ready offline');
-  },
-});
+    const updateSW = registerSW({
+      onNeedRefresh() {
+        console.log('🔄 New version available');
+      },
+      onOfflineReady() {
+        console.log('✅ App ready offline');
+      },
+    });
+  } catch (error) {
+    console.warn('PWA registration failed:', error);
+  }
+}
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
