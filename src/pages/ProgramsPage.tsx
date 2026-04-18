@@ -4,49 +4,29 @@ export default function ProgramsPage() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-10 text-black dark:text-white">
       <SEO
-        title="Praise FM Programs | Christian Radio Shows"
-        description="Discover all programs on Praise FM United States. Christian radio shows, worship music, gospel, and inspirational content 24/7."
+        title="Praise FM Programs | Global Christian Radio Shows"
+        description="Explore all programs on Praise FM. Christian radio shows, worship music, and gospel programming streaming worldwide."
       />
 
-      <h1>Praise FM Programs</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        Praise FM Programs
+      </h1>
 
-      <p>
-        Explore the full lineup of Praise FM United States. Our Christian radio
-        station features inspiring programs, worship music, gospel hits, and
-        uplifting content throughout the day.
+      <p className="mb-4">
+        Discover the full lineup of Praise FM. Our programs are designed to inspire,
+        encourage, and bring faith-filled music to listeners around the world.
       </p>
 
-      <h2>Featured Shows</h2>
-
-      <ul>
-        <li>
-          <a href="/programs/morning-show-with-stancy-campbell">
-            Morning Show With Stancy Campbell
-          </a>
-        </li>
-        <li>
-          <a href="/programs/midday-grace">
-            Midday Grace
-          </a>
-        </li>
-        <li>
-          <a href="/programs/praise-fm-worship">
-            Praise FM Worship
-          </a>
-        </li>
-      </ul>
-
-      <h2>Listen Anytime</h2>
-      <p>
-        All programs are part of our 24/7 Christian radio stream, available
-        worldwide. Listen live and stay connected through music, faith, and
-        encouragement.
+      <p className="mb-4">
+        From worship sessions to gospel hits and special shows, Praise FM delivers
+        a global Christian radio experience 24/7.
       </p>
 
-      <nav>
-        <a href="/listen-live">Listen Live</a> |{" "}
-        <a href="/christian-radio">Christian Radio</a>
-      </nav>
+      <p>
+        <a href="/#/christian-radio">Christian Radio</a> |{" "}
+        <a href="/#/gospel-radio">Gospel Radio</a> |{" "}
+        <a href="/#/worship-radio">Worship Radio</a>
+      </p>
     </main>
   );
 }

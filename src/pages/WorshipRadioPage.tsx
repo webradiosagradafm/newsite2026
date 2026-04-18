@@ -4,37 +4,29 @@ export default function WorshipRadioPage() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-10 text-black dark:text-white">
       <SEO
-        title="Worship Radio | Praise FM United States"
-        description="Listen to worship radio live with Praise FM United States. Non-stop worship music, praise songs, and Christian inspiration 24/7."
+        title="Worship Radio Live | Praise FM Global"
+        description="Listen to worship radio live with Praise FM. Non-stop worship music and praise songs streaming worldwide."
       />
 
-      <h1>Worship Radio</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        Worship Radio Live
+      </h1>
 
-      <p>
-        Praise FM United States is your destination for worship radio. Enjoy
-        non-stop worship music, praise songs, and a peaceful listening
-        experience anytime.
+      <p className="mb-4">
+        Praise FM is your destination for worship radio live. Experience non-stop worship music,
+        praise songs, and a peaceful atmosphere designed to strengthen your faith.
       </p>
 
-      <h2>Non-Stop Worship Music</h2>
-      <p>
-        Our worship programming includes top Christian artists, live-style
-        worship tracks, and songs that help you connect spiritually wherever
-        you are.
+      <p className="mb-4">
+        Wherever you are in the world, you can connect through worship and music that inspires.
+        Let every song bring you closer to God.
       </p>
 
-      <h2>A Global Worship Station</h2>
       <p>
-        Listeners from across the world tune in to Praise FM for worship music.
-        Whether you're at home, driving, or working, our stream is always
-        available.
+        <a href="/#/christian-radio">Christian Radio</a> |{" "}
+        <a href="/#/gospel-radio">Gospel Radio</a> |{" "}
+        <a href="/">Listen Live</a>
       </p>
-
-      <nav>
-        <a href="/christian-radio">Christian Radio</a> |{" "}
-        <a href="/gospel-radio">Gospel Radio</a> |{" "}
-        <a href="/listen-live">Listen Live</a>
-      </nav>
     </main>
   );
 }
