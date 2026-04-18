@@ -6,7 +6,6 @@ import { supabase } from '../lib/supabase';
 // Add global CSS for the live pulse animation
 const LivePulseAnimation = () => {
   useEffect(() => {
-    // Inject animation CSS into the document
     const style = document.createElement('style');
     style.textContent = `
       @keyframes live-pulse {
@@ -24,12 +23,12 @@ const LivePulseAnimation = () => {
       }
     `;
     document.head.appendChild(style);
-    
+
     return () => {
       document.head.removeChild(style);
     };
   }, []);
-  
+
   return null;
 };
 
@@ -45,25 +44,80 @@ interface LivePlayerBarProps {
 // Helper function to format time to AM/PM
 const formatTimeToAmPm = (timeString: string): string => {
   try {
-    // If it's already formatted (like "10:00 AM"), return as is
     if (timeString.includes('AM') || timeString.includes('PM')) {
       return timeString;
     }
-    
-    // Parse time string (assuming format like "14:30" or "2:30 PM")
+
     const [hours, minutes] = timeString.split(':');
     let hour = parseInt(hours);
     const period = hour >= 12 ? 'PM' : 'AM';
-    
-    // Convert to 12-hour format
+
     hour = hour % 12;
-    hour = hour ? hour : 12; // 0 should be 12
-    
+    hour = hour ? hour : 12;
+
     return `${hour}:${minutes || '00'} ${period}`;
   } catch (error) {
     console.error('Error formatting time:', error);
     return timeString;
   }
+};
+
+// Time helpers for real program progress
+const getChicagoNow = () => {
+  return new Date(
+    new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })
+  );
+};
+
+const timeStringToMinutes = (timeString: string): number => {
+  const [hours, minutes] = timeString.split(':').map(Number);
+  return hours * 60 + minutes;
+};
+
+const getProgramProgress = (program: Program | null | undefined): number => {
+  if (!program) return 0;
+
+  const now = getChicagoNow();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const start = timeStringToMinutes(program.startTime);
+  let end = timeStringToMinutes(program.endTime);
+
+  if (end === 0) end = 24 * 60;
+  if (end < start) end += 24 * 60;
+
+  let adjustedNow = nowMinutes;
+  if (adjustedNow < start && end > 1440) adjustedNow += 1440;
+
+  const duration = end - start;
+  const elapsed = adjustedNow - start;
+
+  if (duration <= 0) return 0;
+  if (elapsed <= 0) return 0;
+  if (elapsed >= duration) return 100;
+
+  return (elapsed / duration) * 100;
+};
+
+const getRemainingMinutes = (program: Program | null | undefined): number => {
+  if (!program) return 0;
+
+  const now = getChicagoNow();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const start = timeStringToMinutes(program.startTime);
+  let end = timeStringToMinutes(program.endTime);
+
+  if (end === 0) end = 24 * 60;
+  if (end < start) end += 24 * 60;
+
+  let adjustedNow = nowMinutes;
+  if (adjustedNow < start && end > 1440) adjustedNow += 1440;
+
+  if (adjustedNow <= start) return end - start;
+  if (adjustedNow >= end) return 0;
+
+  return end - adjustedNow;
 };
 
 // Função para gerar/pegar ID único do ouvinte
@@ -79,31 +133,27 @@ const getListenerId = (): string => {
 // Função para obter informações do ouvinte
 const getListenerInfo = async () => {
   const userAgent = navigator.userAgent;
-  
-  // Detectar device
+
   const isMobile = /Mobile|Android|iPhone|iPad|iPod/i.test(userAgent);
   const isTablet = /iPad|Android(?!.*Mobile)/i.test(userAgent);
   let device = 'Desktop';
   if (isMobile) device = 'Mobile';
   if (isTablet) device = 'Tablet';
-  
-  // Detectar browser
+
   let browser = 'Unknown';
   if (userAgent.includes('Chrome')) browser = 'Chrome';
   else if (userAgent.includes('Firefox')) browser = 'Firefox';
   else if (userAgent.includes('Safari')) browser = 'Safari';
   else if (userAgent.includes('Edge')) browser = 'Edge';
-  
-  // Pegar referrer (de onde veio)
+
   const referrer = document.referrer || 'Direct';
-  
-  // Buscar IP e localização (usando API gratuita)
+
   let ipData = {
     ip: 'Unknown',
     country: 'Unknown',
     city: 'Unknown'
   };
-  
+
   try {
     const response = await fetch('https://ipapi.co/json/');
     const data = await response.json();
@@ -115,7 +165,7 @@ const getListenerInfo = async () => {
   } catch (error) {
     console.log('Could not get location:', error);
   }
-  
+
   return {
     device,
     browser,
@@ -124,7 +174,14 @@ const getListenerInfo = async () => {
   };
 };
 
-const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayback, program, liveMetadata, queue = [], audioRef }) => {
+const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
+  isPlaying,
+  onTogglePlayback,
+  program,
+  liveMetadata,
+  queue = [],
+  audioRef
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
   const [volume, setVolume] = useState(() => {
@@ -135,6 +192,8 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
   const [prevVolume, setPrevVolume] = useState(0.8);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
+  const [progress, setProgress] = useState(0);
+  const [remainingMinutes, setRemainingMinutes] = useState(0);
 
   // Estados para rastreamento
   const sessionIdRef = useRef<string | null>(null);
@@ -148,10 +207,8 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
     sessionIdRef.current = sessionId;
     startTimeRef.current = Date.now();
 
-    // Obter informações do ouvinte
     const listenerInfo = await getListenerInfo();
 
-    // DEBUG: Ver o que está no program
     console.log('🔍 DEBUG - Program ', {
       title: program.title,
       id: program.id,
@@ -214,10 +271,10 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
 
     try {
       const durationSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000);
-      
+
       await supabase
         .from('listeners')
-        .update({ 
+        .update({
           completed: true,
           duration_seconds: durationSeconds
         })
@@ -232,26 +289,20 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
   // Effect para rastrear quando começar/parar de tocar
   useEffect(() => {
     if (isPlaying && !sessionIdRef.current) {
-      // Começou a ouvir
       trackListeningStart();
-
-      // Atualizar duração a cada 10 segundos
       durationIntervalRef.current = setInterval(updateDuration, 10000);
     } else if (!isPlaying && sessionIdRef.current) {
-      // Parou de ouvir
       updateDuration();
-      
+
       if (durationIntervalRef.current) {
         clearInterval(durationIntervalRef.current);
       }
 
-      // Marcar como completo se ouviu mais de 5 minutos
       const listenedMinutes = (Date.now() - startTimeRef.current) / 60000;
       if (listenedMinutes >= 5) {
         markAsCompleted();
       }
 
-      // Reset da sessão
       sessionIdRef.current = null;
     }
 
@@ -262,7 +313,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
     };
   }, [isPlaying]);
 
-  // Cleanup ao desmontar componente
   useEffect(() => {
     return () => {
       if (sessionIdRef.current) {
@@ -295,6 +345,18 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
       audioRef.current.playbackRate = playbackRate;
     }
   }, [volume, isMuted, playbackRate, audioRef]);
+
+  useEffect(() => {
+    const updateProgress = () => {
+      setProgress(getProgramProgress(program));
+      setRemainingMinutes(getRemainingMinutes(program));
+    };
+
+    updateProgress();
+    const interval = setInterval(updateProgress, 15000);
+
+    return () => clearInterval(interval);
+  }, [program]);
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
@@ -345,22 +407,24 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
     } else {
       document.body.style.overflow = 'unset';
     }
-    return () => { document.body.style.overflow = 'unset'; };
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [showSchedule, isExpanded]);
 
   return (
     <>
-      {/* Inject animation CSS globally */}
       <LivePulseAnimation />
 
       {/* SCHEDULE DRAWER - LIVE + next 4 */}
-      <div 
+      <div
         className={`fixed top-0 right-0 bottom-0 w-full md:w-96 z-[100] bg-white dark:bg-[#121212] transition-transform duration-300 flex flex-col shadow-2xl ${showSchedule ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
           <h2 className="text-lg font-semibold text-black dark:text-white">Schedule</h2>
-          <button 
-            onClick={() => setShowSchedule(false)} 
+          <button
+            onClick={() => setShowSchedule(false)}
+            aria-label="Close schedule"
             className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
           >
             <X className="w-5 h-5 text-black dark:text-white" />
@@ -368,7 +432,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         </div>
 
         <div className="flex-grow overflow-y-auto pb-20 md:pb-0">
-          {/* LIVE Program */}
           <div className="p-3 border-b border-gray-100 dark:border-white/5">
             <div className="flex items-start space-x-3">
               <div className="w-16 h-16 flex-shrink-0 rounded overflow-hidden">
@@ -387,8 +450,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
               </div>
             </div>
           </div>
-          
-          {/* Next 4 programs */}
+
           {queue && queue.slice(0, 4).map((prog, index) => (
             <div key={prog.id} className="p-3 border-b border-gray-100 dark:border-white/5">
               <div className="flex items-start space-x-3">
@@ -412,8 +474,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
               </div>
             </div>
           ))}
-          
-          {/* Placeholder to ensure 5 programs */}
+
           {queue && queue.slice(0, 4).length < 4 && (
             <>
               {Array.from({ length: 4 - queue.slice(0, 4).length }).map((_, index) => (
@@ -436,21 +497,20 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         </div>
       </div>
 
-      {/* Overlay when drawer is open */}
       {showSchedule && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-[99] md:hidden"
           onClick={() => setShowSchedule(false)}
-        ></div>
+        />
       )}
 
       {/* MOBILE MINI-PLAYER */}
       {isPlaying && (
-        <div 
-          className={`fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 md:hidden transition-all duration-300 ${isExpanded ? 'h-auto' : 'h-[72px]'}`}
+        <div
+          className={`fixed bottom-0 left-0 right-0 z-[60] bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md border-t border-gray-200 dark:border-white/10 md:hidden transition-all duration-300 shadow-2xl ${isExpanded ? 'h-auto' : 'h-[72px]'}`}
         >
           {!isExpanded ? (
-            <div 
+            <div
               className="flex items-center justify-between px-4 py-3 h-[72px]"
               onClick={() => {
                 setIsExpanded(true);
@@ -465,13 +525,14 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                   {program.host} • LIVE
                 </span>
               </div>
-              
+
               <div className="flex items-center gap-2">
-                <button 
-                  onClick={(e) => { 
+                <button
+                  onClick={(e) => {
                     e.stopPropagation();
-                    onTogglePlayback(); 
+                    onTogglePlayback();
                   }}
+                  aria-label={isPlaying ? 'Pause live radio' : 'Play live radio'}
                   className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-black dark:border-white flex items-center justify-center bg-white dark:bg-[#121212]"
                 >
                   {isPlaying ? (
@@ -481,11 +542,12 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                   )}
                 </button>
 
-                <button 
-                  onClick={(e) => { 
-                    e.stopPropagation(); 
-                    setShowSchedule(true); 
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSchedule(true);
                   }}
+                  aria-label="Open schedule"
                   className="p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white"
                 >
                   <List className="w-5 h-5" />
@@ -496,11 +558,12 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
             <div className="flex flex-col">
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
                 <span className="text-sm font-semibold text-black dark:text-white">Schedule</span>
-                <button 
+                <button
                   onClick={() => {
                     setIsExpanded(false);
                     setShowSchedule(false);
                   }}
+                  aria-label="Close expanded player"
                   className="p-2"
                 >
                   <X className="w-5 h-5 text-black dark:text-white" />
@@ -524,38 +587,49 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                 </div>
               </div>
 
-              {/* REALISTIC LIVE INDICATOR - REPLACED STATIC BAR */}
+              {/* REAL PROGRAM PROGRESS - MOBILE */}
               <div className="px-4 py-3">
-                <div className="w-full h-1 bg-gray-200 dark:bg-white/10 rounded-full relative overflow-hidden">
-                  {/* Moving pulse dot for live streams */}
-                  <div 
-                    className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#ff6600] shadow-[0_0_8px_rgba(255,102,0,0.8)] animate-live-pulse"
-                    style={{ 
-                      left: `${((Date.now() / 500) % 100)}%`,
-                      transition: 'left 0.5s linear'
-                    }}
-                  />
+                <div className="w-full">
+                  <div className="relative h-1.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#ff6600] rounded-full transition-all duration-700 ease-out"
+                      style={{ width: `${progress}%` }}
+                    />
+                    <div
+                      className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#ff6600] shadow-[0_0_10px_rgba(255,102,0,0.9)] transition-all duration-700 ease-out"
+                      style={{ left: `calc(${progress}% - 6px)` }}
+                    />
+                  </div>
+
+                  <div className="flex justify-between mt-2 text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                    <span>{formatTimeToAmPm(program.startTime)}</span>
+                    <span>{remainingMinutes} min left</span>
+                    <span>{formatTimeToAmPm(program.endTime)}</span>
+                  </div>
                 </div>
               </div>
 
               <div className="flex items-center justify-center space-x-6 px-4 py-4">
-                <button 
+                <button
                   onClick={skip30Backward}
+                  aria-label="Skip backward 30 seconds"
                   className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300"
                 >
                   <RotateCcw className="w-5 h-5" strokeWidth={2} />
                   <span className="absolute text-[9px] font-bold mt-[2px]">30</span>
                 </button>
 
-                <button 
+                <button
                   onClick={onTogglePlayback}
+                  aria-label={isPlaying ? 'Pause live radio' : 'Play live radio'}
                   className="w-12 h-12 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center shadow-lg"
                 >
                   {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
                 </button>
 
-                <button 
+                <button
                   onClick={skip30Forward}
+                  aria-label="Skip forward 30 seconds"
                   className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300"
                 >
                   <RotateCw className="w-5 h-5" strokeWidth={2} />
@@ -565,13 +639,13 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
 
               <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-white/5">
                 <div className="flex items-center space-x-2 flex-grow">
-                  <button onClick={toggleMute} className="p-2">
+                  <button onClick={toggleMute} aria-label={isMuted ? 'Unmute' : 'Mute'} className="p-2">
                     <VolumeIcon />
                   </button>
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max="1" 
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
                     step="0.01"
                     value={isMuted ? 0 : volume}
                     onChange={handleVolumeChange}
@@ -583,7 +657,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                 </div>
 
                 <div className="flex items-center space-x-3 ml-4">
-                  <button 
+                  <button
                     onClick={cyclePlaybackRate}
                     className="px-2.5 py-1 text-xs font-semibold text-black dark:text-white border border-gray-300 dark:border-white/30 rounded"
                   >
@@ -603,17 +677,27 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
 
       {/* DESKTOP PLAYER BAR */}
       {isPlaying && (
-        <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 hidden md:flex flex-col transition-colors duration-300">
-          {/* REALISTIC LIVE INDICATOR - REPLACED STATIC BAR */}
-          <div className="w-full h-1.5 bg-gray-100 dark:bg-white/5 relative overflow-hidden">
-            {/* Moving pulse dot for live streams */}
-            <div 
-              className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#ff6600] shadow-[0_0_10px_rgba(255,102,0,0.9)] animate-live-pulse"
-              style={{ 
-                left: `${((Date.now() / 400) % 100)}%`,
-                transition: 'left 0.4s linear'
-              }}
-            />
+        <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md border-t border-gray-200 dark:border-white/10 hidden md:flex flex-col transition-colors duration-300 shadow-2xl">
+          {/* REAL PROGRAM PROGRESS - DESKTOP */}
+          <div className="w-full px-8 pt-2">
+            <div className="w-full">
+              <div className="relative h-1.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#ff6600] rounded-full transition-all duration-700 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#ff6600] shadow-[0_0_10px_rgba(255,102,0,0.9)] transition-all duration-700 ease-out"
+                  style={{ left: `calc(${progress}% - 6px)` }}
+                />
+              </div>
+
+              <div className="flex justify-between mt-2 text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                <span>{formatTimeToAmPm(program.startTime)}</span>
+                <span>{remainingMinutes} min left</span>
+                <span>{formatTimeToAmPm(program.endTime)}</span>
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center justify-between px-8 py-4">
@@ -632,49 +716,52 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
             </div>
 
             <div className="flex items-center justify-center space-x-6">
-              <button 
+              <button
                 onClick={skip30Backward}
+                aria-label="Skip backward 30 seconds"
                 className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
               >
                 <RotateCcw className="w-5 h-5" strokeWidth={2} />
                 <span className="absolute text-[9px] font-bold mt-[2px]">30</span>
               </button>
 
-              <button 
+              <button
                 onClick={onTogglePlayback}
+                aria-label={isPlaying ? 'Pause live radio' : 'Play live radio'}
                 className="w-12 h-12 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center hover:scale-105 transition-all active:scale-95 shadow-md"
               >
                 {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
               </button>
 
-              <button 
+              <button
                 onClick={skip30Forward}
+                aria-label="Skip forward 30 seconds"
                 className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
               >
                 <RotateCw className="w-5 h-5" strokeWidth={2} />
                 <span className="absolute text-[9px] font-bold mt-[2px]">30</span>
               </button>
-
-              {/* Listeners Counter Desktop - ao lado do botão play */}
-              <div className="ml-2">
-              </div>
             </div>
 
             <div className="flex items-center justify-end space-x-4 w-[30%]">
-              <div 
+              <div
                 className="flex items-center space-x-2 relative"
                 onMouseEnter={() => setShowVolumeSlider(true)}
                 onMouseLeave={() => setShowVolumeSlider(false)}
               >
-                <button onClick={toggleMute} className="p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
+                <button
+                  onClick={toggleMute}
+                  aria-label={isMuted ? 'Unmute' : 'Mute'}
+                  className="p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
+                >
                   <VolumeIcon />
                 </button>
-                
+
                 <div className={`flex items-center transition-all duration-200 overflow-hidden ${showVolumeSlider ? 'w-24 opacity-100' : 'w-0 opacity-0'}`}>
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max="1" 
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
                     step="0.01"
                     value={isMuted ? 0 : volume}
                     onChange={handleVolumeChange}
@@ -686,15 +773,16 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={cyclePlaybackRate}
                 className="px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white border border-gray-300 dark:border-white/20 rounded hover:border-black dark:hover:border-white transition-all"
               >
                 {playbackRate}×
               </button>
 
-              <button 
+              <button
                 onClick={() => setShowSchedule(true)}
+                aria-label="Open schedule"
                 className="p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
               >
                 <List className="w-6 h-6" strokeWidth={2} />
