@@ -2,7 +2,7 @@ import SEO from "../components/SEO";
 
 export default function WorshipRadioPage() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className="mx-auto max-w-4xl px-4 py-10 text-black dark:text-white">
       <SEO
         title="Worship Radio | Praise FM United States"
         description="Listen to worship radio live with Praise FM United States. Non-stop worship music, praise songs, and Christian inspiration 24/7."
