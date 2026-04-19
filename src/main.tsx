@@ -1,13 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import './index.css';
 
-// 👇 IMPORTANTE
-if ('serviceWorker' in navigator) {
+async function registerPWA() {
+  if (!('serviceWorker' in navigator)) return;
+
   try {
-    const { registerSW } = await import('virtual:pwa-register' as any);
+    const { registerSW } = await import('virtual:pwa-register');
 
-    const updateSW = registerSW({
+    registerSW({
       onNeedRefresh() {
         console.log('🔄 New version available');
       },
@@ -20,9 +22,11 @@ if ('serviceWorker' in navigator) {
   }
 }
 
+registerPWA();
+
 const rootElement = document.getElementById('root');
 if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
+  throw new Error('Could not find root element to mount to');
 }
 
 const root = ReactDOM.createRoot(rootElement);
