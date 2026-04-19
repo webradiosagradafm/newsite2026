@@ -1,12 +1,12 @@
 {
-  "name": "Praise FM USA",
+  "name": "Praise FM - Global Christian Radio",
   "short_name": "Praise FM",
-  "description": "Praise FM USA – Christian Radio",
-  "start_url": "/app",
+  "description": "Global Christian radio streaming 24/7 with gospel, worship, and praise music.",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#000000",
-  "theme_color": "#ff6600",
+  "theme_color": "#000000",
   "orientation": "portrait",
   "icons": [
     {
