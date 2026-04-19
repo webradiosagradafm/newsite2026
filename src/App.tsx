@@ -186,7 +186,7 @@ const AppContent: React.FC = () => {
   const isAppRoute = location.pathname === '/app';
 
   return (
-    <div className="min-h-screen flex flex-col pb-[120px] bg-white dark:bg-[#121212] transition-colors">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#121212] transition-colors">
       <h1 className="sr-only">Praise FM USA - 24/7 Gospel Radio Station</h1>
 
       {!isAppRoute && (
@@ -197,7 +197,7 @@ const AppContent: React.FC = () => {
         />
       )}
 
-      <main className="flex-grow">
+      <main className={`flex-grow transition-all duration-300 ${isPlaying ? 'pb-[88px] md:pb-[120px]' : 'pb-0'}`}>
         {selectedProgram ? (
           <ProgramDetail
             program={selectedProgram}
