@@ -7,7 +7,9 @@ import {
   useLocation,
   useNavigate
 } from 'react-router-dom';
+
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
@@ -16,6 +18,7 @@ import LivePlayerBar from './components/LivePlayerBar';
 import ProgramDetail from './components/ProgramDetail';
 import Playlist from './components/Playlist';
 import ScheduleList from './components/ScheduleList';
+
 import DevotionalPage from './pages/DevotionalPage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
@@ -31,11 +34,12 @@ import EventsPage from './pages/EventsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfUsePage from './pages/TermsOfUsePage';
 import CookiesPolicyPage from './pages/CookiesPolicyPage';
-import AppHomePage from './pages/AppHomePage';
+
 import ProgramsPage from './pages/ProgramsPage';
 import ChristianRadioPage from './pages/ChristianRadioPage';
 import GospelRadioPage from './pages/GospelRadioPage';
 import WorshipRadioPage from './pages/WorshipRadioPage';
+
 import { SCHEDULES } from './constants';
 import { Program } from './types';
 
@@ -43,8 +47,8 @@ const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv';
 const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv';
 
 const BLOCKED_METADATA_KEYWORDS = [
-  'praise fm', 'praisefm', 'commercial', 'spot', 'promo', 'ident', 'sweeper',
-  'intro', 'program', 'announcement', 'station id', 'jingle', 'bumper'
+  'praise fm','praisefm','commercial','spot','promo','ident','sweeper',
+  'intro','program','announcement','station id','jingle','bumper'
 ];
 
 interface LiveMetadata {
@@ -56,7 +60,10 @@ interface LiveMetadata {
 
 const getChicagoDayAndTotalMinutes = () => {
   const now = new Date();
-  const chicagoDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+  const chicagoDate = new Date(
+    now.toLocaleString('en-US', { timeZone: 'America/Chicago' })
+  );
+
   return {
     day: chicagoDate.getDay(),
     total: chicagoDate.getHours() * 60 + chicagoDate.getMinutes()
@@ -65,15 +72,19 @@ const getChicagoDayAndTotalMinutes = () => {
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
   return null;
 };
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
+
   if (loading) return <div className="min-h-screen bg-white dark:bg-[#121212]" />;
+
   return user ? <>{children}</> : <Navigate to="/login" />;
 };
 
@@ -87,7 +98,6 @@ const AppContent: React.FC = () => {
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -96,11 +106,14 @@ const AppContent: React.FC = () => {
 
   const { currentProgram, queue } = useMemo(() => {
     const schedule = SCHEDULES[day] || SCHEDULES[1];
+
     const index = schedule.findIndex(p => {
       const [sH, sM] = p.startTime.split(':').map(Number);
       const [eH, eM] = p.endTime.split(':').map(Number);
+
       const start = sH * 60 + sM;
       const end = (eH === 0 ? 24 : eH) * 60 + eM;
+
       return total >= start && total < end;
     });
 
@@ -117,9 +130,7 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     const audio = new Audio(STREAM_URL);
-    audio.crossOrigin = 'anonymous';
-    (audio as any).playsInline = true;
-    audio.preload = 'none';
+
     audio.volume = parseFloat(localStorage.getItem('praise-volume') || '0.8');
 
     audio.addEventListener('play', () => setIsPlaying(true));
@@ -130,36 +141,25 @@ const AppContent: React.FC = () => {
     return () => {
       audio.pause();
       audio.src = '';
-      audioRef.current = null;
     };
   }, []);
 
   const togglePlayback = () => {
     if (!audioRef.current) return;
-    isPlaying ? audioRef.current.pause() : audioRef.current.play().catch(() => {});
+
+    isPlaying
+      ? audioRef.current.pause()
+      : audioRef.current.play().catch(() => {});
   };
 
   useEffect(() => {
-    if (!('mediaSession' in navigator)) return;
-
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: liveMetadata?.title || 'Praise FM USA',
-      artist: liveMetadata?.artist || 'Live Radio',
-      artwork: [{ src: '/icon-512.png', sizes: '512x512', type: 'image/png' }]
-    });
-
-    navigator.mediaSession.setActionHandler('play', togglePlayback);
-    navigator.mediaSession.setActionHandler('pause', togglePlayback);
-  }, [liveMetadata, isPlaying]);
-
-  useEffect(() => {
-    const es = new EventSource(METADATA_URL, { withCredentials: false });
-    eventSourceRef.current = es;
+    const es = new EventSource(METADATA_URL);
 
     es.onmessage = (e) => {
       try {
         const data = JSON.parse(e.data);
         const streamTitle = data.streamTitle || '';
+
         if (!streamTitle.includes(' - ')) return;
 
         const [artist, ...rest] = streamTitle.split(' - ');
@@ -173,8 +173,11 @@ const AppContent: React.FC = () => {
 
         setLiveMetadata(prev => {
           if (prev && prev.title === title && prev.artist === artist) return prev;
+
           const meta = { artist, title, playedAt: new Date(), isMusic: true };
+
           setTrackHistory(h => [meta, ...h].slice(0, 10));
+
           return meta;
         });
       } catch {}
@@ -183,21 +186,15 @@ const AppContent: React.FC = () => {
     return () => es.close();
   }, []);
 
-  const isAppRoute = location.pathname === '/app';
-
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-[#121212] transition-colors">
-      <h1 className="sr-only">Praise FM USA - 24/7 Gospel Radio Station</h1>
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#121212]">
+      <Navbar
+        activeTab={location.pathname === '/' ? 'home' : location.pathname.split('/')[1]}
+        theme={theme}
+        onToggleTheme={() => setTheme(t => (t === 'light' ? 'dark' : 'light'))}
+      />
 
-      {!isAppRoute && (
-        <Navbar
-          activeTab={location.pathname === '/' ? 'home' : location.pathname.split('/')[1]}
-          theme={theme}
-          onToggleTheme={() => setTheme(t => (t === 'light' ? 'dark' : 'light'))}
-        />
-      )}
-
-      <main className={`flex-grow transition-all duration-300 ${isPlaying ? 'pb-[88px] md:pb-[120px]' : 'pb-0'}`}>
+      <main className={`flex-grow ${isPlaying ? 'pb-[100px]' : ''}`}>
         {selectedProgram ? (
           <ProgramDetail
             program={selectedProgram}
@@ -223,9 +220,8 @@ const AppContent: React.FC = () => {
               }
             />
 
-            <Route path="/app" element={<AppHomePage />} />
-
             <Route path="/music" element={<Playlist />} />
+
             <Route
               path="/schedule"
               element={
@@ -240,10 +236,7 @@ const AppContent: React.FC = () => {
             <Route path="/events" element={<EventsPage />} />
             <Route path="/new-releases" element={<NewReleasesPage />} />
             <Route path="/artists" element={<FeaturedArtistsPage />} />
-            <Route
-              path="/presenters"
-              element={<PresentersPage onNavigateToProgram={setSelectedProgram} />}
-            />
+            <Route path="/presenters" element={<PresentersPage />} />
             <Route path="/live-recordings" element={<LiveRecordingsPage />} />
             <Route path="/help" element={<HelpCenterPage />} />
             <Route path="/feedback" element={<FeedbackPage />} />
@@ -264,6 +257,7 @@ const AppContent: React.FC = () => {
                 </ProtectedRoute>
               }
             />
+
             <Route
               path="/profile"
               element={
@@ -282,8 +276,9 @@ const AppContent: React.FC = () => {
         )}
       </main>
 
-      {!isAppRoute && <Footer />}
-      {!isAppRoute && currentProgram && (
+      <Footer />
+
+      {currentProgram && (
         <LivePlayerBar
           isPlaying={isPlaying}
           onTogglePlayback={togglePlayback}
