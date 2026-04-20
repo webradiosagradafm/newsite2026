@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -6,7 +5,7 @@ import { User, Mail, Camera, Save, Loader2, ArrowLeft, ShieldCheck, Upload } fro
 import { useNavigate } from 'react-router-dom';
 
 const ProfilePage: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, refreshAvatar } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
@@ -29,7 +28,7 @@ const ProfilePage: React.FC = () => {
   const fetchProfile = async () => {
     setFetching(true);
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('profiles')
         .select('username, avatar_url')
         .eq('id', user?.id)
@@ -75,14 +74,30 @@ const ProfilePage: React.FC = () => {
         .from('avatars')
         .getPublicUrl(filePath);
 
-      // 3. Atualizar estado local
+      // 3. Salva no banco imediatamente
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user?.id,
+          avatar_url: publicUrl,
+          updated_at: new Date().toISOString(),
+        });
+
+      if (updateError) throw updateError;
+
+      // 4. Atualiza estado local e Navbar
       setProfile(prev => ({ ...prev, avatar_url: publicUrl }));
-      setMessage({ type: 'success', text: 'Photo uploaded! Don\'t forget to save changes.' });
+      await refreshAvatar();
+
+      setMessage({ type: 'success', text: 'Photo updated successfully!' });
+      setTimeout(() => setMessage(null), 3000);
 
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || 'Error uploading image. Check if "avatars" bucket exists.' });
+      setMessage({ type: 'error', text: error.message || 'Error uploading image.' });
     } finally {
       setUploading(false);
+      // Reset input para permitir reupload do mesmo arquivo
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -102,8 +117,9 @@ const ProfilePage: React.FC = () => {
         });
 
       if (error) throw error;
+
+      await refreshAvatar();
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
-      
       setTimeout(() => setMessage(null), 3000);
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message || 'Error saving profile' });
@@ -141,7 +157,7 @@ const ProfilePage: React.FC = () => {
             {/* Foto de Perfil com Upload Direto */}
             <div 
               className="relative w-48 h-48 group cursor-pointer"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => !uploading && fileInputRef.current?.click()}
             >
               <div className="w-full h-full rounded-full overflow-hidden bg-gray-100 dark:bg-white/5 border-[3px] border-[#ff6600] flex items-center justify-center shadow-2xl transition-all duration-500 group-hover:border-white">
                 {uploading ? (
@@ -155,16 +171,18 @@ const ProfilePage: React.FC = () => {
                 ) : (
                   <div className="flex flex-col items-center text-gray-400">
                     <User className="w-12 h-12 mb-2" />
-                    <span className="text-[8px] font-regular uppercase tracking-widest text-center px-4">Upload Photo</span>
+                    <span className="text-[8px] uppercase tracking-widest text-center px-4">Upload Photo</span>
                   </div>
                 )}
               </div>
               
               {/* Overlay de Upload */}
-              <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
-                <Camera className="w-8 h-8 mb-2" />
-                <span className="text-[9px] font-black uppercase tracking-widest">Change Image</span>
-              </div>
+              {!uploading && (
+                <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
+                  <Camera className="w-8 h-8 mb-2" />
+                  <span className="text-[9px] font-black uppercase tracking-widest">Change Photo</span>
+                </div>
+              )}
 
               {/* Input de Arquivo Escondido */}
               <input 
@@ -181,21 +199,29 @@ const ProfilePage: React.FC = () => {
             </h2>
             <div className="flex items-center mt-2 space-x-2">
               <ShieldCheck className="w-4 h-4 text-[#ff6600]" />
-              <p className="text-gray-500 text-[11px] font-medium uppercase tracking-[0.2em]">BBC ID VERIFIED</p>
+              <p className="text-gray-500 text-[11px] font-medium uppercase tracking-[0.2em]">Verified Account</p>
             </div>
+
+            <p className="mt-3 text-gray-400 text-[10px] uppercase tracking-widest text-center">
+              {user?.email}
+            </p>
 
             <button 
               onClick={signOut}
               className="mt-12 text-red-500 text-[10px] font-black uppercase tracking-[0.3em] hover:underline transition-all"
             >
-              Sign out from all devices
+              Sign out
             </button>
           </div>
 
           <div className="md:col-span-8">
             <form onSubmit={handleUpdate} className="space-y-10">
               {message && (
-                <div className={`p-5 text-xs font-regular uppercase tracking-widest border-l-4 animate-in fade-in slide-in-from-top-2 ${message.type === 'success' ? 'bg-green-50 text-green-600 border-green-600' : 'bg-red-50 text-red-600 border-red-600'}`}>
+                <div className={`p-5 text-xs font-medium uppercase tracking-widest border-l-4 animate-in fade-in slide-in-from-top-2 ${
+                  message.type === 'success' 
+                    ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-600' 
+                    : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-600'
+                }`}>
                   {message.text}
                 </div>
               )}
@@ -224,6 +250,7 @@ const ProfilePage: React.FC = () => {
                   value={profile.email}
                   className="w-full bg-gray-100 dark:bg-white/10 p-5 outline-none text-gray-500 font-medium cursor-not-allowed border-2 border-transparent"
                 />
+                <p className="text-[9px] text-gray-400 uppercase tracking-wider">Email cannot be changed</p>
               </div>
 
               <div className="pt-4">
@@ -233,18 +260,18 @@ const ProfilePage: React.FC = () => {
                   className="w-full md:w-auto bg-[#ff6600] text-white px-12 py-5 text-[11px] font-black uppercase tracking-[0.4em] hover:bg-black transition-all flex items-center justify-center space-x-4 disabled:opacity-50 shadow-2xl active:scale-95"
                 >
                   {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                  <span>Save Profile Changes</span>
+                  <span>Save Changes</span>
                 </button>
               </div>
             </form>
 
             <div className="mt-20 p-8 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5">
               <div className="flex items-start space-x-5">
-                <Upload className="w-6 h-6 text-[#ff6600]" />
+                <Upload className="w-6 h-6 text-[#ff6600] flex-shrink-0" />
                 <div>
-                  <h4 className="text-sm font-black uppercase tracking-widest dark:text-white">Direct Upload Enabled</h4>
+                  <h4 className="text-sm font-black uppercase tracking-widest dark:text-white">Photo Upload</h4>
                   <p className="text-xs text-gray-500 mt-2 uppercase leading-relaxed font-normal">
-                    You can now click on your profile avatar to upload an image directly from your computer. We use Supabase Storage to keep your data secure.
+                    Click on your avatar to upload a new photo. Supported formats: JPG, PNG, WebP. Your photo is stored securely on Supabase Storage.
                   </p>
                 </div>
               </div>
