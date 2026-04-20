@@ -51,14 +51,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .select('avatar_url')
         .eq('id', userId)
         .single();
-
       setAvatarUrl(data?.avatar_url || null);
     } catch {
       setAvatarUrl(null);
     }
   };
 
-  // Aceita userId opcional para evitar problema de closure com user state
   const refreshAvatar = async (userId?: string) => {
     const id = userId || user?.id;
     if (id) await fetchAvatar(id);
@@ -79,29 +77,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         return;
       }
-
       setFavorites((data as FavoriteItem[]) || []);
     } catch (e: any) {
       console.error('Unexpected error fetching favorites:', e?.message || String(e));
     }
   };
 
+  const clearAuthState = () => {
+    setUser(null);
+    setSession(null);
+    setAvatarUrl(null);
+    setFavorites([]);
+  };
+
   useEffect(() => {
     let isMounted = true;
 
+    // ✅ Busca sessão existente ao montar (resolve o problema de reload)
+    auth.getSession().then(({ data: { session: initialSession } }: any) => {
+      if (!isMounted) return;
+      if (initialSession?.user) {
+        setSession(initialSession);
+        setUser(initialSession.user);
+        Promise.all([
+          fetchFavorites(initialSession.user.id),
+          fetchAvatar(initialSession.user.id),
+        ]).finally(() => { if (isMounted) setLoading(false); });
+      } else {
+        clearAuthState();
+        setLoading(false);
+      }
+    });
+
+    // Escuta mudanças subsequentes (login, logout, token refresh)
     const { data: authListener } = auth.onAuthStateChange(
       async (event: any, nextSession: any) => {
         if (!isMounted) return;
 
-        // Limpa tudo ao deslogar
         if (event === 'SIGNED_OUT') {
-          setUser(null);
-          setSession(null);
-          setAvatarUrl(null);
-          setFavorites([]);
-          if (isMounted) setLoading(false);
+          clearAuthState();
+          setLoading(false);
           return;
         }
+
+        // Ignora INITIAL_SESSION — já tratado acima pelo getSession
+        if (event === 'INITIAL_SESSION') return;
 
         setSession(nextSession ?? null);
         setUser(nextSession?.user ?? null);
@@ -180,25 +200,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return favorites.some((f) => String(f.item_id) === String(id));
   };
 
+  // ✅ signOut corrigido — limpa estado ANTES de redirecionar
   const signOut = async () => {
     try {
-      await auth.signOut();
-      // onAuthStateChange com SIGNED_OUT cuida de limpar o estado
-      window.location.href = '/login';
+      clearAuthState();        // limpa UI imediatamente
+      await auth.signOut();    // depois avisa o Supabase
     } catch (e: any) {
       console.error('Sign out error:', e?.message || String(e));
-      // Força limpeza em caso de erro
-      setUser(null);
-      setSession(null);
-      setAvatarUrl(null);
-      setFavorites([]);
-      window.location.href = '/login';
+    } finally {
+      window.location.href = '/login'; // redireciona só no final
     }
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, session, loading, avatarUrl, refreshAvatar, favorites, toggleFavorite, isFavorite, signOut, refreshFavorites }}
+      value={{
+        user, session, loading, avatarUrl, refreshAvatar,
+        favorites, toggleFavorite, isFavorite, signOut, refreshFavorites,
+      }}
     >
       {children}
     </AuthContext.Provider>
