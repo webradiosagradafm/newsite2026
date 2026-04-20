@@ -26,12 +26,14 @@ const ITUNES_RSS =
 async function enrichWithPreview(item: Release): Promise<Release> {
   try {
     const q = encodeURIComponent(`${item.artist} ${item.title}`);
+    // Busca por song (track) — muito mais chance de ter previewUrl de 30s
     const res = await fetch(
-      `https://itunes.apple.com/search?term=${q}&media=music&entity=album&limit=1`
+      `https://itunes.apple.com/search?term=${q}&media=music&entity=song&limit=5`
     );
     if (!res.ok) return item;
     const data = await res.json();
-    const result = data.results?.[0];
+    // Pega o primeiro resultado que tenha preview
+    const result = data.results?.find((r: any) => r.previewUrl) ?? data.results?.[0];
     if (!result) return item;
     return {
       ...item,
@@ -190,7 +192,7 @@ const NewReleasesPage: React.FC = () => {
 
       // Enriquece só os 6 primeiros com preview (evita muitas requests)
       const enriched = await Promise.all(
-        parsed.map((r, i) => (i < 6 ? enrichWithPreview(r) : Promise.resolve(r)))
+        parsed.map((r, i) => (i < 12 ? enrichWithPreview(r) : Promise.resolve(r)))
       );
       setReleases(enriched);
     } catch {
