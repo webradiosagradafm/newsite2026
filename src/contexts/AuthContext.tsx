@@ -24,6 +24,8 @@ interface AuthContextType {
   user: any | null;
   session: any | null;
   loading: boolean;
+  avatarUrl: string | null;
+  refreshAvatar: () => Promise<void>;
   favorites: FavoriteItem[];
   toggleFavorite: (item: ToggleFavoriteInput) => Promise<void>;
   isFavorite: (id: string) => boolean;
@@ -37,9 +39,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<any | null>(null);
   const [session, setSession] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
 
   const auth = (supabase as any).auth;
+
+  const fetchAvatar = async (userId: string) => {
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', userId)
+        .single();
+
+      setAvatarUrl(data?.avatar_url || null);
+    } catch {
+      setAvatarUrl(null);
+    }
+  };
+
+  const refreshAvatar = async () => {
+    if (user?.id) await fetchAvatar(user.id);
+  };
 
   const fetchFavorites = async (userId: string) => {
     try {
@@ -74,9 +95,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(nextSession?.user ?? null);
 
         if (nextSession?.user?.id) {
-          await fetchFavorites(nextSession.user.id);
+          await Promise.all([
+            fetchFavorites(nextSession.user.id),
+            fetchAvatar(nextSession.user.id),
+          ]);
         } else {
           setFavorites([]);
+          setAvatarUrl(null);
         }
 
         if (isMounted) setLoading(false);
@@ -90,9 +115,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const refreshFavorites = async () => {
-    if (user?.id) {
-      await fetchFavorites(user.id);
-    }
+    if (user?.id) await fetchFavorites(user.id);
   };
 
   const toggleFavorite = async (item: ToggleFavoriteInput) => {
@@ -153,6 +176,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setUser(null);
       setSession(null);
+      setAvatarUrl(null);
       setFavorites([]);
       window.location.href = '/login';
     }
@@ -160,7 +184,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider
-      value={{ user, session, loading, favorites, toggleFavorite, isFavorite, signOut, refreshFavorites }}
+      value={{ user, session, loading, avatarUrl, refreshAvatar, favorites, toggleFavorite, isFavorite, signOut, refreshFavorites }}
     >
       {children}
     </AuthContext.Provider>
