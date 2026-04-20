@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Home,
   Music,
@@ -13,20 +13,22 @@ import {
   Settings,
   Ticket,
   LogOut
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+} from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 
 interface NavbarProps {
-  activeTab: string;
-  theme: 'light' | 'dark';
-  onToggleTheme: () => void;
+  activeTab: string
+  theme: 'light' | 'dark'
+  onToggleTheme: () => void
 }
 
 const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
-  const { user, signOut, avatarUrl } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const navigate = useNavigate()
+
+  // 🔥 CORRIGIDO (sem avatarUrl)
+  const { user, signOut } = useAuth()
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home, path: '/' },
@@ -34,7 +36,10 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
     { id: 'schedule', label: 'Schedule', icon: Calendar, path: '/schedule' },
     { id: 'events', label: 'Events', icon: Ticket, path: '/events' },
     { id: 'devotional', label: 'Devotional', icon: Radio, path: '/devotional' },
-  ];
+  ]
+
+  // 🔥 pega avatar do Supabase metadata
+  const avatarUrl = user?.user_metadata?.avatar_url
 
   return (
     <header className="bg-white dark:bg-[#0b0b0b] text-black dark:text-white">
@@ -44,13 +49,12 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
         <div className="flex items-center h-full space-x-12">
           <button
             onClick={() => navigate('/')}
-            aria-label="Go to home"
             className="flex items-center h-full"
           >
             <img
               src="https://res.cloudinary.com/dtecypmsh/image/upload/v1769820657/logo_hochsa.webp"
               alt="Praise FM USA"
-              className={`h-7 w-auto object-contain transition-all ${
+              className={`h-7 w-auto object-contain ${
                 theme === 'dark' ? 'brightness-0 invert' : ''
               }`}
             />
@@ -59,15 +63,14 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
           {/* MENU DESKTOP */}
           <nav className="hidden md:flex items-center space-x-8 h-full">
             {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
+              const Icon = item.icon
+              const isActive = activeTab === item.id
 
               return (
                 <button
                   key={item.id}
                   onClick={() => navigate(item.path)}
-                  aria-label={`Go to ${item.label}`}
-                  className={`flex items-center space-x-2 text-[15px] font-medium transition-all h-full border-b-2 px-1 uppercase tracking-tighter ${
+                  className={`flex items-center space-x-2 text-[15px] font-medium h-full border-b-2 px-1 uppercase tracking-tighter ${
                     isActive
                       ? 'text-black dark:text-white border-[#ff6600]'
                       : 'text-gray-500 border-transparent hover:text-black dark:hover:text-white'
@@ -76,14 +79,12 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
                   <Icon className="w-4 h-4" strokeWidth={1.5} />
                   <span>{item.label}</span>
                 </button>
-              );
+              )
             })}
 
-            {/* MY SOUNDS */}
             <button
               onClick={() => navigate('/my-sounds')}
-              aria-label="Go to My Sounds"
-              className={`flex items-center space-x-2 text-[15px] font-medium transition-all h-full border-b-2 px-1 uppercase tracking-tighter ${
+              className={`flex items-center space-x-2 text-[15px] font-medium h-full border-b-2 px-1 uppercase tracking-tighter ${
                 activeTab === 'my-sounds'
                   ? 'text-black dark:text-white border-[#ff6600]'
                   : 'text-gray-500 border-transparent hover:text-black dark:hover:text-white'
@@ -98,11 +99,10 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
         {/* DIREITA */}
         <div className="flex items-center">
 
-          {/* THEME TOGGLE */}
+          {/* THEME */}
           <button
             onClick={onToggleTheme}
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-gray-400 mr-8 md:mr-12"
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-400 mr-8 md:mr-12"
           >
             {theme === 'light' ? (
               <Moon className="w-4 h-4" />
@@ -115,33 +115,38 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
           <div className="flex items-center space-x-4">
             {user ? (
               <div className="hidden md:flex items-center space-x-4">
+
                 {/* PROFILE */}
                 <button
                   onClick={() => navigate('/profile')}
-                  aria-label="Go to profile"
                   className="flex items-center space-x-3 group"
                 >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 dark:bg-white/10 flex items-center justify-center border border-transparent group-hover:border-[#ff6600] transition-all">
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 dark:bg-white/10 flex items-center justify-center border group-hover:border-[#ff6600]">
+
                     {avatarUrl ? (
                       <img
                         src={avatarUrl}
-                        alt="User avatar"
+                        alt="avatar"
                         className="w-full h-full object-cover"
                       />
                     ) : (
                       <UserIcon className="w-4 h-4 text-gray-500" />
                     )}
+
                   </div>
-                  <span className="text-[10px] font-medium uppercase tracking-widest text-gray-500 group-hover:text-black dark:group-hover:text-white">
+
+                  <span className="text-[10px] uppercase tracking-widest text-gray-500 group-hover:text-black dark:group-hover:text-white">
                     Profile
                   </span>
                 </button>
 
-                {/* SIGN OUT DESKTOP */}
+                {/* SIGN OUT */}
                 <button
-                  onClick={signOut}
-                  aria-label="Sign out"
-                  className="flex items-center space-x-2 text-[10px] font-medium uppercase tracking-widest text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors"
+                  onClick={async () => {
+                    await signOut()
+                    navigate('/login')
+                  }}
+                  className="flex items-center space-x-2 text-[10px] uppercase tracking-widest text-red-500 hover:text-red-700"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out</span>
@@ -150,107 +155,58 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
             ) : (
               <button
                 onClick={() => navigate('/login')}
-                aria-label="Sign in"
-                className="hidden md:block text-[10px] font-medium uppercase tracking-widest text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                className="hidden md:block text-[10px] uppercase tracking-widest text-gray-600 dark:text-gray-300"
               >
                 Sign In
               </button>
             )}
 
-            {/* MOBILE MENU BUTTON */}
+            {/* MOBILE BUTTON */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle menu"
-              className="p-2 md:hidden text-gray-800 dark:text-white"
+              className="p-2 md:hidden"
             >
-              {isMobileMenuOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
+              {isMobileMenuOpen ? <X /> : <Menu />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* MENU MOBILE */}
+      {/* MOBILE MENU */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 top-16 bg-white dark:bg-black z-40 md:hidden p-6 overflow-y-auto">
+        <div className="fixed inset-0 top-16 bg-white dark:bg-black z-40 p-6">
           <nav className="flex flex-col space-y-4">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => {
-                  navigate(item.path);
-                  setIsMobileMenuOpen(false);
+                  navigate(item.path)
+                  setIsMobileMenuOpen(false)
                 }}
-                aria-label={`Go to ${item.label}`}
-                className="flex items-center space-x-4 p-4 rounded-xl text-lg font-medium text-gray-600 dark:text-gray-400 uppercase tracking-tighter"
+                className="flex items-center space-x-4 p-4 text-lg"
               >
                 <item.icon className="w-5 h-5" />
                 <span>{item.label}</span>
               </button>
             ))}
 
-            <button
-              onClick={() => {
-                navigate('/my-sounds');
-                setIsMobileMenuOpen(false);
-              }}
-              aria-label="Go to My Sounds"
-              className="flex items-center space-x-4 p-4 rounded-xl text-lg font-medium text-gray-600 dark:text-gray-400 uppercase tracking-tighter"
-            >
-              <Library className="w-5 h-5" />
-              <span>My Sounds</span>
-            </button>
-
             {user && (
-              <>
-                {/* AVATAR MOBILE */}
-                <div className="flex items-center space-x-4 p-4 border-t border-gray-100 dark:border-white/5 mt-4 pt-8">
-                  <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 dark:bg-white/10 flex items-center justify-center border-2 border-[#ff6600]">
-                    {avatarUrl ? (
-                      <img src={avatarUrl} alt="User avatar" className="w-full h-full object-cover" />
-                    ) : (
-                      <UserIcon className="w-5 h-5 text-gray-500" />
-                    )}
-                  </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest truncate">
-                    {user.email}
-                  </span>
-                </div>
-
-                <button
-                  onClick={() => {
-                    navigate('/profile');
-                    setIsMobileMenuOpen(false);
-                  }}
-                  aria-label="Account settings"
-                  className="flex items-center space-x-4 p-4 rounded-xl text-lg font-medium text-[#ff6600] uppercase tracking-tighter"
-                >
-                  <Settings className="w-5 h-5" />
-                  <span>Account Settings</span>
-                </button>
-
-                {/* SIGN OUT MOBILE */}
-                <button
-                  onClick={() => {
-                    signOut();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  aria-label="Sign out"
-                  className="flex items-center space-x-4 p-4 rounded-xl text-lg font-medium text-red-500 uppercase tracking-tighter"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span>Sign Out</span>
-                </button>
-              </>
+              <button
+                onClick={async () => {
+                  await signOut()
+                  navigate('/login')
+                }}
+                className="flex items-center space-x-4 p-4 text-red-500"
+              >
+                <LogOut className="w-5 h-5" />
+                <span>Sign Out</span>
+              </button>
             )}
           </nav>
         </div>
       )}
     </header>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar
