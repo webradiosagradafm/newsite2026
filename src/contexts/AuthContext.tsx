@@ -68,13 +68,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .from('favorites')
         .select('*')
         .eq('user_id', userId);
-
       if (error) {
-        if (error.code === 'PGRST103') {
-          console.warn("Supabase: 'favorites' table not found.");
-        } else {
-          console.error('Error fetching favorites:', error.message);
-        }
+        if (error.code !== 'PGRST103') console.error('Error fetching favorites:', error.message);
         return;
       }
       setFavorites((data as FavoriteItem[]) || []);
@@ -93,25 +88,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let isMounted = true;
 
-    // ✅ Busca sessão existente ao montar (resolve o problema de reload)
-    auth.getSession().then(({ data: { session: initialSession } }: any) => {
-      if (!isMounted) return;
-      if (initialSession?.user) {
-        setSession(initialSession);
-        setUser(initialSession.user);
-        Promise.all([
-          fetchFavorites(initialSession.user.id),
-          fetchAvatar(initialSession.user.id),
-        ]).finally(() => { if (isMounted) setLoading(false); });
-      } else {
-        clearAuthState();
-        setLoading(false);
-      }
-    });
-
-    // Escuta mudanças subsequentes (login, logout, token refresh)
+    // Usa APENAS onAuthStateChange — ele dispara INITIAL_SESSION na montagem
+    // com a sessão atual (ou null), eliminando a necessidade de getSession()
     const { data: authListener } = auth.onAuthStateChange(
-      async (event: any, nextSession: any) => {
+      async (event: string, nextSession: any) => {
         if (!isMounted) return;
 
         if (event === 'SIGNED_OUT') {
@@ -120,20 +100,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
 
-        // Ignora INITIAL_SESSION — já tratado acima pelo getSession
-        if (event === 'INITIAL_SESSION') return;
-
-        setSession(nextSession ?? null);
-        setUser(nextSession?.user ?? null);
-
-        if (nextSession?.user?.id) {
+        // INITIAL_SESSION e SIGNED_IN: atualiza estado
+        if (nextSession?.user) {
+          setSession(nextSession);
+          setUser(nextSession.user);
           await Promise.all([
             fetchFavorites(nextSession.user.id),
             fetchAvatar(nextSession.user.id),
           ]);
         } else {
-          setFavorites([]);
-          setAvatarUrl(null);
+          clearAuthState();
         }
 
         if (isMounted) setLoading(false);
@@ -152,24 +128,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const toggleFavorite = async (item: ToggleFavoriteInput) => {
     if (!user?.id) return;
-
     const itemIdString = String(item.id ?? item.item_id ?? '');
     if (!itemIdString) return;
-
     const existing = favorites.find((f) => String(f.item_id) === itemIdString);
-
     try {
       if (existing?.id) {
-        const { error } = await supabase
-          .from('favorites')
-          .delete()
-          .eq('id', existing.id);
-
-        if (error) {
-          console.error('Error removing favorite:', error.message);
-        } else {
-          setFavorites((prev) => prev.filter((f) => f.id !== existing.id));
-        }
+        const { error } = await supabase.from('favorites').delete().eq('id', existing.id);
+        if (!error) setFavorites((prev) => prev.filter((f) => f.id !== existing.id));
       } else {
         const newItem: FavoriteItem = {
           user_id: user.id,
@@ -179,45 +144,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           subtitle: item.subtitle || '',
           image: item.image || '',
         };
-
-        const { data, error } = await supabase
-          .from('favorites')
-          .insert([newItem])
-          .select();
-
-        if (error) {
-          console.error('Error adding favorite:', error.message);
-        } else if (data && data.length > 0) {
-          setFavorites((prev) => [...prev, data[0] as FavoriteItem]);
-        }
+        const { data, error } = await supabase.from('favorites').insert([newItem]).select();
+        if (!error && data?.length) setFavorites((prev) => [...prev, data[0] as FavoriteItem]);
       }
     } catch (err: any) {
       console.error('Toggle favorite failed:', err?.message || String(err));
     }
   };
 
-  const isFavorite = (id: string) => {
-    return favorites.some((f) => String(f.item_id) === String(id));
-  };
+  const isFavorite = (id: string) => favorites.some((f) => String(f.item_id) === String(id));
 
-  // ✅ signOut corrigido — limpa estado ANTES de redirecionar
   const signOut = async () => {
     try {
-      clearAuthState();        // limpa UI imediatamente
-      await auth.signOut();    // depois avisa o Supabase
+      // Limpa estado local imediatamente — UI responde na hora
+      clearAuthState();
+      await auth.signOut();
     } catch (e: any) {
       console.error('Sign out error:', e?.message || String(e));
     } finally {
-      window.location.href = '/login'; // redireciona só no final
+      window.location.replace('/login'); // replace evita voltar com o botão
     }
   };
 
   return (
     <AuthContext.Provider
-      value={{
-        user, session, loading, avatarUrl, refreshAvatar,
-        favorites, toggleFavorite, isFavorite, signOut, refreshFavorites,
-      }}
+      value={{ user, session, loading, avatarUrl, refreshAvatar, favorites, toggleFavorite, isFavorite, signOut, refreshFavorites }}
     >
       {children}
     </AuthContext.Provider>
@@ -226,8 +177,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (context === undefined) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
