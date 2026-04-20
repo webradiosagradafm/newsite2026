@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { useNavigate, Link, Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { Mail, Lock, Loader2, Radio, ArrowRight, AlertCircle, CheckCircle, Eye, EyeOff, HelpCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const LoginPage: React.FC = () => {
-  const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -16,12 +15,10 @@ const LoginPage: React.FC = () => {
   const [resetSent, setResetSent] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
 
-  // ✅ Se já está logado, manda pra home
   if (!authLoading && user) {
     return <Navigate to="/" replace />;
   }
 
-  // Aguarda auth carregar antes de mostrar o form
   if (authLoading) {
     return <div className="min-h-screen bg-white dark:bg-[#000]" />;
   }
@@ -32,7 +29,7 @@ const LoginPage: React.FC = () => {
     setError(null);
 
     try {
-      const { data, error: loginError } = await supabase.auth.signInWithPassword({
+      const { error: loginError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
@@ -50,10 +47,11 @@ const LoginPage: React.FC = () => {
         return;
       }
 
-      console.log('Login successful:', data);
-      navigate('/');
+      // Não use navigate('/') aqui.
+      // O redirecionamento acontece automaticamente quando o AuthContext atualizar o user.
     } catch (err: any) {
       console.error('Login error:', err);
+      setError('Erro inesperado ao fazer login.');
     } finally {
       setLoading(false);
     }
@@ -83,11 +81,10 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
   return (
     <div className="bg-white dark:bg-[#000] min-h-screen transition-colors duration-300">
-      {/* Hero Section */}
       <div className="bg-black text-white py-20 border-b border-white/10 relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 relative z-10">
           <div className="flex items-center space-x-3 text-[#ff6600] mb-4 font-medium uppercase tracking-widest text-[10px]">
@@ -103,7 +100,6 @@ const LoginPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Form */}
       <div className="max-w-md mx-auto px-4 py-16">
         {!showResetForm ? (
           <form onSubmit={handleLogin} className="space-y-8">
@@ -122,7 +118,10 @@ const LoginPage: React.FC = () => {
                     </div>
                   )}
                   {error.includes('não encontrado') && (
-                    <Link to="/signup" className="inline-block mt-3 text-[9px] font-black uppercase tracking-wider text-red-600 hover:underline">
+                    <Link
+                      to="/signup"
+                      className="inline-block mt-3 text-[9px] font-black uppercase tracking-wider text-red-600 hover:underline"
+                    >
                       → Criar conta agora
                     </Link>
                   )}
@@ -139,10 +138,15 @@ const LoginPage: React.FC = () => {
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => { setEmail(e.target.value); setError(null); }}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setError(null);
+                  }}
                   autoComplete="email"
                   className={`w-full bg-gray-50 dark:bg-white/5 border-2 ${
-                    email && !isValidEmail(email) ? 'border-red-300 dark:border-red-800' : 'border-transparent focus:border-[#ff6600]'
+                    email && !isValidEmail(email)
+                      ? 'border-red-300 dark:border-red-800'
+                      : 'border-transparent focus:border-[#ff6600]'
                   } p-5 outline-none transition-all dark:text-white text-lg font-medium`}
                   placeholder="seu@email.com"
                   disabled={loading}
@@ -163,7 +167,11 @@ const LoginPage: React.FC = () => {
                 <span className="flex items-center">
                   <Lock className="w-3 h-3 mr-2" /> Password
                 </span>
-                <button type="button" onClick={() => setShowResetForm(true)} className="text-[#ff6600] hover:underline text-[9px] font-medium normal-case tracking-normal">
+                <button
+                  type="button"
+                  onClick={() => setShowResetForm(true)}
+                  className="text-[#ff6600] hover:underline text-[9px] font-medium normal-case tracking-normal"
+                >
                   Esqueci minha senha
                 </button>
               </label>
@@ -172,14 +180,21 @@ const LoginPage: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
-                  onChange={(e) => { setPassword(e.target.value); setError(null); }}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError(null);
+                  }}
                   autoComplete="current-password"
                   className="w-full bg-gray-50 dark:bg-white/5 border-2 border-transparent focus:border-[#ff6600] p-5 pr-12 outline-none transition-all dark:text-white text-lg font-medium"
                   placeholder="••••••••"
                   disabled={loading}
                   minLength={6}
                 />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
@@ -191,13 +206,25 @@ const LoginPage: React.FC = () => {
                 disabled={loading || !isValidEmail(email)}
                 className="w-full bg-[#ff6600] text-white px-12 py-5 text-[11px] font-black uppercase tracking-[0.4em] hover:bg-black transition-all flex items-center justify-center space-x-4 disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl active:scale-95"
               >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><span>Sign In</span><ArrowRight className="w-5 h-5" /></>}
+                {loading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
               </button>
             </div>
 
             <div className="text-center pt-6 border-t border-gray-200 dark:border-white/10">
-              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Don't have an account?</p>
-              <Link to="/signup" className="text-[#ff6600] text-[10px] font-black uppercase tracking-[0.3em] hover:underline transition-all">
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">
+                Don't have an account?
+              </p>
+              <Link
+                to="/signup"
+                className="text-[#ff6600] text-[10px] font-black uppercase tracking-[0.3em] hover:underline transition-all"
+              >
                 Create Account
               </Link>
             </div>
@@ -212,12 +239,14 @@ const LoginPage: React.FC = () => {
                 </p>
               </div>
             )}
+
             {error && (
               <div className="p-5 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-600 flex items-start space-x-3">
                 <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                 <p className="text-xs uppercase tracking-widest text-red-600 dark:text-red-400">{error}</p>
               </div>
             )}
+
             <div className="space-y-3">
               <label className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 flex items-center">
                 <Mail className="w-3 h-3 mr-2" /> Email Address
@@ -233,17 +262,30 @@ const LoginPage: React.FC = () => {
                 disabled={loading}
               />
             </div>
+
             <div className="space-y-4">
               <button
                 type="submit"
                 disabled={loading || !isValidEmail(email)}
                 className="w-full bg-[#ff6600] text-white px-12 py-5 text-[11px] font-black uppercase tracking-[0.4em] hover:bg-black transition-all flex items-center justify-center space-x-4 disabled:opacity-50 shadow-2xl active:scale-95"
               >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><span>Send Reset Link</span><ArrowRight className="w-5 h-5" /></>}
+                {loading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <span>Send Reset Link</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
               </button>
+
               <button
                 type="button"
-                onClick={() => { setShowResetForm(false); setError(null); setResetSent(false); }}
+                onClick={() => {
+                  setShowResetForm(false);
+                  setError(null);
+                  setResetSent(false);
+                }}
                 className="w-full bg-transparent text-gray-500 px-12 py-5 text-[10px] font-black uppercase tracking-[0.4em] hover:text-black dark:hover:text-white transition-all"
               >
                 ← Back to Login
@@ -256,7 +298,9 @@ const LoginPage: React.FC = () => {
           <div className="flex items-start space-x-5">
             <HelpCircle className="w-6 h-6 text-[#ff6600] flex-shrink-0" />
             <div>
-              <h4 className="text-sm font-black uppercase tracking-widest dark:text-white mb-3">Problemas para entrar?</h4>
+              <h4 className="text-sm font-black uppercase tracking-widest dark:text-white mb-3">
+                Problemas para entrar?
+              </h4>
               <ul className="text-xs text-gray-500 space-y-2 uppercase leading-relaxed">
                 <li>• Verifique se o email está correto</li>
                 <li>• A senha tem no mínimo 6 caracteres</li>
