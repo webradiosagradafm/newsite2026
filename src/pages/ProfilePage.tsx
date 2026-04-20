@@ -60,19 +60,18 @@ const ProfilePage: React.FC = () => {
       const file = event.target.files[0];
       const fileExt = file.name.split('.').pop();
       const fileName = `${user?.id}-${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
 
       // 1. Upload para o Bucket 'avatars'
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file);
+        .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
       // 2. Obter URL Pública
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
-        .getPublicUrl(filePath);
+        .getPublicUrl(fileName);
 
       // 3. Salva no banco imediatamente
       const { error: updateError } = await supabase
@@ -87,7 +86,7 @@ const ProfilePage: React.FC = () => {
 
       // 4. Atualiza estado local e Navbar
       setProfile(prev => ({ ...prev, avatar_url: publicUrl }));
-      await refreshAvatar();
+      await refreshAvatar(user?.id);
 
       setMessage({ type: 'success', text: 'Photo updated successfully!' });
       setTimeout(() => setMessage(null), 3000);
@@ -96,7 +95,6 @@ const ProfilePage: React.FC = () => {
       setMessage({ type: 'error', text: error.message || 'Error uploading image.' });
     } finally {
       setUploading(false);
-      // Reset input para permitir reupload do mesmo arquivo
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
@@ -118,7 +116,7 @@ const ProfilePage: React.FC = () => {
 
       if (error) throw error;
 
-      await refreshAvatar();
+      await refreshAvatar(user?.id);
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
       setTimeout(() => setMessage(null), 3000);
     } catch (err: any) {
@@ -154,7 +152,6 @@ const ProfilePage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-16">
           <div className="md:col-span-4 flex flex-col items-center">
-            {/* Foto de Perfil com Upload Direto */}
             <div 
               className="relative w-48 h-48 group cursor-pointer"
               onClick={() => !uploading && fileInputRef.current?.click()}
@@ -176,7 +173,6 @@ const ProfilePage: React.FC = () => {
                 )}
               </div>
               
-              {/* Overlay de Upload */}
               {!uploading && (
                 <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
                   <Camera className="w-8 h-8 mb-2" />
@@ -184,7 +180,6 @@ const ProfilePage: React.FC = () => {
                 </div>
               )}
 
-              {/* Input de Arquivo Escondido */}
               <input 
                 type="file"
                 ref={fileInputRef}
@@ -207,7 +202,9 @@ const ProfilePage: React.FC = () => {
             </p>
 
             <button 
-              onClick={signOut}
+              onClick={async () => {
+                await signOut();
+              }}
               className="mt-12 text-red-500 text-[10px] font-black uppercase tracking-[0.3em] hover:underline transition-all"
             >
               Sign out
