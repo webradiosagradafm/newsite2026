@@ -20,34 +20,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    let mounted = true
+    let isMounted = true
 
-    const init = async () => {
-      const { data, error } = await supabase.auth.getSession()
+    const loadSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession()
 
-      if (!mounted) return
+        if (error) {
+          console.error('getSession error:', error)
+        }
 
-      if (error) {
-        console.error('getSession error:', error)
+        if (!isMounted) return
+
+        setSession(data.session ?? null)
+        setUser(data.session?.user ?? null)
+      } catch (err) {
+        console.error('Auth init error:', err)
+      } finally {
+        if (isMounted) setLoading(false)
       }
-
-      setSession(data.session ?? null)
-      setUser(data.session?.user ?? null)
-      setLoading(false)
     }
 
-    init()
+    loadSession()
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return
       setSession(session ?? null)
       setUser(session?.user ?? null)
       setLoading(false)
     })
 
     return () => {
-      mounted = false
+      isMounted = false
       subscription.unsubscribe()
     }
   }, [])
