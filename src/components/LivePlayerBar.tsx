@@ -44,8 +44,12 @@ const LivePlayerBar: React.FC<Props> = ({
   // buscar listeners
   useEffect(() => {
     const fetchListeners = async () => {
-      const { data } = await supabase.from('listeners_now').select('id')
-      setSiteListeners(data?.length || 0)
+      try {
+        const { data } = await supabase.from('listeners_now').select('id')
+        setSiteListeners(data?.length || 0)
+      } catch (err) {
+        console.error('listeners error:', err)
+      }
     }
 
     fetchListeners()
@@ -53,14 +57,15 @@ const LivePlayerBar: React.FC<Props> = ({
     return () => clearInterval(interval)
   }, [])
 
-  // país (global vibe)
+  // país
   useEffect(() => {
     fetch('https://ipapi.co/json/')
-      .then((res) => res.json())
-      .then((data) => setCountry(data.country_name))
+      .then((r) => r.json())
+      .then((d) => setCountry(d.country_name))
       .catch(() => {})
   }, [])
 
+  // volume
   useEffect(() => {
     if (!audioRef.current) return
     audioRef.current.volume = volume
@@ -78,12 +83,11 @@ const LivePlayerBar: React.FC<Props> = ({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 h-[78px] bg-black border-t border-white/10 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-4">
+
+      <div className="max-w-7xl mx-auto h-full grid grid-cols-3 items-center px-4">
 
         {/* LEFT */}
         <div className="flex items-center gap-4 min-w-0">
-
-          {/* FOTO (VOLTOU 🔥) */}
           <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#ff6600]">
             <img
               src={program?.image}
@@ -92,15 +96,6 @@ const LivePlayerBar: React.FC<Props> = ({
             />
           </div>
 
-          {/* PLAY */}
-          <button
-            onClick={onTogglePlayback}
-            className="w-12 h-12 rounded-full bg-[#ff6600] flex items-center justify-center"
-          >
-            {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-          </button>
-
-          {/* INFO */}
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-widest text-gray-400 truncate">
               {subtitle}
@@ -114,35 +109,47 @@ const LivePlayerBar: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* CENTER (GLOBAL 🔥) */}
-        <div className="hidden md:flex flex-col items-center">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span className="text-[9px] uppercase tracking-widest text-gray-400">
-              {siteListeners} site + {TUNEIN_DEFAULT} TuneIn
-            </span>
-          </div>
-
-          <span className="text-xs text-white font-semibold">
-            {total} listening now {country && `• ${country}`}
-          </span>
+        {/* CENTER (PLAY 🔥) */}
+        <div className="flex justify-center">
+          <button
+            onClick={onTogglePlayback}
+            className="w-14 h-14 rounded-full bg-[#ff6600] flex items-center justify-center shadow-lg hover:scale-110 transition"
+          >
+            {isPlaying ? <Pause size={22} /> : <Play size={22} />}
+          </button>
         </div>
 
         {/* RIGHT */}
-        <div className="flex items-center gap-3">
-          <button onClick={() => setMuted(!muted)}>
-            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-          </button>
+        <div className="flex items-center justify-end gap-4">
 
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={muted ? 0 : volume}
-            onChange={(e) => setVolume(Number(e.target.value))}
-            className="w-24 accent-[#ff6600]"
-          />
+          {/* listeners */}
+          <div className="hidden md:flex flex-col items-end">
+            <span className="text-[9px] uppercase tracking-widest text-gray-400">
+              {siteListeners} site + {TUNEIN_DEFAULT} TuneIn
+            </span>
+
+            <span className="text-xs text-white font-semibold">
+              {total} listening now {country && `• ${country}`}
+            </span>
+          </div>
+
+          {/* volume */}
+          <div className="flex items-center gap-2">
+            <button onClick={() => setMuted(!muted)}>
+              {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+            </button>
+
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={muted ? 0 : volume}
+              onChange={(e) => setVolume(Number(e.target.value))}
+              className="w-24 accent-[#ff6600]"
+            />
+          </div>
+
         </div>
 
       </div>
