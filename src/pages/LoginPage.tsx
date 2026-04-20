@@ -1,87 +1,95 @@
-import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { Link, Navigate } from 'react-router-dom';
-import { Mail, Lock, Loader2, Radio, ArrowRight, AlertCircle, CheckCircle, Eye, EyeOff, HelpCircle } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useState } from 'react'
+import { supabase } from '../lib/supabase'
+import { Link, Navigate } from 'react-router-dom'
+import {
+  Mail,
+  Lock,
+  Loader2,
+  Radio,
+  ArrowRight,
+  AlertCircle,
+  CheckCircle,
+  Eye,
+  EyeOff,
+  HelpCircle,
+} from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 
 const LoginPage: React.FC = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth()
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [resetSent, setResetSent] = useState(false);
-  const [showResetForm, setShowResetForm] = useState(false);
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
+  const [showResetForm, setShowResetForm] = useState(false)
 
   if (!authLoading && user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" replace />
   }
 
   if (authLoading) {
-    return <div className="min-h-screen bg-white dark:bg-[#000]" />;
+    return <div className="min-h-screen bg-white dark:bg-[#000]" />
   }
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
 
     try {
       const { error: loginError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
-      });
+      })
 
       if (loginError) {
         if (loginError.message.includes('Invalid login credentials')) {
-          setError('Email ou senha incorretos. Verifique seus dados e tente novamente.');
+          setError('Email ou senha incorretos. Verifique seus dados e tente novamente.')
         } else if (loginError.message.includes('Email not confirmed')) {
-          setError('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.');
+          setError('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.')
         } else if (loginError.message.includes('User not found')) {
-          setError('Usuário não encontrado. Você já criou uma conta?');
+          setError('Usuário não encontrado. Você já criou uma conta?')
         } else {
-          setError(loginError.message);
+          setError(loginError.message)
         }
-        return;
+        return
       }
-
-      // Não use navigate('/') aqui.
-      // O redirecionamento acontece automaticamente quando o AuthContext atualizar o user.
     } catch (err: any) {
-      console.error('Login error:', err);
-      setError('Erro inesperado ao fazer login.');
+      console.error('Login error:', err)
+      setError('Erro inesperado ao fazer login.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handlePasswordReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
 
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: `${window.location.origin}/reset-password`,
-      });
+      })
 
-      if (resetError) throw resetError;
+      if (resetError) throw resetError
 
-      setResetSent(true);
+      setResetSent(true)
       setTimeout(() => {
-        setShowResetForm(false);
-        setResetSent(false);
-      }, 5000);
+        setShowResetForm(false)
+        setResetSent(false)
+      }, 5000)
     } catch (err: any) {
-      setError(err.message || 'Erro ao enviar email de recuperação');
+      setError(err.message || 'Erro ao enviar email de recuperação')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 
   return (
     <div className="bg-white dark:bg-[#000] min-h-screen transition-colors duration-300">
@@ -139,8 +147,8 @@ const LoginPage: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => {
-                    setEmail(e.target.value);
-                    setError(null);
+                    setEmail(e.target.value)
+                    setError(null)
                   }}
                   autoComplete="email"
                   className={`w-full bg-gray-50 dark:bg-white/5 border-2 ${
@@ -175,14 +183,15 @@ const LoginPage: React.FC = () => {
                   Esqueci minha senha
                 </button>
               </label>
+
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => {
-                    setPassword(e.target.value);
-                    setError(null);
+                    setPassword(e.target.value)
+                    setError(null)
                   }}
                   autoComplete="current-password"
                   className="w-full bg-gray-50 dark:bg-white/5 border-2 border-transparent focus:border-[#ff6600] p-5 pr-12 outline-none transition-all dark:text-white text-lg font-medium"
@@ -192,7 +201,7 @@ const LoginPage: React.FC = () => {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -282,9 +291,9 @@ const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => {
-                  setShowResetForm(false);
-                  setError(null);
-                  setResetSent(false);
+                  setShowResetForm(false)
+                  setError(null)
+                  setResetSent(false)
                 }}
                 className="w-full bg-transparent text-gray-500 px-12 py-5 text-[10px] font-black uppercase tracking-[0.4em] hover:text-black dark:hover:text-white transition-all"
               >
@@ -324,7 +333,7 @@ const LoginPage: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LoginPage;
+export default LoginPage
