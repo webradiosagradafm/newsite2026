@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Home,
   Music,
@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
 
 interface NavbarProps {
   activeTab: string;
@@ -26,26 +25,8 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      const fetchAvatar = async () => {
-        const { data } = await supabase
-          .from('profiles')
-          .select('avatar_url')
-          .eq('id', user.id)
-          .single();
-
-        if (data?.avatar_url) setAvatarUrl(data.avatar_url);
-      };
-      fetchAvatar();
-    } else {
-      setAvatarUrl(null);
-    }
-  }, [user]);
+  const { user, signOut, avatarUrl } = useAuth();
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home, path: '/' },
@@ -225,13 +206,27 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
 
             {user && (
               <>
+                {/* AVATAR MOBILE */}
+                <div className="flex items-center space-x-4 p-4 border-t border-gray-100 dark:border-white/5 mt-4 pt-8">
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 dark:bg-white/10 flex items-center justify-center border-2 border-[#ff6600]">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt="User avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <UserIcon className="w-5 h-5 text-gray-500" />
+                    )}
+                  </div>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest truncate">
+                    {user.email}
+                  </span>
+                </div>
+
                 <button
                   onClick={() => {
                     navigate('/profile');
                     setIsMobileMenuOpen(false);
                   }}
                   aria-label="Account settings"
-                  className="flex items-center space-x-4 p-4 rounded-xl text-lg font-medium text-[#ff6600] uppercase tracking-tighter border-t border-gray-100 dark:border-white/5 mt-4 pt-8"
+                  className="flex items-center space-x-4 p-4 rounded-xl text-lg font-medium text-[#ff6600] uppercase tracking-tighter"
                 >
                   <Settings className="w-5 h-5" />
                   <span>Account Settings</span>
