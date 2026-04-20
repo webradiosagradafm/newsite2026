@@ -1,416 +1,349 @@
-import React, { useState } from 'react';
-import { Calendar, MapPin, ExternalLink, Music, Filter, Clock, Ticket } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Calendar, MapPin, ExternalLink, Music2,
+  Ticket, Loader2, RefreshCw, Search, AlertCircle
+} from 'lucide-react';
 
-/**
- * COMO ADICIONAR EVENTOS:
- * 
- * 1. Copie o modelo abaixo
- * 2. Cole no array EVENTS
- * 3. Preencha os dados
- * 4. Commit e push!
- * 
- * MODELO:
- * {
- *   id: PRÓXIMO_NÚMERO,
- *   artist: 'Nome do Artista',
- *   title: 'Nome do Tour/Show',
- *   date: 'YYYY-MM-DD',  // Formato: 2026-03-15
- *   time: '7:00 PM',      // Formato: 7:00 PM ou 19:00
- *   venue: 'Nome do Local',
- *   city: 'Cidade',
- *   state: 'Estado (sigla)',
- *   country: 'USA',
- *   description: 'Descrição curta do evento (opcional)',
- *   ticketUrl: 'https://link-para-ingressos.com',
- *   eventUrl: 'https://site-do-artista.com',
- *   featured: false,  // true para destacar o evento
- * },
- */
+// ─── ⚙️  Config ───────────────────────────────────────────────────────────────
+// 1. Acesse https://developer.ticketmaster.com e crie uma conta gratuita
+// 2. Copie sua "Consumer Key" do dashboard
+// 3. Adicione no .env: VITE_TICKETMASTER_KEY=knLH1Jjqm2gn2f8wnjS0xAmxDgh7kf0S
+const TM_API_KEY = import.meta.env.VITE_TICKETMASTER_KEY ?? 'knLH1Jjqm2gn2f8wnjS0xAmxDgh7kf0S';
 
-const EVENTS = [
-  {
-    id: 1,
-    artist: 'Elevation Worship',
-    title: 'The Blessing Tour 2026',
-    date: '2026-03-15',
-    time: '7:00 PM',
-    venue: 'United Center',
-    city: 'Chicago',
-    state: 'IL',
-    country: 'USA',
-    description: 'Experience an evening of powerful worship with Elevation Worship',
-    ticketUrl: 'https://www.ticketmaster.com',
-    eventUrl: 'https://elevationworship.com',
-    featured: true,
-  },
-  {
-    id: 2,
-    artist: 'Lauren Daigle',
-    title: 'Kaleidoscope Night Tour',
-    date: '2026-04-20',
-    time: '8:00 PM',
-    venue: 'Madison Square Garden',
-    city: 'New York',
-    state: 'NY',
-    country: 'USA',
-    description: 'Grammy Award-winning artist Lauren Daigle live in concert',
-    ticketUrl: 'https://www.ticketmaster.com',
-    eventUrl: 'https://laurendaigle.com',
-    featured: true,
-  },
-  {
-    id: 3,
-    artist: 'Maverick City Music',
-    title: 'Kingdom Tour',
-    date: '2026-05-10',
-    time: '7:30 PM',
-    venue: 'Crypto.com Arena',
-    city: 'Los Angeles',
-    state: 'CA',
-    country: 'USA',
-    description: 'Join Maverick City Music for an unforgettable worship experience',
-    ticketUrl: 'https://www.axs.com',
-    eventUrl: 'https://maverickcitymusic.com',
-    featured: false,
-  },
-  {
-    id: 4,
-    artist: 'Kirk Franklin',
-    title: 'The Long Live Love Tour',
-    date: '2026-06-05',
-    time: '8:00 PM',
-    venue: 'State Farm Arena',
-    city: 'Atlanta',
-    state: 'GA',
-    country: 'USA',
-    description: 'The legendary Kirk Franklin brings his electrifying show to Atlanta',
-    ticketUrl: 'https://www.ticketmaster.com',
-    eventUrl: 'https://kirkfranklin.com',
-    featured: false,
-  },
-  {
-    id: 5,
-    artist: 'for KING & COUNTRY',
-    title: 'What Are We Waiting For Tour',
-    date: '2026-07-12',
-    time: '7:00 PM',
-    venue: 'American Airlines Center',
-    city: 'Dallas',
-    state: 'TX',
-    country: 'USA',
-    description: 'Multi-platinum duo for KING & COUNTRY live on stage',
-    ticketUrl: 'https://www.ticketmaster.com',
-    eventUrl: 'https://forkingandcountry.com',
-    featured: false,
-  },
-  {
-    id: 6,
-    artist: 'Chris Tomlin',
-    title: 'Always Tour',
-    date: '2026-08-15',
-    time: '7:30 PM',
-    venue: 'Red Rocks Amphitheatre',
-    city: 'Morrison',
-    state: 'CO',
-    country: 'USA',
-    description: 'An intimate evening of worship under the stars with Chris Tomlin',
-    ticketUrl: 'https://www.axs.com',
-    eventUrl: 'https://christomlin.com',
-    featured: false,
-  },
-  {
-    id: 7,
-    artist: 'Tasha Cobbs Leonard',
-    title: 'Hymns Live Tour',
-    date: '2026-09-20',
-    time: '7:00 PM',
-    venue: 'State Farm Arena',
-    city: 'Atlanta',
-    state: 'GA',
-    country: 'USA',
-    description: 'Gospel powerhouse Tasha Cobbs Leonard performs classic hymns',
-    ticketUrl: 'https://www.ticketmaster.com',
-    eventUrl: 'https://tashacobbs.com',
-    featured: false,
-  },
-  {
-    id: 8,
-    artist: 'TobyMac',
-    title: 'The Theater Tour',
-    date: '2026-10-08',
-    time: '7:30 PM',
-    venue: 'Bridgestone Arena',
-    city: 'Nashville',
-    state: 'TN',
-    country: 'USA',
-    description: 'High-energy concert experience with Christian hip-hop legend TobyMac',
-    ticketUrl: 'https://www.ticketmaster.com',
-    eventUrl: 'https://tobymac.com',
-    featured: false,
-  },
+// Artistas Gospel/CCM monitorados — adicione ou remova à vontade
+const GOSPEL_KEYWORDS = [
+  'Kirk Franklin',
+  'Maverick City Music',
+  'Elevation Worship',
+  'Tasha Cobbs Leonard',
+  'Chris Tomlin',
+  'Hillsong',
+  'Bethel Music',
+  'Phil Wickham',
+  'Lauren Daigle',
+  'for KING & COUNTRY',
+  'TobyMac',
+  'CeCe Winans',
+  'Travis Greene',
+  'Todd Dulaney',
+  'Lecrae',
 ];
 
-interface Event {
-  id: number;
-  artist: string;
-  title: string;
-  date: string;
-  time: string;
-  venue: string;
-  city: string;
-  state: string;
-  country: string;
-  description?: string;
-  ticketUrl?: string;
-  eventUrl: string;
-  featured?: boolean;
+// ─── Tipos ────────────────────────────────────────────────────────────────────
+interface TMVenue {
+  name: string;
+  city?: { name: string };
+  state?: { stateCode: string; name: string };
+  country?: { countryCode: string; name: string };
 }
 
-const EventsPage: React.FC = () => {
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'upcoming' | 'thisMonth' | 'featured'>('all');
-
-  const filterEvents = () => {
-    const now = new Date();
-    const thisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    
-    switch (selectedFilter) {
-      case 'upcoming':
-        return EVENTS.filter(event => new Date(event.date) >= now);
-      case 'thisMonth':
-        return EVENTS.filter(event => {
-          const eventDate = new Date(event.date);
-          return eventDate >= now && eventDate <= thisMonth;
-        });
-      case 'featured':
-        return EVENTS.filter(event => event.featured);
-      default:
-        return EVENTS;
-    }
+interface TMEvent {
+  id: string;
+  name: string;
+  url: string;
+  dates: {
+    start: { localDate: string; localTime?: string };
+    status?: { code: string };
   };
+  images?: { url: string; width: number; height: number }[];
+  priceRanges?: { min: number; max: number; currency: string }[];
+  _embedded?: { venues?: TMVenue[] };
+  _keyword: string;
+}
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function getVenue(e: TMEvent): TMVenue | null {
+  return e._embedded?.venues?.[0] ?? null;
+}
+
+function formatDate(localDate: string) {
+  const d = new Date(localDate + 'T12:00:00');
+  return {
+    month: d.toLocaleDateString('en-US', { month: 'short' }),
+    day: d.getDate(),
+    year: d.getFullYear(),
+    weekday: d.toLocaleDateString('en-US', { weekday: 'short' }),
+    full: d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
   };
+}
 
-  const getDaysUntil = (dateString: string) => {
-    const eventDate = new Date(dateString);
-    const today = new Date();
-    const diffTime = eventDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
+function daysUntil(localDate: string) {
+  return Math.ceil((new Date(localDate + 'T12:00:00').getTime() - Date.now()) / 86400000);
+}
 
-  const filteredEvents = filterEvents().sort((a, b) => 
-    new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+function getBestImage(e: TMEvent) {
+  if (!e.images?.length) return null;
+  const sorted = [...e.images].sort((a, b) => b.width - a.width);
+  return (sorted.find(i => i.width / (i.height || 1) > 1.5) ?? sorted[0]).url;
+}
+
+function formatPrice(e: TMEvent) {
+  const r = e.priceRanges?.[0];
+  if (!r) return null;
+  return r.min === r.max ? `$${Math.round(r.min)}` : `$${Math.round(r.min)}–$${Math.round(r.max)}`;
+}
+
+async function fetchForKeyword(keyword: string): Promise<TMEvent[]> {
+  const params = new URLSearchParams({
+    apikey: TM_API_KEY,
+    keyword,
+    classificationName: 'Music',
+    size: '5',
+    sort: 'date,asc',
+  });
+  const res = await fetch(`https://app.ticketmaster.com/discovery/v2/events.json?${params}`);
+  if (!res.ok) throw new Error(`TM ${res.status}`);
+  const data = await res.json();
+  return (data._embedded?.events ?? []).map((ev: TMEvent) => ({ ...ev, _keyword: keyword }));
+}
+
+// ─── Card ─────────────────────────────────────────────────────────────────────
+const EventCard: React.FC<{ event: TMEvent }> = ({ event }) => {
+  const venue = getVenue(event);
+  const d = formatDate(event.dates.start.localDate);
+  const days = daysUntil(event.dates.start.localDate);
+  const image = getBestImage(event);
+  const price = formatPrice(event);
+  const cancelled = event.dates.status?.code === 'cancelled';
+  const location = [
+    venue?.city?.name,
+    venue?.state?.stateCode,
+    venue?.country?.countryCode !== 'US' ? venue?.country?.name : undefined,
+  ].filter(Boolean).join(', ');
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white dark:from-gray-900 dark:to-gray-800">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex justify-center mb-4">
-              <Calendar className="w-16 h-16" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Gospel Events & Concerts
-            </h1>
-            <p className="text-xl text-orange-100 max-w-2xl mx-auto">
-              Don't miss out on the most powerful worship experiences and gospel concerts
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className={`group flex flex-col bg-white dark:bg-gray-900 border rounded-xl overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl ${
+      cancelled ? 'border-red-200 dark:border-red-900/40 opacity-60' : 'border-gray-100 dark:border-white/5 hover:border-orange-400 dark:hover:border-orange-500'
+    }`}>
 
-      {/* Filters */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-wrap gap-3 justify-center items-center">
-          <Filter className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-          <button
-            onClick={() => setSelectedFilter('all')}
-            className={`px-6 py-2 rounded-full font-medium transition-all ${
-              selectedFilter === 'all'
-                ? 'bg-orange-500 text-white shadow-lg'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-700'
-            }`}
-          >
-            All Events
-          </button>
-          <button
-            onClick={() => setSelectedFilter('featured')}
-            className={`px-6 py-2 rounded-full font-medium transition-all ${
-              selectedFilter === 'featured'
-                ? 'bg-orange-500 text-white shadow-lg'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-700'
-            }`}
-          >
-            ⭐ Featured
-          </button>
-          <button
-            onClick={() => setSelectedFilter('upcoming')}
-            className={`px-6 py-2 rounded-full font-medium transition-all ${
-              selectedFilter === 'upcoming'
-                ? 'bg-orange-500 text-white shadow-lg'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-700'
-            }`}
-          >
-            Upcoming
-          </button>
-          <button
-            onClick={() => setSelectedFilter('thisMonth')}
-            className={`px-6 py-2 rounded-full font-medium transition-all ${
-              selectedFilter === 'thisMonth'
-                ? 'bg-orange-500 text-white shadow-lg'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-700'
-            }`}
-          >
-            This Month
-          </button>
+      {/* Imagem ou header laranja */}
+      {image ? (
+        <div className="relative h-36 overflow-hidden bg-gray-100 dark:bg-gray-800">
+          <img src={image} alt={event.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          {!cancelled && days >= 0 && days <= 30 && (
+            <span className="absolute top-3 right-3 bg-orange-500 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+              {days === 0 ? 'Today' : days === 1 ? 'Tomorrow' : `${days}d`}
+            </span>
+          )}
+          {cancelled && <span className="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-full">Cancelled</span>}
+          <span className="absolute bottom-3 left-3 bg-black/50 text-white text-[9px] font-medium uppercase tracking-widest px-2 py-0.5 rounded-full backdrop-blur-sm">{event._keyword}</span>
         </div>
-      </div>
-
-      {/* Events Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        {filteredEvents.length === 0 ? (
-          <div className="text-center py-20">
-            <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
-              No events found for the selected filter.
-            </p>
+      ) : (
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Music2 className="w-4 h-4 text-orange-100" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-orange-100">{event._keyword}</span>
           </div>
-        ) : (
-          <>
-            <div className="text-center mb-8">
-              <p className="text-gray-600 dark:text-gray-400">
-                {filteredEvents.length} {filteredEvents.length === 1 ? 'event' : 'events'} {selectedFilter !== 'all' && `(${selectedFilter})`}
+          {!cancelled && days >= 0 && days <= 30 && (
+            <span className="bg-white/20 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+              {days === 0 ? 'Today' : days === 1 ? 'Tomorrow' : `${days}d`}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Corpo */}
+      <div className="p-5 flex-1 flex flex-col gap-3">
+        <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-snug line-clamp-2 uppercase tracking-tight">
+          {event.name}
+        </h3>
+
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col items-center justify-center bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20 rounded-lg w-12 h-12 flex-shrink-0">
+            <span className="text-[9px] font-bold uppercase tracking-wider text-orange-400">{d.month}</span>
+            <span className="text-lg font-black text-orange-500 leading-none">{d.day}</span>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">{d.weekday}, {d.full}</p>
+            {event.dates.start.localTime && (
+              <p className="text-[11px] text-gray-400 mt-0.5">
+                {new Date(`2000-01-01T${event.dates.start.localTime}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
               </p>
+            )}
+          </div>
+        </div>
+
+        {venue && (
+          <div className="flex items-start gap-2">
+            <MapPin className="w-3.5 h-3.5 text-orange-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">{venue.name}</p>
+              {location && <p className="text-[11px] text-gray-400">{location}</p>}
             </div>
+          </div>
+        )}
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredEvents.map((event) => {
-                const daysUntil = getDaysUntil(event.date);
-                const isUpcoming = daysUntil >= 0;
-                
-                return (
-                  <div
-                    key={event.id}
-                    className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1 ${
-                      event.featured ? 'ring-2 ring-orange-400' : ''
-                    }`}
-                  >
-                    {/* Featured Badge */}
-                    {event.featured && (
-                      <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-1 text-xs font-bold flex items-center gap-1">
-                        <span>⭐</span> FEATURED EVENT
-                      </div>
-                    )}
-                    
-                    {/* Event Header */}
-                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6 text-white">
-                      <div className="flex items-start justify-between mb-2">
-                        <Music className="w-6 h-6 flex-shrink-0" />
-                        {isUpcoming && daysUntil <= 30 && (
-                          <span className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
-                            {daysUntil === 0 ? 'TODAY' : daysUntil === 1 ? 'TOMORROW' : `${daysUntil} days`}
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-xl font-bold mb-1">{event.artist}</h3>
-                      <p className="text-orange-100 text-sm font-medium">{event.title}</p>
-                    </div>
+        {price && (
+          <p className="text-xs text-gray-500">From <span className="font-semibold text-gray-800 dark:text-gray-200">{price}</span></p>
+        )}
 
-                    {/* Event Details */}
-                    <div className="p-6 space-y-4">
-                      {/* Description */}
-                      {event.description && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                          {event.description}
-                        </p>
-                      )}
+        <div className="mt-auto pt-3">
+          <a
+            href={event.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-[11px] font-black uppercase tracking-widest px-4 py-2.5 rounded-lg transition-all"
+          >
+            <Ticket className="w-3.5 h-3.5" />
+            Get Tickets
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-                      {/* Date & Time */}
-                      <div className="flex items-start gap-3">
-                        <Calendar className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-900 dark:text-white text-sm">
-                            {formatDate(event.date)}
-                          </p>
-                          <div className="flex items-center gap-1 mt-1">
-                            <Clock className="w-4 h-4 text-gray-400" />
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {event.time}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+// ─── Página ───────────────────────────────────────────────────────────────────
+const EventsPage: React.FC = () => {
+  const [events, setEvents] = useState<TMEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<'all' | 'this-month' | 'next-3-months'>('all');
 
-                      {/* Location */}
-                      <div className="flex items-start gap-3">
-                        <MapPin className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white text-sm">
-                            {event.venue}
-                          </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {event.city}, {event.state}
-                          </p>
-                        </div>
-                      </div>
+  const load = useCallback(async () => {
+    if (TM_API_KEY === 'SUA_KEY_AQUI') { setError('missing_key'); setLoading(false); return; }
+    setLoading(true); setError(null);
+    try {
+      const results = await Promise.allSettled(GOSPEL_KEYWORDS.map(fetchForKeyword));
+      const seen = new Set<string>();
+      const flat: TMEvent[] = [];
+      results.forEach(r => {
+        if (r.status === 'fulfilled') r.value.forEach(e => { if (!seen.has(e.id)) { seen.add(e.id); flat.push(e); } });
+      });
+      flat.sort((a, b) => new Date(a.dates.start.localDate).getTime() - new Date(b.dates.start.localDate).getTime());
+      setEvents(flat);
+    } catch {
+      setError('Erro ao carregar eventos. Verifique sua API key.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-                      {/* Actions */}
-                      <div className="pt-4 space-y-2">
-                        {event.ticketUrl && (
-                          <a
-                            href={event.ticketUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full flex items-center justify-center gap-2 bg-orange-500 text-white px-4 py-2.5 rounded-lg hover:bg-orange-600 transition-colors font-medium text-sm"
-                          >
-                            <Ticket className="w-4 h-4" />
-                            Get Tickets
-                          </a>
-                        )}
-                        <a
-                          href={event.eventUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          More Info
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+  useEffect(() => { load(); }, [load]);
+
+  const filtered = events.filter(e => {
+    const days = daysUntil(e.dates.start.localDate);
+    if (filter === 'this-month' && !(days >= 0 && days <= 30)) return false;
+    if (filter === 'next-3-months' && !(days >= 0 && days <= 90)) return false;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      const v = getVenue(e);
+      return e.name.toLowerCase().includes(q) || e._keyword.toLowerCase().includes(q) || !!v?.city?.name?.toLowerCase().includes(q);
+    }
+    return true;
+  });
+
+  const countries = new Set(events.map(e => getVenue(e)?.country?.countryCode).filter(Boolean));
+
+  const FILTERS = [
+    { key: 'all' as const, label: 'All Upcoming' },
+    { key: 'this-month' as const, label: 'This Month' },
+    { key: 'next-3-months' as const, label: 'Next 3 Months' },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+
+      {/* Header */}
+      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Calendar className="w-14 h-14 mx-auto mb-4 opacity-90" />
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-3">Gospel Events</h1>
+          <p className="text-orange-100 text-lg max-w-xl mx-auto">Real upcoming concerts & worship nights — powered by Ticketmaster.</p>
+          {!loading && events.length > 0 && (
+            <div className="flex justify-center gap-8 mt-8">
+              {[{ v: events.length, l: 'Events' }, { v: GOSPEL_KEYWORDS.length, l: 'Artists' }, { v: countries.size, l: 'Countries' }].map(({ v, l }) => (
+                <React.Fragment key={l}>
+                  <div><p className="text-3xl font-black">{v}</p><p className="text-orange-200 text-xs uppercase tracking-widest mt-0.5">{l}</p></div>
+                  {l !== 'Countries' && <div className="w-px bg-white/20" />}
+                </React.Fragment>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Filtros */}
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-white/5 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center gap-3">
+          <div className="flex gap-2">
+            {FILTERS.map(f => (
+              <button key={f.key} onClick={() => setFilter(f.key)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${filter === f.key ? 'bg-orange-500 text-white' : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-orange-50 dark:hover:bg-white/10'}`}>
+                {f.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex-1 min-w-[180px] relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+            <input type="text" placeholder="Search artist or city..." value={search} onChange={e => setSearch(e.target.value)}
+              className="w-full pl-8 pr-4 py-1.5 text-sm bg-gray-100 dark:bg-white/5 border border-transparent focus:border-orange-300 rounded-full outline-none text-gray-800 dark:text-gray-200 placeholder-gray-400" />
+          </div>
+          <button onClick={load} disabled={loading} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-orange-500 transition-colors disabled:opacity-40 ml-auto">
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* Conteúdo */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        {error === 'missing_key' && (
+          <div className="max-w-lg mx-auto text-center py-20">
+            <AlertCircle className="w-12 h-12 text-orange-400 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">API Key não configurada</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Adicione no <code className="bg-gray-100 dark:bg-white/10 px-1.5 py-0.5 rounded text-orange-500">.env</code>:</p>
+            <pre className="bg-gray-900 text-green-400 text-xs text-left rounded-xl p-4 mb-6">VITE_TICKETMASTER_KEY=sua_consumer_key</pre>
+            <a href="https://developer.ticketmaster.com" target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors">
+              <ExternalLink className="w-4 h-4" /> Get API Key (free)
+            </a>
+          </div>
+        )}
+
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-32 text-gray-400">
+            <Loader2 className="w-10 h-10 animate-spin text-orange-500 mb-4" />
+            <p className="text-sm">Loading events from Ticketmaster...</p>
+          </div>
+        )}
+
+        {error && error !== 'missing_key' && (
+          <div className="text-center py-20">
+            <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+            <p className="text-red-500 mb-4 text-sm">{error}</p>
+            <button onClick={load} className="bg-orange-500 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors">Try Again</button>
+          </div>
+        )}
+
+        {!loading && !error && filtered.length === 0 && (
+          <div className="text-center py-20 text-gray-400">
+            <Calendar className="w-12 h-12 mx-auto mb-3 opacity-40" />
+            <p className="text-sm">No events found.</p>
+          </div>
+        )}
+
+        {!loading && !error && filtered.length > 0 && (
+          <>
+            <p className="text-xs text-gray-400 mb-6">{filtered.length} event{filtered.length !== 1 ? 's' : ''} found</p>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map(event => <EventCard key={event.id} event={event} />)}
             </div>
           </>
         )}
       </div>
 
-      {/* Submit Event CTA */}
+      {/* Submit */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-8 text-center">
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Have an event to share?
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Submit your gospel event or concert information to be featured on our events page
-          </p>
-          <a
-            href="mailto:events@praisefm.com?subject=Event Submission"
-            className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium"
-          >
-            <Calendar className="w-5 h-5" />
-            Submit Event
+        <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-xl p-8 text-center">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Have a Gospel event to share?</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">Submit your concert or ministry event to be featured here.</p>
+          <a href="mailto:events@praisefm.com?subject=Event Submission"
+            className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors">
+            <Calendar className="w-4 h-4" /> Submit Event
           </a>
         </div>
       </div>
