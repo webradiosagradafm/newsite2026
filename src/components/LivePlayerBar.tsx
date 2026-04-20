@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { connectListener } from '../lib/listeners'
@@ -6,27 +6,25 @@ import { connectListener } from '../lib/listeners'
 type LiveMetadata = {
   artist: string
   title: string
-  playedAt?: Date
-  isMusic?: boolean
 } | null
 
-type Program = {
+interface Program {
   title: string
-  host?: string
+  host: string
+  image: string
 }
 
-interface LivePlayerBarProps {
+interface Props {
   isPlaying: boolean
   onTogglePlayback: () => void
   program: Program
   liveMetadata: LiveMetadata
-  queue?: Program[]
   audioRef: React.RefObject<HTMLAudioElement | null>
 }
 
 const TUNEIN_DEFAULT = 2
 
-const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
+const LivePlayerBar: React.FC<Props> = ({
   isPlaying,
   onTogglePlayback,
   program,
@@ -34,23 +32,20 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
   audioRef,
 }) => {
   const [siteListeners, setSiteListeners] = useState(0)
-  const [tuneInListeners] = useState(TUNEIN_DEFAULT)
   const [volume, setVolume] = useState(0.8)
   const [muted, setMuted] = useState(false)
+  const [country, setCountry] = useState<string | null>(null)
 
+  // conectar listener
   useEffect(() => {
     connectListener()
   }, [])
 
+  // buscar listeners
   useEffect(() => {
     const fetchListeners = async () => {
-      try {
-        const { data, error } = await supabase.from('listeners_now').select('id')
-        if (error) throw error
-        setSiteListeners(data?.length || 0)
-      } catch (err) {
-        console.error('Listeners fetch error:', err)
-      }
+      const { data } = await supabase.from('listeners_now').select('id')
+      setSiteListeners(data?.length || 0)
     }
 
     fetchListeners()
@@ -58,13 +53,21 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
     return () => clearInterval(interval)
   }, [])
 
+  // país (global vibe)
+  useEffect(() => {
+    fetch('https://ipapi.co/json/')
+      .then((res) => res.json())
+      .then((data) => setCountry(data.country_name))
+      .catch(() => {})
+  }, [])
+
   useEffect(() => {
     if (!audioRef.current) return
     audioRef.current.volume = volume
     audioRef.current.muted = muted
-  }, [audioRef, volume, muted])
+  }, [volume, muted])
 
-  const totalListeners = siteListeners + tuneInListeners
+  const total = siteListeners + TUNEIN_DEFAULT
 
   const subtitle = useMemo(() => {
     if (liveMetadata?.artist && liveMetadata?.title) {
@@ -73,66 +76,62 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
     return 'PRAISE FM — LIVE STREAM'
   }, [liveMetadata])
 
-  const handleVolumeChange = (value: number) => {
-    setVolume(value)
-    if (value > 0 && muted) setMuted(false)
-    if (value === 0) setMuted(true)
-  }
-
-  const toggleMute = () => {
-    setMuted((prev) => !prev)
-  }
-
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 h-[72px] border-t border-white/5 bg-[#0b0b0b]">
-      <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4">
-        <div className="flex min-w-0 items-center gap-4">
+    <div className="fixed bottom-0 left-0 right-0 z-50 h-[78px] bg-black border-t border-white/10 backdrop-blur-md">
+      <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-4">
+
+        {/* LEFT */}
+        <div className="flex items-center gap-4 min-w-0">
+
+          {/* FOTO (VOLTOU 🔥) */}
+          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#ff6600]">
+            <img
+              src={program?.image}
+              alt={program?.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* PLAY */}
           <button
             onClick={onTogglePlayback}
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-[#ff6600] text-white transition hover:scale-105 active:scale-95"
-            aria-label={isPlaying ? 'Pause stream' : 'Play stream'}
+            className="w-12 h-12 rounded-full bg-[#ff6600] flex items-center justify-center"
           >
-            {isPlaying ? (
-              <Pause className="h-7 w-7 fill-current" />
-            ) : (
-              <Play className="ml-0.5 h-7 w-7 fill-current" />
-            )}
+            {isPlaying ? <Pause size={20} /> : <Play size={20} />}
           </button>
 
+          {/* INFO */}
           <div className="min-w-0">
-            <div className="truncate text-[10px] uppercase tracking-[0.3em] text-gray-400">
+            <p className="text-[10px] uppercase tracking-widest text-gray-400 truncate">
               {subtitle}
-            </div>
-            <div className="truncate text-sm font-medium text-white">
-              {program?.title || 'Live'}
-              {program?.host ? ` with ${program.host}` : ''}
-            </div>
+            </p>
+            <p className="text-sm text-white font-semibold truncate">
+              {program?.title}
+            </p>
+            <p className="text-xs text-gray-400 truncate">
+              with {program?.host}
+            </p>
           </div>
         </div>
 
-        <div className="hidden flex-col items-center justify-center md:flex">
+        {/* CENTER (GLOBAL 🔥) */}
+        <div className="hidden md:flex flex-col items-center">
           <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
             <span className="text-[9px] uppercase tracking-widest text-gray-400">
-              {siteListeners} site + {tuneInListeners} tunein
+              {siteListeners} site + {TUNEIN_DEFAULT} TuneIn
             </span>
           </div>
-          <div className="text-xs font-semibold text-white">
-            {totalListeners} listening now
-          </div>
+
+          <span className="text-xs text-white font-semibold">
+            {total} listening now {country && `• ${country}`}
+          </span>
         </div>
 
+        {/* RIGHT */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={toggleMute}
-            className="text-gray-300 transition hover:text-white"
-            aria-label={muted ? 'Unmute' : 'Mute'}
-          >
-            {muted || volume === 0 ? (
-              <VolumeX className="h-5 w-5" />
-            ) : (
-              <Volume2 className="h-5 w-5" />
-            )}
+          <button onClick={() => setMuted(!muted)}>
+            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
           </button>
 
           <input
@@ -141,11 +140,11 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
             max="1"
             step="0.01"
             value={muted ? 0 : volume}
-            onChange={(e) => handleVolumeChange(Number(e.target.value))}
-            className="w-24 accent-[#2f80ff]"
-            aria-label="Volume"
+            onChange={(e) => setVolume(Number(e.target.value))}
+            className="w-24 accent-[#ff6600]"
           />
         </div>
+
       </div>
     </div>
   )
