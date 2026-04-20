@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Play, Pause, Zap, Flame, Heart, Share2,
+  Play, Pause, Zap, Flame, Heart,
   Loader2, RefreshCw, ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-// ─── Tipos ────────────────────────────────────────────────────────────────────
 interface Release {
   id: string;
   artist: string;
@@ -18,23 +17,21 @@ interface Release {
   isHot?: boolean;
 }
 
-// ─── iTunes RSS — Top 24 Gospel/Christian albums (sem API key) ────────────────
 const ITUNES_RSS =
   'https://itunes.apple.com/us/rss/topalbums/limit=24/genre=22/json';
 
-// ─── Busca preview + detalhes via iTunes Search API ──────────────────────────
 async function enrichWithPreview(item: Release): Promise<Release> {
   try {
     const q = encodeURIComponent(`${item.artist} ${item.title}`);
-    // Busca por song (track) — muito mais chance de ter previewUrl de 30s
     const res = await fetch(
       `https://itunes.apple.com/search?term=${q}&media=music&entity=song&limit=5`
     );
     if (!res.ok) return item;
+
     const data = await res.json();
-    // Pega o primeiro resultado que tenha preview
     const result = data.results?.find((r: any) => r.previewUrl) ?? data.results?.[0];
     if (!result) return item;
+
     return {
       ...item,
       image: result.artworkUrl100?.replace('100x100', '600x600') ?? item.image,
@@ -45,7 +42,6 @@ async function enrichWithPreview(item: Release): Promise<Release> {
   }
 }
 
-// ─── Parse do feed RSS ────────────────────────────────────────────────────────
 function parseRSS(feed: any): Release[] {
   const entries: any[] = feed?.feed?.entry ?? [];
   return entries.map((e, i) => ({
@@ -60,14 +56,12 @@ function parseRSS(feed: any): Release[] {
   }));
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 function isNew(dateStr?: string) {
   if (!dateStr) return false;
   const d = new Date(dateStr);
   return (Date.now() - d.getTime()) / 86400000 <= 30;
 }
 
-// ─── Card ─────────────────────────────────────────────────────────────────────
 interface CardProps {
   release: Release;
   activePreview: string | null;
@@ -76,7 +70,13 @@ interface CardProps {
   isFav: boolean;
 }
 
-const ReleaseCard: React.FC<CardProps> = ({ release, activePreview, onTogglePlay, onFavorite, isFav }) => {
+const ReleaseCard: React.FC<CardProps> = ({
+  release,
+  activePreview,
+  onTogglePlay,
+  onFavorite,
+  isFav
+}) => {
   const isPlaying = activePreview === release.id;
 
   return (
@@ -102,13 +102,13 @@ const ReleaseCard: React.FC<CardProps> = ({ release, activePreview, onTogglePlay
 
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all" />
 
-        {/* Badges */}
         {isNew(release.releaseDate) && (
           <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 flex items-center space-x-1">
             <Zap className="w-3 h-3 fill-current" />
             <span className="text-[9px] font-black uppercase tracking-widest">New</span>
           </div>
         )}
+
         {release.isHot && !isNew(release.releaseDate) && (
           <div className="absolute top-4 left-4 bg-[#ff6600] text-white px-3 py-1 flex items-center space-x-1">
             <Flame className="w-3 h-3 fill-current" />
@@ -116,7 +116,6 @@ const ReleaseCard: React.FC<CardProps> = ({ release, activePreview, onTogglePlay
           </div>
         )}
 
-        {/* Hover overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-black/80 backdrop-blur-md">
           <div className="flex items-center justify-between mb-4">
             <button
@@ -128,6 +127,7 @@ const ReleaseCard: React.FC<CardProps> = ({ release, activePreview, onTogglePlay
                 ? <Pause className="w-5 h-5 fill-current" />
                 : <Play className="w-5 h-5 fill-current ml-0.5" />}
             </button>
+
             <div className="flex space-x-2">
               <button
                 onClick={(e) => onFavorite(e, release)}
@@ -139,6 +139,7 @@ const ReleaseCard: React.FC<CardProps> = ({ release, activePreview, onTogglePlay
               >
                 <Heart className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`} />
               </button>
+
               <a
                 href={release.itunesUrl}
                 target="_blank"
@@ -150,9 +151,11 @@ const ReleaseCard: React.FC<CardProps> = ({ release, activePreview, onTogglePlay
               </a>
             </div>
           </div>
+
           <p className="text-[#ff6600] text-[10px] font-black uppercase tracking-[0.2em] mb-1 truncate">
             {release.artist}
           </p>
+
           <h4 className="text-white text-lg font-medium uppercase tracking-tight truncate">
             {release.title}
           </h4>
@@ -171,29 +174,31 @@ const ReleaseCard: React.FC<CardProps> = ({ release, activePreview, onTogglePlay
   );
 };
 
-// ─── Página ───────────────────────────────────────────────────────────────────
 const NewReleasesPage: React.FC = () => {
   const [releases, setReleases] = useState<Release[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [activePreview, setActivePreview] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const { toggleFavorite, isFavorite, user } = useAuth();
+
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const load = async () => {
     setLoading(true);
     setError(false);
+
     try {
       const res = await fetch(ITUNES_RSS);
       if (!res.ok) throw new Error();
+
       const data = await res.json();
       const parsed = parseRSS(data);
 
-      // Enriquece só os 6 primeiros com preview (evita muitas requests)
       const enriched = await Promise.all(
         parsed.map((r, i) => (i < 12 ? enrichWithPreview(r) : Promise.resolve(r)))
       );
+
       setReleases(enriched);
     } catch {
       setError(true);
@@ -202,10 +207,13 @@ const NewReleasesPage: React.FC = () => {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const togglePlay = (id: string, url: string) => {
     if (!url || !audioRef.current) return;
+
     if (activePreview === id) {
       audioRef.current.pause();
       setActivePreview(null);
@@ -216,16 +224,15 @@ const NewReleasesPage: React.FC = () => {
     }
   };
 
-  const handleFavorite = (e: React.MouseEvent, release: Release) => {
+  const handleFavorite = (e: React.MouseEvent, _release: Release) => {
     e.stopPropagation();
-    if (!user) return navigate('/login');
-    toggleFavorite({
-      id: release.id,
-      title: release.title,
-      subtitle: release.artist,
-      image: release.image,
-      item_type: 'album',
-    });
+
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    // Favoritos ainda não implementados no AuthContext atual.
   };
 
   const main = releases[0];
@@ -235,7 +242,6 @@ const NewReleasesPage: React.FC = () => {
     <div className="bg-white dark:bg-[#000] min-h-screen transition-colors duration-300">
       <audio ref={audioRef} onEnded={() => setActivePreview(null)} />
 
-      {/* Hero */}
       <div className="bg-black text-white relative overflow-hidden h-[70vh] flex items-center">
         <div className="absolute inset-0 opacity-40">
           {main && (
@@ -250,6 +256,7 @@ const NewReleasesPage: React.FC = () => {
             />
           )}
         </div>
+
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent" />
 
         <div className="max-w-7xl mx-auto px-4 relative z-10 w-full">
@@ -259,9 +266,11 @@ const NewReleasesPage: React.FC = () => {
               #1 Gospel Right Now
             </span>
           </div>
+
           <h1 className="text-7xl md:text-[9rem] font-medium uppercase tracking-tighter leading-[0.85] mb-8">
             The New<br />Wave
           </h1>
+
           {main && (
             <div className="flex flex-col md:flex-row md:items-end gap-10">
               <div>
@@ -272,6 +281,7 @@ const NewReleasesPage: React.FC = () => {
                   {main.title}
                 </h2>
               </div>
+
               {main.previewUrl && (
                 <button
                   onClick={() => togglePlay(main.id, main.previewUrl)}
@@ -288,8 +298,6 @@ const NewReleasesPage: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-24">
-
-        {/* Header */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-16 border-b-2 border-black dark:border-white pb-8">
           <div className="flex items-center space-x-4 mb-6 md:mb-0">
             <h3 className="text-4xl font-medium uppercase tracking-tighter dark:text-white">
@@ -299,6 +307,7 @@ const NewReleasesPage: React.FC = () => {
               iTunes Charts · US
             </span>
           </div>
+
           <button
             onClick={load}
             disabled={loading}
@@ -309,7 +318,6 @@ const NewReleasesPage: React.FC = () => {
           </button>
         </div>
 
-        {/* Estados */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-40">
             <Loader2 className="w-12 h-12 text-[#ff6600] animate-spin mb-4" />
@@ -321,7 +329,9 @@ const NewReleasesPage: React.FC = () => {
 
         {error && !loading && (
           <div className="text-center py-40">
-            <p className="text-gray-400 mb-4 text-sm uppercase tracking-widest">Could not load releases.</p>
+            <p className="text-gray-400 mb-4 text-sm uppercase tracking-widest">
+              Could not load releases.
+            </p>
             <button
               onClick={load}
               className="bg-[#ff6600] text-white px-6 py-2 text-[10px] font-black uppercase tracking-widest"
@@ -340,13 +350,12 @@ const NewReleasesPage: React.FC = () => {
                 activePreview={activePreview}
                 onTogglePlay={togglePlay}
                 onFavorite={handleFavorite}
-                isFav={isFavorite(release.id)}
+                isFav={false}
               />
             ))}
           </div>
         )}
 
-        {/* Footer stats */}
         {!loading && !error && (
           <div className="mt-32 border-t border-gray-100 dark:border-white/10 pt-16 flex flex-col md:flex-row items-start gap-20">
             <div className="w-full md:w-1/3">
@@ -361,6 +370,7 @@ const NewReleasesPage: React.FC = () => {
                 <span>Powered by iTunes RSS · Updated daily</span>
               </div>
             </div>
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 flex-grow">
               {[
                 { v: releases.length, l: 'Albums Tracked' },
