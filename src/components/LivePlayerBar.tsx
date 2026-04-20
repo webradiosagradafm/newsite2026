@@ -1,803 +1,144 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Volume2, VolumeX, Volume1, List, X, RotateCcw, RotateCw } from 'lucide-react';
-import { Program } from '../types';
-import { supabase } from '../lib/supabase';
+import React, { useEffect, useRef, useState } from 'react'
+import { Play, Pause, Volume2, VolumeX } from 'lucide-react'
+import { supabase } from '../lib/supabase'
+import { connectListener } from '../lib/listeners'
 
-// Add global CSS for the live pulse animation
-const LivePulseAnimation = () => {
+const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv'
+
+const TUNEIN_DEFAULT = 2 // 🔥 AJUSTA AQUI CONFORME TUNEIN
+
+const LivePlayerBar: React.FC = () => {
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  const [playing, setPlaying] = useState(false)
+  const [volume, setVolume] = useState(1)
+  const [muted, setMuted] = useState(false)
+
+  const [siteListeners, setSiteListeners] = useState(0)
+  const [tuneInListeners, setTuneInListeners] = useState(TUNEIN_DEFAULT)
+
+  // 🎧 conecta listener
   useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes live-pulse {
-        0%, 100% { 
-          opacity: 0.7; 
-          transform: translate(-50%, -50%) scale(0.9); 
-        }
-        50% { 
-          opacity: 1; 
-          transform: translate(-50%, -50%) scale(1.3); 
-        }
-      }
-      .animate-live-pulse {
-        animation: live-pulse 1.8s infinite;
-      }
-    `;
-    document.head.appendChild(style);
+    connectListener()
+  }, [])
 
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
-
-  return null;
-};
-
-interface LivePlayerBarProps {
-  isPlaying: boolean;
-  onTogglePlayback: () => void;
-  program: Program;
-  liveMetadata?: { artist: string; title: string; artwork?: string } | null;
-  queue?: Program[];
-  audioRef: React.RefObject<HTMLAudioElement | null>;
-}
-
-// Helper function to format time to AM/PM
-const formatTimeToAmPm = (timeString: string): string => {
-  try {
-    if (timeString.includes('AM') || timeString.includes('PM')) {
-      return timeString;
-    }
-
-    const [hours, minutes] = timeString.split(':');
-    let hour = parseInt(hours);
-    const period = hour >= 12 ? 'PM' : 'AM';
-
-    hour = hour % 12;
-    hour = hour ? hour : 12;
-
-    return `${hour}:${minutes || '00'} ${period}`;
-  } catch (error) {
-    console.error('Error formatting time:', error);
-    return timeString;
-  }
-};
-
-// Time helpers for real program progress
-const getChicagoNow = () => {
-  return new Date(
-    new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })
-  );
-};
-
-const timeStringToMinutes = (timeString: string): number => {
-  const [hours, minutes] = timeString.split(':').map(Number);
-  return hours * 60 + minutes;
-};
-
-const getProgramProgress = (program: Program | null | undefined): number => {
-  if (!program) return 0;
-
-  const now = getChicagoNow();
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-
-  const start = timeStringToMinutes(program.startTime);
-  let end = timeStringToMinutes(program.endTime);
-
-  if (end === 0) end = 24 * 60;
-  if (end < start) end += 24 * 60;
-
-  let adjustedNow = nowMinutes;
-  if (adjustedNow < start && end > 1440) adjustedNow += 1440;
-
-  const duration = end - start;
-  const elapsed = adjustedNow - start;
-
-  if (duration <= 0) return 0;
-  if (elapsed <= 0) return 0;
-  if (elapsed >= duration) return 100;
-
-  return (elapsed / duration) * 100;
-};
-
-const getRemainingMinutes = (program: Program | null | undefined): number => {
-  if (!program) return 0;
-
-  const now = getChicagoNow();
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-
-  const start = timeStringToMinutes(program.startTime);
-  let end = timeStringToMinutes(program.endTime);
-
-  if (end === 0) end = 24 * 60;
-  if (end < start) end += 24 * 60;
-
-  let adjustedNow = nowMinutes;
-  if (adjustedNow < start && end > 1440) adjustedNow += 1440;
-
-  if (adjustedNow <= start) return end - start;
-  if (adjustedNow >= end) return 0;
-
-  return end - adjustedNow;
-};
-
-// Função para gerar/pegar ID único do ouvinte
-const getListenerId = (): string => {
-  let listenerId = localStorage.getItem('listener_id');
-  if (!listenerId) {
-    listenerId = crypto.randomUUID();
-    localStorage.setItem('listener_id', listenerId);
-  }
-  return listenerId;
-};
-
-// Função para obter informações do ouvinte
-const getListenerInfo = async () => {
-  const userAgent = navigator.userAgent;
-
-  const isMobile = /Mobile|Android|iPhone|iPad|iPod/i.test(userAgent);
-  const isTablet = /iPad|Android(?!.*Mobile)/i.test(userAgent);
-  let device = 'Desktop';
-  if (isMobile) device = 'Mobile';
-  if (isTablet) device = 'Tablet';
-
-  let browser = 'Unknown';
-  if (userAgent.includes('Chrome')) browser = 'Chrome';
-  else if (userAgent.includes('Firefox')) browser = 'Firefox';
-  else if (userAgent.includes('Safari')) browser = 'Safari';
-  else if (userAgent.includes('Edge')) browser = 'Edge';
-
-  const referrer = document.referrer || 'Direct';
-
-  let ipData = {
-    ip: 'Unknown',
-    country: 'Unknown',
-    city: 'Unknown'
-  };
-
-  try {
-    const response = await fetch('https://ipapi.co/json/');
-    const data = await response.json();
-    ipData = {
-      ip: data.ip || 'Unknown',
-      country: data.country_name || 'Unknown',
-      city: data.city || 'Unknown'
-    };
-  } catch (error) {
-    console.log('Could not get location:', error);
-  }
-
-  return {
-    device,
-    browser,
-    referrer,
-    ...ipData
-  };
-};
-
-const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
-  isPlaying,
-  onTogglePlayback,
-  program,
-  liveMetadata,
-  queue = [],
-  audioRef
-}) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showSchedule, setShowSchedule] = useState(false);
-  const [volume, setVolume] = useState(() => {
-    const saved = localStorage.getItem('praise-volume');
-    return saved ? parseFloat(saved) : 0.8;
-  });
-  const [isMuted, setIsMuted] = useState(false);
-  const [prevVolume, setPrevVolume] = useState(0.8);
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-  const [playbackRate, setPlaybackRate] = useState(1);
-  const [progress, setProgress] = useState(0);
-  const [remainingMinutes, setRemainingMinutes] = useState(0);
-
-  // Estados para rastreamento
-  const sessionIdRef = useRef<string | null>(null);
-  const startTimeRef = useRef<number>(0);
-  const durationIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Registrar quando começar a ouvir
-  const trackListeningStart = async () => {
-    const listenerId = getListenerId();
-    const sessionId = crypto.randomUUID();
-    sessionIdRef.current = sessionId;
-    startTimeRef.current = Date.now();
-
-    const listenerInfo = await getListenerInfo();
-
-    console.log('🔍 DEBUG - Program ', {
-      title: program.title,
-      id: program.id,
-      host: program.host,
-      fullProgram: program
-    });
-
-    console.log('🌍 DEBUG - Listener info:', listenerInfo);
-
-    try {
-      const dataToInsert = {
-        user_id: listenerId,
-        session_id: sessionId,
-        audio_id: program.title || program.host || `Program ${program.id}` || 'Unknown Program',
-        duration_seconds: 0,
-        completed: false,
-        ip_address: listenerInfo.ip,
-        country: listenerInfo.country,
-        city: listenerInfo.city,
-        device: listenerInfo.device,
-        browser: listenerInfo.browser,
-        referrer: listenerInfo.referrer
-      };
-
-      console.log('📤 Sending to Supabase:', dataToInsert);
-
-      const { error } = await supabase
-        .from('listeners')
-        .insert(dataToInsert);
-
-      if (error) {
-        console.error('❌ Error registering listener:', error);
-      } else {
-        console.log('✅ Listener registered successfully!', dataToInsert);
-      }
-    } catch (err) {
-      console.error('❌ Error connecting to Supabase:', err);
-    }
-  };
-
-  // Atualizar duração periodicamente
-  const updateDuration = async () => {
-    if (!sessionIdRef.current) return;
-
-    const durationSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000);
-
-    try {
-      await supabase
-        .from('listeners')
-        .update({ duration_seconds: durationSeconds })
-        .eq('session_id', sessionIdRef.current);
-    } catch (err) {
-      console.error('Error updating duration:', err);
-    }
-  };
-
-  // Marcar como completado
-  const markAsCompleted = async () => {
-    if (!sessionIdRef.current) return;
-
-    try {
-      const durationSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000);
-
-      await supabase
-        .from('listeners')
-        .update({
-          completed: true,
-          duration_seconds: durationSeconds
-        })
-        .eq('session_id', sessionIdRef.current);
-
-      console.log('✅ Session marked as complete');
-    } catch (err) {
-      console.error('Error marking as completed:', err);
-    }
-  };
-
-  // Effect para rastrear quando começar/parar de tocar
+  // 🎧 buscar listeners
   useEffect(() => {
-    if (isPlaying && !sessionIdRef.current) {
-      trackListeningStart();
-      durationIntervalRef.current = setInterval(updateDuration, 10000);
-    } else if (!isPlaying && sessionIdRef.current) {
-      updateDuration();
+    const fetchListeners = async () => {
+      try {
+        const { data } = await supabase
+          .from('listeners_now')
+          .select('*')
 
-      if (durationIntervalRef.current) {
-        clearInterval(durationIntervalRef.current);
+        setSiteListeners(data?.length || 0)
+      } catch (err) {
+        console.error('Listeners error:', err)
       }
-
-      const listenedMinutes = (Date.now() - startTimeRef.current) / 60000;
-      if (listenedMinutes >= 5) {
-        markAsCompleted();
-      }
-
-      sessionIdRef.current = null;
     }
 
-    return () => {
-      if (durationIntervalRef.current) {
-        clearInterval(durationIntervalRef.current);
-      }
-    };
-  }, [isPlaying]);
+    fetchListeners()
 
-  useEffect(() => {
-    return () => {
-      if (sessionIdRef.current) {
-        updateDuration();
-      }
-      if (durationIntervalRef.current) {
-        clearInterval(durationIntervalRef.current);
-      }
-    };
-  }, []);
+    const interval = setInterval(fetchListeners, 10000)
 
-  useEffect(() => {
-    if ('mediaSession' in navigator && (liveMetadata || program)) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: liveMetadata?.title || program.title,
-        artist: liveMetadata?.artist || program.host,
-        artwork: [
-          { src: liveMetadata?.artwork || program.image, sizes: '512x512', type: 'image/png' }
-        ]
-      });
-      navigator.mediaSession.setActionHandler('play', onTogglePlayback);
-      navigator.mediaSession.setActionHandler('pause', onTogglePlayback);
-    }
-  }, [liveMetadata, program, onTogglePlayback]);
+    return () => clearInterval(interval)
+  }, [])
 
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
-      audioRef.current.muted = isMuted;
-      audioRef.current.playbackRate = playbackRate;
-    }
-  }, [volume, isMuted, playbackRate, audioRef]);
+  const totalListeners = siteListeners + tuneInListeners
 
-  useEffect(() => {
-    const updateProgress = () => {
-      setProgress(getProgramProgress(program));
-      setRemainingMinutes(getRemainingMinutes(program));
-    };
+  // ▶️ play / pause
+  const togglePlay = () => {
+    if (!audioRef.current) return
 
-    updateProgress();
-    const interval = setInterval(updateProgress, 15000);
-
-    return () => clearInterval(interval);
-  }, [program]);
-
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseFloat(e.target.value);
-    setVolume(val);
-    if (val > 0) {
-      setIsMuted(false);
-      setPrevVolume(val);
+    if (playing) {
+      audioRef.current.pause()
+      setPlaying(false)
     } else {
-      setIsMuted(true);
+      audioRef.current.src = STREAM_URL
+      audioRef.current.play().catch(() => {})
+      setPlaying(true)
     }
-    localStorage.setItem('praise-volume', val.toString());
-  };
+  }
+
+  // 🔊 volume
+  const handleVolume = (v: number) => {
+    if (!audioRef.current) return
+    audioRef.current.volume = v
+    setVolume(v)
+    setMuted(v === 0)
+  }
 
   const toggleMute = () => {
-    if (isMuted) {
-      setIsMuted(false);
-      setVolume(prevVolume > 0.05 ? prevVolume : 0.8);
+    if (!audioRef.current) return
+
+    if (muted) {
+      audioRef.current.volume = volume || 1
+      setMuted(false)
     } else {
-      setPrevVolume(volume);
-      setIsMuted(true);
+      audioRef.current.volume = 0
+      setMuted(true)
     }
-  };
-
-  const cyclePlaybackRate = () => {
-    const rates = [1, 1.25, 1.5, 2];
-    const currentIndex = rates.indexOf(playbackRate);
-    const nextIndex = (currentIndex + 1) % rates.length;
-    setPlaybackRate(rates[nextIndex]);
-  };
-
-  const skip30Forward = () => {
-    console.log('Skip forward 30s - not available for live streams');
-  };
-
-  const skip30Backward = () => {
-    console.log('Skip backward 30s - not available for live streams');
-  };
-
-  const VolumeIcon = () => {
-    if (isMuted || volume === 0) return <VolumeX className="w-5 h-5" />;
-    if (volume < 0.5) return <Volume1 className="w-5 h-5" />;
-    return <Volume2 className="w-5 h-5" />;
-  };
-
-  useEffect(() => {
-    if (showSchedule || isExpanded) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [showSchedule, isExpanded]);
+  }
 
   return (
-    <>
-      <LivePulseAnimation />
+    <div className="fixed bottom-0 left-0 w-full bg-black text-white z-50 border-t border-white/10 px-4 py-3 flex items-center justify-between">
 
-      {/* SCHEDULE DRAWER - LIVE + next 4 */}
-      <div
-        className={`fixed top-0 right-0 bottom-0 w-full md:w-96 z-[100] bg-white dark:bg-[#121212] transition-transform duration-300 flex flex-col shadow-2xl ${showSchedule ? 'translate-x-0' : 'translate-x-full'}`}
-      >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
-          <h2 className="text-lg font-semibold text-black dark:text-white">Schedule</h2>
-          <button
-            onClick={() => setShowSchedule(false)}
-            aria-label="Close schedule"
-            className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
-          >
-            <X className="w-5 h-5 text-black dark:text-white" />
-          </button>
-        </div>
-
-        <div className="flex-grow overflow-y-auto pb-20 md:pb-0">
-          <div className="p-3 border-b border-gray-100 dark:border-white/5">
-            <div className="flex items-start space-x-3">
-              <div className="w-16 h-16 flex-shrink-0 rounded overflow-hidden">
-                <img src={program.image} className="w-full h-full object-cover" alt={program.title} />
-              </div>
-              <div className="flex flex-col min-w-0 flex-grow">
-                <span className="font-bold text-base text-black dark:text-white leading-tight mb-1 truncate">
-                  {program.title}
-                </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
-                  {program.host}
-                </span>
-                <span className="text-xs text-gray-400 dark:text-gray-500 truncate">
-                  {formatTimeToAmPm(program.startTime)} - {formatTimeToAmPm(program.endTime)} • LIVE
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {queue && queue.slice(0, 4).map((prog, index) => (
-            <div key={prog.id} className="p-3 border-b border-gray-100 dark:border-white/5">
-              <div className="flex items-start space-x-3">
-                <div className="w-16 h-16 flex-shrink-0 rounded overflow-hidden">
-                  <img src={prog.image} className="w-full h-full object-cover" alt={prog.title} />
-                </div>
-                <div className="flex flex-col min-w-0 flex-grow">
-                  <span className="font-bold text-base text-black dark:text-white leading-tight mb-1 truncate">
-                    {prog.title}
-                  </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
-                    {prog.host}
-                  </span>
-                  <span className="text-xs text-gray-400 dark:text-gray-500 truncate">
-                    {formatTimeToAmPm(prog.startTime)} - {formatTimeToAmPm(prog.endTime)}
-                  </span>
-                </div>
-                <span className="text-xs font-medium text-[#00d9c9] mt-1">
-                  {index + 2}°
-                </span>
-              </div>
-            </div>
-          ))}
-
-          {queue && queue.slice(0, 4).length < 4 && (
-            <>
-              {Array.from({ length: 4 - queue.slice(0, 4).length }).map((_, index) => (
-                <div key={`placeholder-${index}`} className="p-3 border-b border-gray-100 dark:border-white/5">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-16 h-16 flex-shrink-0 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
-                    <div className="flex flex-col min-w-0 flex-grow">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-1 animate-pulse" />
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-1 animate-pulse" />
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse" />
-                    </div>
-                    <span className="text-xs font-medium text-[#00d9c9] mt-1">
-                      {queue.length + index + 2}°
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </>
+      {/* 🎵 PLAYER CONTROLS */}
+      <div className="flex items-center space-x-4">
+        <button
+          onClick={togglePlay}
+          className="w-12 h-12 bg-[#ff6600] flex items-center justify-center rounded-full hover:scale-105 transition"
+        >
+          {playing ? (
+            <Pause className="w-6 h-6 fill-current" />
+          ) : (
+            <Play className="w-6 h-6 fill-current ml-1" />
           )}
+        </button>
+
+        <div className="text-xs uppercase tracking-widest text-gray-400">
+          Praise FM — Live Stream
         </div>
       </div>
 
-      {showSchedule && (
-        <div
-          className="fixed inset-0 bg-black/50 z-[99] md:hidden"
-          onClick={() => setShowSchedule(false)}
-        />
-      )}
+      {/* 📡 LISTENERS */}
+      <div className="flex items-center space-x-2">
+        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
 
-      {/* MOBILE MINI-PLAYER */}
-      {isPlaying && (
-        <div
-          className={`fixed bottom-0 left-0 right-0 z-[60] bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md border-t border-gray-200 dark:border-white/10 md:hidden transition-all duration-300 shadow-2xl ${isExpanded ? 'h-auto' : 'h-[72px]'}`}
-        >
-          {!isExpanded ? (
-            <div
-              className="flex items-center justify-between px-4 py-3 h-[72px]"
-              onClick={() => {
-                setIsExpanded(true);
-                setShowSchedule(true);
-              }}
-            >
-              <div className="flex flex-col min-w-0 flex-grow">
-                <span className="text-base font-bold text-black dark:text-white leading-tight truncate">
-                  {program.title}
-                </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400 truncate leading-tight">
-                  {program.host} • LIVE
-                </span>
-              </div>
+        <div className="flex flex-col text-right leading-tight">
+          <span className="text-[9px] uppercase tracking-widest text-gray-400">
+            {siteListeners} site + {tuneInListeners} TuneIn
+          </span>
+          <span className="text-xs font-semibold">
+            {totalListeners} listening now
+          </span>
+        </div>
+      </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onTogglePlayback();
-                  }}
-                  aria-label={isPlaying ? 'Pause live radio' : 'Play live radio'}
-                  className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-black dark:border-white flex items-center justify-center bg-white dark:bg-[#121212]"
-                >
-                  {isPlaying ? (
-                    <Pause className="w-4 h-4 text-black dark:text-white fill-current" />
-                  ) : (
-                    <Play className="w-4 h-4 text-black dark:text-white fill-current ml-0.5" />
-                  )}
-                </button>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowSchedule(true);
-                  }}
-                  aria-label="Open schedule"
-                  className="p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white"
-                >
-                  <List className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
+      {/* 🔊 VOLUME */}
+      <div className="flex items-center space-x-3">
+        <button onClick={toggleMute}>
+          {muted ? (
+            <VolumeX className="w-5 h-5" />
           ) : (
-            <div className="flex flex-col">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
-                <span className="text-sm font-semibold text-black dark:text-white">Schedule</span>
-                <button
-                  onClick={() => {
-                    setIsExpanded(false);
-                    setShowSchedule(false);
-                  }}
-                  aria-label="Close expanded player"
-                  className="p-2"
-                >
-                  <X className="w-5 h-5 text-black dark:text-white" />
-                </button>
-              </div>
-
-              <div className="flex items-center space-x-3 px-4 py-4 border-b border-gray-100 dark:border-white/5">
-                <div className="w-14 h-14 flex-shrink-0">
-                  <img src={program.image} className="w-full h-full object-cover rounded" alt={program.title} />
-                </div>
-                <div className="flex flex-col min-w-0 flex-grow">
-                  <span className="font-bold text-base text-black dark:text-white leading-tight mb-1 truncate">
-                    {program.title}
-                  </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
-                    with {program.host}
-                  </span>
-                  <span className="text-xs text-gray-400 dark:text-gray-500">
-                    {formatTimeToAmPm(program.startTime)} - {formatTimeToAmPm(program.endTime)} • LIVE
-                  </span>
-                </div>
-              </div>
-
-              {/* REAL PROGRAM PROGRESS - MOBILE */}
-              <div className="px-4 py-3">
-                <div className="w-full">
-                  <div className="relative h-1.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#ff6600] rounded-full transition-all duration-700 ease-out"
-                      style={{ width: `${progress}%` }}
-                    />
-                    <div
-                      className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#ff6600] shadow-[0_0_10px_rgba(255,102,0,0.9)] transition-all duration-700 ease-out"
-                      style={{ left: `calc(${progress}% - 6px)` }}
-                    />
-                  </div>
-
-                  <div className="flex justify-between mt-2 text-[11px] font-medium text-gray-500 dark:text-gray-400">
-                    <span>{formatTimeToAmPm(program.startTime)}</span>
-                    <span>{remainingMinutes} min left</span>
-                    <span>{formatTimeToAmPm(program.endTime)}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-center space-x-6 px-4 py-4">
-                <button
-                  onClick={skip30Backward}
-                  aria-label="Skip backward 30 seconds"
-                  className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300"
-                >
-                  <RotateCcw className="w-5 h-5" strokeWidth={2} />
-                  <span className="absolute text-[9px] font-bold mt-[2px]">30</span>
-                </button>
-
-                <button
-                  onClick={onTogglePlayback}
-                  aria-label={isPlaying ? 'Pause live radio' : 'Play live radio'}
-                  className="w-12 h-12 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center shadow-lg"
-                >
-                  {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
-                </button>
-
-                <button
-                  onClick={skip30Forward}
-                  aria-label="Skip forward 30 seconds"
-                  className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300"
-                >
-                  <RotateCw className="w-5 h-5" strokeWidth={2} />
-                  <span className="absolute text-[9px] font-bold mt-[2px]">30</span>
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-white/5">
-                <div className="flex items-center space-x-2 flex-grow">
-                  <button onClick={toggleMute} aria-label={isMuted ? 'Unmute' : 'Mute'} className="p-2">
-                    <VolumeIcon />
-                  </button>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={isMuted ? 0 : volume}
-                    onChange={handleVolumeChange}
-                    className="flex-grow h-1 bg-gray-200 dark:bg-white/20 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
-                  />
-                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 w-6 text-right">
-                    {Math.round((isMuted ? 0 : volume) * 10)}
-                  </span>
-                </div>
-
-                <div className="flex items-center space-x-3 ml-4">
-                  <button
-                    onClick={cyclePlaybackRate}
-                    className="px-2.5 py-1 text-xs font-semibold text-black dark:text-white border border-gray-300 dark:border-white/30 rounded"
-                  >
-                    {playbackRate}×
-                  </button>
-
-                  <div className="flex items-center space-x-1.5">
-                    <div className="w-2 h-2 bg-[#00d9c9] rounded-full animate-pulse"></div>
-                    <span className="text-xs font-bold text-[#00d9c9] uppercase">LIVE</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <Volume2 className="w-5 h-5" />
           )}
-        </div>
-      )}
+        </button>
 
-      {/* DESKTOP PLAYER BAR */}
-      {isPlaying && (
-        <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md border-t border-gray-200 dark:border-white/10 hidden md:flex flex-col transition-colors duration-300 shadow-2xl">
-          {/* REAL PROGRAM PROGRESS - DESKTOP */}
-          <div className="w-full px-8 pt-2">
-            <div className="w-full">
-              <div className="relative h-1.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#ff6600] rounded-full transition-all duration-700 ease-out"
-                  style={{ width: `${progress}%` }}
-                />
-                <div
-                  className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#ff6600] shadow-[0_0_10px_rgba(255,102,0,0.9)] transition-all duration-700 ease-out"
-                  style={{ left: `calc(${progress}% - 6px)` }}
-                />
-              </div>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={muted ? 0 : volume}
+          onChange={(e) => handleVolume(Number(e.target.value))}
+          className="w-24"
+        />
+      </div>
 
-              <div className="flex justify-between mt-2 text-[11px] font-medium text-gray-500 dark:text-gray-400">
-                <span>{formatTimeToAmPm(program.startTime)}</span>
-                <span>{remainingMinutes} min left</span>
-                <span>{formatTimeToAmPm(program.endTime)}</span>
-              </div>
-            </div>
-          </div>
+      {/* 🎧 AUDIO */}
+      <audio ref={audioRef} />
+    </div>
+  )
+}
 
-          <div className="flex items-center justify-between px-8 py-4">
-            <div className="flex items-center space-x-4 w-[30%] min-w-0">
-              <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-200 dark:border-white/10 shadow-sm">
-                <img src={program.image} alt="" className="w-full h-full object-cover" />
-              </div>
-              <div className="min-w-0">
-                <h4 className="font-semibold text-gray-900 dark:text-white tracking-tight leading-tight truncate text-[15px]">
-                  {program.title}
-                </h4>
-                <p className="text-[11px] font-normal text-gray-500 dark:text-gray-400 truncate tracking-tight mt-0.5">
-                  with {program.host}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center space-x-6">
-              <button
-                onClick={skip30Backward}
-                aria-label="Skip backward 30 seconds"
-                className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
-              >
-                <RotateCcw className="w-5 h-5" strokeWidth={2} />
-                <span className="absolute text-[9px] font-bold mt-[2px]">30</span>
-              </button>
-
-              <button
-                onClick={onTogglePlayback}
-                aria-label={isPlaying ? 'Pause live radio' : 'Play live radio'}
-                className="w-12 h-12 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center hover:scale-105 transition-all active:scale-95 shadow-md"
-              >
-                {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
-              </button>
-
-              <button
-                onClick={skip30Forward}
-                aria-label="Skip forward 30 seconds"
-                className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
-              >
-                <RotateCw className="w-5 h-5" strokeWidth={2} />
-                <span className="absolute text-[9px] font-bold mt-[2px]">30</span>
-              </button>
-            </div>
-
-            <div className="flex items-center justify-end space-x-4 w-[30%]">
-              <div
-                className="flex items-center space-x-2 relative"
-                onMouseEnter={() => setShowVolumeSlider(true)}
-                onMouseLeave={() => setShowVolumeSlider(false)}
-              >
-                <button
-                  onClick={toggleMute}
-                  aria-label={isMuted ? 'Unmute' : 'Mute'}
-                  className="p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
-                >
-                  <VolumeIcon />
-                </button>
-
-                <div className={`flex items-center transition-all duration-200 overflow-hidden ${showVolumeSlider ? 'w-24 opacity-100' : 'w-0 opacity-0'}`}>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={isMuted ? 0 : volume}
-                    onChange={handleVolumeChange}
-                    className="w-full h-1 bg-gray-200 dark:bg-white/20 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
-                  />
-                  <span className="ml-2 text-xs font-medium text-gray-600 dark:text-gray-400 w-6 text-right">
-                    {Math.round((isMuted ? 0 : volume) * 10)}
-                  </span>
-                </div>
-              </div>
-
-              <button
-                onClick={cyclePlaybackRate}
-                className="px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white border border-gray-300 dark:border-white/20 rounded hover:border-black dark:hover:border-white transition-all"
-              >
-                {playbackRate}×
-              </button>
-
-              <button
-                onClick={() => setShowSchedule(true)}
-                aria-label="Open schedule"
-                className="p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
-              >
-                <List className="w-6 h-6" strokeWidth={2} />
-              </button>
-
-              <div className="flex items-center space-x-1.5 px-2">
-                <div className="w-2 h-2 bg-[#00d9c9] rounded-full animate-pulse"></div>
-                <span className="text-xs font-bold text-[#00d9c9] uppercase tracking-wider">LIVE</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
-
-export default LivePlayerBar;
+export default LivePlayerBar
