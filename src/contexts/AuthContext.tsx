@@ -1,17 +1,27 @@
-const authListener = auth.onAuthStateChange(
-  async (event: any, nextSession: any) => {
-    // Ignora o evento inicial pois o initAuth já cuida disso
-    if (event === 'INITIAL_SESSION') return;
+useEffect(() => {
+  let isMounted = true;
 
-    setSession(nextSession ?? null);
-    setUser(nextSession?.user ?? null);
+  // Só usa o onAuthStateChange, remove o initAuth separado
+  const { data: authListener } = auth.onAuthStateChange(
+    async (event: any, nextSession: any) => {
+      if (!isMounted) return;
 
-    if (nextSession?.user?.id) {
-      await fetchFavorites(nextSession.user.id);
-    } else {
-      setFavorites([]);
+      setSession(nextSession ?? null);
+      setUser(nextSession?.user ?? null);
+
+      if (nextSession?.user?.id) {
+        await fetchFavorites(nextSession.user.id);
+      } else {
+        setFavorites([]);
+      }
+
+      // Só seta loading false depois que tudo resolveu
+      if (isMounted) setLoading(false);
     }
+  );
 
-    setLoading(false);
-  }
-);
+  return () => {
+    isMounted = false;
+    authListener?.subscription?.unsubscribe?.();
+  };
+}, []);
