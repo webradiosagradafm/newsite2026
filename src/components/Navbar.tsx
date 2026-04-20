@@ -11,7 +11,8 @@ import {
   User as UserIcon,
   Library,
   Settings,
-  Ticket
+  Ticket,
+  LogOut
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -27,7 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     if (user) {
@@ -41,6 +42,8 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
         if (data?.avatar_url) setAvatarUrl(data.avatar_url);
       };
       fetchAvatar();
+    } else {
+      setAvatarUrl(null);
     }
   }, [user]);
 
@@ -114,19 +117,10 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
         {/* DIREITA */}
         <div className="flex items-center">
 
-          {/* 🌙 / ☀️ BOTÃO CORRIGIDO */}
+          {/* THEME TOGGLE */}
           <button
             onClick={onToggleTheme}
-            aria-label={
-              theme === 'dark'
-                ? 'Switch to light mode'
-                : 'Switch to dark mode'
-            }
-            title={
-              theme === 'dark'
-                ? 'Switch to light mode'
-                : 'Switch to dark mode'
-            }
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-gray-400 mr-8 md:mr-12"
           >
             {theme === 'light' ? (
@@ -140,6 +134,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
           <div className="flex items-center space-x-4">
             {user ? (
               <div className="hidden md:flex items-center space-x-4">
+                {/* PROFILE */}
                 <button
                   onClick={() => navigate('/profile')}
                   aria-label="Go to profile"
@@ -160,6 +155,16 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
                     Profile
                   </span>
                 </button>
+
+                {/* SIGN OUT DESKTOP */}
+                <button
+                  onClick={signOut}
+                  aria-label="Sign out"
+                  className="flex items-center space-x-2 text-[10px] font-medium uppercase tracking-widest text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </button>
               </div>
             ) : (
               <button
@@ -171,7 +176,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
               </button>
             )}
 
-            {/* MOBILE MENU */}
+            {/* MOBILE MENU BUTTON */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle menu"
@@ -219,17 +224,32 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
             </button>
 
             {user && (
-              <button
-                onClick={() => {
-                  navigate('/profile');
-                  setIsMobileMenuOpen(false);
-                }}
-                aria-label="Account settings"
-                className="flex items-center space-x-4 p-4 rounded-xl text-lg font-medium text-[#ff6600] uppercase tracking-tighter border-t border-gray-100 dark:border-white/5 mt-4 pt-8"
-              >
-                <Settings className="w-5 h-5" />
-                <span>Account Settings</span>
-              </button>
+              <>
+                <button
+                  onClick={() => {
+                    navigate('/profile');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  aria-label="Account settings"
+                  className="flex items-center space-x-4 p-4 rounded-xl text-lg font-medium text-[#ff6600] uppercase tracking-tighter border-t border-gray-100 dark:border-white/5 mt-4 pt-8"
+                >
+                  <Settings className="w-5 h-5" />
+                  <span>Account Settings</span>
+                </button>
+
+                {/* SIGN OUT MOBILE */}
+                <button
+                  onClick={() => {
+                    signOut();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  aria-label="Sign out"
+                  className="flex items-center space-x-4 p-4 rounded-xl text-lg font-medium text-red-500 uppercase tracking-tighter"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span>Sign Out</span>
+                </button>
+              </>
             )}
           </nav>
         </div>
