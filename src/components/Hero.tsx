@@ -1,33 +1,40 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Play, Pause, ChevronRight, Zap, ArrowRight } from 'lucide-react';
-import { SCHEDULES } from '../constants';
-import { Program } from '../types';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react'
+import { Play, Pause, ChevronRight, Zap, ArrowRight } from 'lucide-react'
+import { SCHEDULES } from '../constants'
+import { Program } from '../types'
+import { useNavigate } from 'react-router-dom'
 
 const getChicagoInfo = () => {
-  const now = new Date();
+  const now = new Date()
   const chicagoString = now.toLocaleString('en-US', {
     timeZone: 'America/Chicago',
-  });
-  const chicagoDate = new Date(chicagoString);
-  const h = chicagoDate.getHours();
-  const m = chicagoDate.getMinutes();
-  const day = chicagoDate.getDay();
-  return { day, totalMinutes: h * 60 + m };
-};
+  })
+  const chicagoDate = new Date(chicagoString)
+  const h = chicagoDate.getHours()
+  const m = chicagoDate.getMinutes()
+  const day = chicagoDate.getDay()
+  return { day, totalMinutes: h * 60 + m }
+}
+
+const parseTime = (time24: string) => {
+  const parts = time24.split(':')
+  const h = parseInt(parts[0] || '0', 10)
+  const m = parseInt(parts[1] || '0', 10)
+  return { h, m }
+}
 
 const format12h = (time24: string) => {
-  const [h, m] = time24.split(':').map(Number);
-  const period = h >= 12 ? 'PM' : 'AM';
-  const displayH = h % 12 || 12;
-  return `${displayH}:${m.toString().padStart(2, '0')} ${period}`;
-};
+  const { h, m } = parseTime(time24)
+  const period = h >= 12 ? 'PM' : 'AM'
+  const displayH = h % 12 || 12
+  return `${displayH}:${m.toString().padStart(2, '0')} ${period}`
+}
 
 interface HeroProps {
-  onListenClick: () => void;
-  isPlaying: boolean;
-  liveMetadata?: { artist: string; title: string; artwork?: string } | null;
-  onNavigateToProgram: (program: Program) => void;
+  onListenClick: () => void
+  isPlaying: boolean
+  liveMetadata?: { artist: string; title: string; artwork?: string } | null
+  onNavigateToProgram: (program: Program) => void
 }
 
 const Hero: React.FC<HeroProps> = ({
@@ -36,66 +43,71 @@ const Hero: React.FC<HeroProps> = ({
   liveMetadata,
   onNavigateToProgram,
 }) => {
-  const [tick, setTick] = useState(0);
-  const [showDetails, setShowDetails] = useState(true);
-  const navigate = useNavigate();
+  const [tick, setTick] = useState(0)
+  const [showDetails, setShowDetails] = useState(true)
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const interval = setInterval(() => setTick((t) => t + 1), 30000);
-    return () => clearInterval(interval);
-  }, []);
+    const interval = setInterval(() => setTick((t) => t + 1), 30000)
+    return () => clearInterval(interval)
+  }, [])
 
-  const chicago = useMemo(() => getChicagoInfo(), [tick]);
+  const chicago = useMemo(() => getChicagoInfo(), [tick])
 
   const { currentProgram, upNextPrograms } = useMemo(() => {
-    const schedule = SCHEDULES[chicago.day] || SCHEDULES[1];
+    const schedule = Array.isArray(SCHEDULES[chicago.day]) ? SCHEDULES[chicago.day] : SCHEDULES[1]
 
     const currentIndex = schedule.findIndex((p) => {
-      const [sH, sM] = p.startTime.split(':').map(Number);
-      const [eH, eM] = p.endTime.split(':').map(Number);
+      const startTime = parseTime(p.startTime)
+      const endTime = parseTime(p.endTime)
 
-      const start = sH * 60 + sM;
-      let end = eH * 60 + eM;
+      const start = startTime.h * 60 + startTime.m
+      let end = endTime.h * 60 + endTime.m
 
-      if (end === 0 || end <= start) end = 24 * 60;
+      if (end === 0 || end <= start) end = 24 * 60
 
-      return chicago.totalMinutes >= start && chicago.totalMinutes < end;
-    });
+      return chicago.totalMinutes >= start && chicago.totalMinutes < end
+    })
 
-    const current = currentIndex !== -1 ? schedule[currentIndex] : schedule[0];
+    const current = currentIndex !== -1 ? schedule[currentIndex] : schedule[0]
     const next =
       currentIndex !== -1
         ? schedule.slice(currentIndex + 1, currentIndex + 3)
-        : schedule.slice(1, 3);
+        : schedule.slice(1, 3)
 
-    return { currentProgram: current, upNextPrograms: next };
-  }, [chicago]);
+    return {
+      currentProgram: current || null,
+      upNextPrograms: Array.isArray(next) ? next : [],
+    }
+  }, [chicago])
 
   const progress = useMemo(() => {
-    if (!currentProgram) return 0;
+    if (!currentProgram) return 0
 
-    const [sH, sM] = currentProgram.startTime.split(':').map(Number);
-    const [eH, eM] = currentProgram.endTime.split(':').map(Number);
+    const startTime = parseTime(currentProgram.startTime)
+    const endTime = parseTime(currentProgram.endTime)
 
-    const start = sH * 60 + sM;
-    let end = eH * 60 + eM;
+    const start = startTime.h * 60 + startTime.m
+    let end = endTime.h * 60 + endTime.m
 
-    if (end === 0 || end <= start) end = 24 * 60;
+    if (end === 0 || end <= start) end = 24 * 60
 
-    const elapsed = chicago.totalMinutes - start;
-    const duration = end - start;
+    const elapsed = chicago.totalMinutes - start
+    const duration = end - start
 
-    return Math.min(Math.max(elapsed / duration, 0), 1);
-  }, [currentProgram, chicago.totalMinutes]);
+    if (duration <= 0) return 0
 
-  if (!currentProgram) return null;
+    return Math.min(Math.max(elapsed / duration, 0), 1)
+  }, [currentProgram, chicago.totalMinutes])
 
-  const circleSize = 192;
-  const strokeWidth = 4;
-  const center = circleSize / 2;
-  const radius = center - strokeWidth / 2;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - progress * circumference;
+  if (!currentProgram) return null
+
+  const circleSize = 192
+  const strokeWidth = 4
+  const center = circleSize / 2
+  const radius = center - strokeWidth / 2
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference - progress * circumference
 
   return (
     <section className="bg-white dark:bg-[#000000] py-10 transition-colors duration-300">
@@ -230,7 +242,7 @@ const Hero: React.FC<HeroProps> = ({
               <div className="flex items-center space-x-6 mb-6 md:mb-0">
                 <div className="w-14 h-14 bg-black dark:bg-white rounded-full flex items-center justify-center relative">
                   <Zap className="w-6 h-6 text-[#ff6600] fill-current animate-pulse" />
-                  <div className="absolute inset-0 rounded-full border-2 border-[#ff6600] scale-110 animate-ping opacity-20"></div>
+                  <div className="absolute inset-0 rounded-full border-2 border-[#ff6600] scale-110 animate-ping opacity-20" />
                 </div>
 
                 <div>
@@ -292,8 +304,8 @@ const Hero: React.FC<HeroProps> = ({
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
 const ExternalLinkIcon = ({ className }: { className?: string }) => (
   <svg
@@ -305,11 +317,11 @@ const ExternalLinkIcon = ({ className }: { className?: string }) => (
     strokeLinejoin="round"
     className={className}
   >
-    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-    <polyline points="15 3 21 3 21 9"></polyline>
-    <line x1="10" y1="14" x2="21" y2="3"></line>
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <polyline points="15 3 21 3 21 9" />
+    <line x1="10" y1="14" x2="21" y2="3" />
   </svg>
-);
+)
 
 const ChevronUpIcon = ({ className }: { className?: string }) => (
   <svg
@@ -321,9 +333,9 @@ const ChevronUpIcon = ({ className }: { className?: string }) => (
     strokeLinejoin="round"
     className={className}
   >
-    <polyline points="18 15 12 9 6 15"></polyline>
+    <polyline points="18 15 12 9 6 15" />
   </svg>
-);
+)
 
 const ChevronDownIcon = ({ className }: { className?: string }) => (
   <svg
@@ -335,8 +347,8 @@ const ChevronDownIcon = ({ className }: { className?: string }) => (
     strokeLinejoin="round"
     className={className}
   >
-    <polyline points="6 9 12 15 18 9"></polyline>
+    <polyline points="6 9 12 15 18 9" />
   </svg>
-);
+)
 
-export default Hero;
+export default Hero
