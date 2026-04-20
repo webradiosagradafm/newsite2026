@@ -1,93 +1,313 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
-import type { Session, User } from '@supabase/supabase-js'
+import React, { useState, useEffect, useRef } from 'react'
+import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import { User, Mail, Camera, Save, Loader2, ArrowLeft, ShieldCheck, Upload } from 'lucide-react'
+import { useNavigate, Navigate } from 'react-router-dom'
 
-type AuthContextType = {
-  user: User | null
-  session: Session | null
-  loading: boolean
-  signOut: () => Promise<void>
-  refreshAvatar: (userId?: string) => Promise<void>
-}
+const ProfilePage: React.FC = () => {
+  const { user, loading: authLoading, signOut, refreshAvatar } = useAuth()
+  const navigate = useNavigate()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  session: null,
-  loading: true,
-  signOut: async () => {},
-  refreshAvatar: async () => {},
-})
+  const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [fetching, setFetching] = useState(true)
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [profile, setProfile] = useState({
+    username: '',
+    avatar_url: '',
+    email: '',
+  })
 
   useEffect(() => {
-    let isMounted = true
+    if (user) {
+      setProfile((prev) => ({
+        ...prev,
+        email: user.email || '',
+      }))
+      fetchProfile()
+    } else if (!authLoading) {
+      setFetching(false)
+    }
+  }, [user, authLoading])
 
-    const loadSession = async () => {
-      try {
-        const { data, error } = await supabase.auth.getSession()
+  const fetchProfile = async () => {
+    if (!user?.id) {
+      setFetching(false)
+      return
+    }
 
-        if (error) {
-          console.error('getSession error:', error)
-        }
+    setFetching(true)
 
-        if (!isMounted) return
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username, avatar_url')
+        .eq('id', user.id)
+        .single()
 
-        setSession(data.session ?? null)
-        setUser(data.session?.user ?? null)
-      } catch (err) {
-        console.error('Auth init error:', err)
-      } finally {
-        if (isMounted) setLoading(false)
+      if (error && error.code !== 'PGRST116') {
+        throw error
       }
+
+      if (data) {
+        setProfile((prev) => ({
+          ...prev,
+          username: data.username || '',
+          avatar_url: data.avatar_url || '',
+          email: user.email || '',
+        }))
+      } else {
+        setProfile((prev) => ({
+          ...prev,
+          email: user.email || '',
+        }))
+      }
+    } catch (err) {
+      console.error('Error fetching profile:', err)
+    } finally {
+      setFetching(false)
     }
-
-    loadSession()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!isMounted) return
-      setSession(session ?? null)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-
-    return () => {
-      isMounted = false
-      subscription.unsubscribe()
-    }
-  }, [])
-
-  const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
-    setUser(null)
-    setSession(null)
   }
 
-  const refreshAvatar = async (_userId?: string) => {
-    const { data } = await supabase.auth.getSession()
-    setSession(data.session ?? null)
-    setUser(data.session?.user ?? null)
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user?.id) return
+
+    try {
+      setUploading(true)
+      setMessage(null)
+
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error('You must select an image to upload.')
+      }
+
+      const file = event.target.files[0]
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(fileName, file, {
+        upsert: true,
+      })
+
+      if (uploadError) throw uploadError
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('avatars').getPublicUrl(fileName)
+
+      const { error: updateError } = await supabase.from('profiles').upsert({
+        id: user.id,
+        username: profile.username || '',
+        avatar_url: publicUrl,
+        updated_at: new Date().toISOString(),
+      })
+
+      if (updateError) throw updateError
+
+      setProfile((prev) => ({ ...prev, avatar_url: publicUrl }))
+      await refreshAvatar(user.id)
+
+      setMessage({ type: 'success', text: 'Photo updated successfully!' })
+      setTimeout(() => setMessage(null), 3000)
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message || 'Error uploading image.' })
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!user?.id) return
+
+    setLoading(true)
+    setMessage(null)
+
+    try {
+      const { error } = await supabase.from('profiles').upsert({
+        id: user.id,
+        username: profile.username,
+        avatar_url: profile.avatar_url,
+        updated_at: new Date().toISOString(),
+      })
+
+      if (error) throw error
+
+      await refreshAvatar(user.id)
+
+      setMessage({ type: 'success', text: 'Profile updated successfully!' })
+      setTimeout(() => setMessage(null), 3000)
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message || 'Error saving profile' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (authLoading || fetching) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#ff6600]" />
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />
   }
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        session,
-        loading,
-        signOut,
-        refreshAvatar,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <div className="bg-white dark:bg-[#000] min-h-screen transition-colors duration-300">
+      <div className="bg-black text-white py-20 border-b border-white/10 relative overflow-hidden">
+        <div className="max-w-4xl mx-auto px-4 relative z-10">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-gray-400 hover:text-white mb-8 text-[10px] font-medium uppercase tracking-[0.4em] group"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+            Go Back
+          </button>
+          <h1 className="text-5xl md:text-7xl font-medium uppercase tracking-tighter leading-none">
+            Your Account
+          </h1>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-16">
+          <div className="md:col-span-4 flex flex-col items-center">
+            <div
+              className="relative w-48 h-48 group cursor-pointer"
+              onClick={() => !uploading && fileInputRef.current?.click()}
+            >
+              <div className="w-full h-full rounded-full overflow-hidden bg-gray-100 dark:bg-white/5 border-[3px] border-[#ff6600] flex items-center justify-center shadow-2xl transition-all duration-500 group-hover:border-white">
+                {uploading ? (
+                  <Loader2 className="w-8 h-8 animate-spin text-[#ff6600]" />
+                ) : profile.avatar_url ? (
+                  <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="flex flex-col items-center text-gray-400">
+                    <User className="w-12 h-12 mb-2" />
+                    <span className="text-[8px] uppercase tracking-widest text-center px-4">Upload Photo</span>
+                  </div>
+                )}
+              </div>
+
+              {!uploading && (
+                <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
+                  <Camera className="w-8 h-8 mb-2" />
+                  <span className="text-[9px] font-black uppercase tracking-widest">Change Photo</span>
+                </div>
+              )}
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                accept="image/*"
+                className="hidden"
+              />
+            </div>
+
+            <h2 className="mt-8 text-3xl font-medium uppercase tracking-tighter dark:text-white text-center">
+              {profile.username || 'Praise User'}
+            </h2>
+
+            <div className="flex items-center mt-2 space-x-2">
+              <ShieldCheck className="w-4 h-4 text-[#ff6600]" />
+              <p className="text-gray-500 text-[11px] font-medium uppercase tracking-[0.2em]">
+                Verified Account
+              </p>
+            </div>
+
+            <p className="mt-3 text-gray-400 text-[10px] uppercase tracking-widest text-center">
+              {user.email}
+            </p>
+
+            <button
+              onClick={async () => {
+                await signOut()
+                navigate('/login')
+              }}
+              className="mt-12 text-red-500 text-[10px] font-black uppercase tracking-[0.3em] hover:underline transition-all"
+            >
+              Sign out
+            </button>
+          </div>
+
+          <div className="md:col-span-8">
+            <form onSubmit={handleUpdate} className="space-y-10">
+              {message && (
+                <div
+                  className={`p-5 text-xs font-medium uppercase tracking-widest border-l-4 animate-in fade-in slide-in-from-top-2 ${
+                    message.type === 'success'
+                      ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-600'
+                      : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-600'
+                  }`}
+                >
+                  {message.text}
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 flex items-center">
+                  <User className="w-3 h-3 mr-2" /> Display Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={profile.username}
+                  onChange={(e) => setProfile({ ...profile, username: e.target.value })}
+                  className="w-full bg-gray-50 dark:bg-white/5 border-2 border-transparent focus:border-[#ff6600] p-5 outline-none transition-all dark:text-white text-lg font-medium"
+                  placeholder="Your Name"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 flex items-center">
+                  <Mail className="w-3 h-3 mr-2" /> Email Address
+                </label>
+                <input
+                  type="email"
+                  disabled
+                  value={profile.email}
+                  className="w-full bg-gray-100 dark:bg-white/10 p-5 outline-none text-gray-500 font-medium cursor-not-allowed border-2 border-transparent"
+                />
+                <p className="text-[9px] text-gray-400 uppercase tracking-wider">Email cannot be changed</p>
+              </div>
+
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={loading || uploading}
+                  className="w-full md:w-auto bg-[#ff6600] text-white px-12 py-5 text-[11px] font-black uppercase tracking-[0.4em] hover:bg-black transition-all flex items-center justify-center space-x-4 disabled:opacity-50 shadow-2xl active:scale-95"
+                >
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                  <span>Save Changes</span>
+                </button>
+              </div>
+            </form>
+
+            <div className="mt-20 p-8 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5">
+              <div className="flex items-start space-x-5">
+                <Upload className="w-6 h-6 text-[#ff6600] flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm font-black uppercase tracking-widest dark:text-white">Photo Upload</h4>
+                  <p className="text-xs text-gray-500 mt-2 uppercase leading-relaxed font-normal">
+                    Click on your avatar to upload a new photo. Supported formats: JPG, PNG, WebP. Your photo is
+                    stored securely on Supabase Storage.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
-export const useAuth = () => useContext(AuthContext)
+export default ProfilePage
