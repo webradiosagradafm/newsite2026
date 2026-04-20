@@ -12,24 +12,23 @@ const IMAGES = {
   MICHAEL_RAY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/MICHAEL_RAY_yv1ehj.webp',
   STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/STANCY_CAMPBELL_xjkigb.webp',
   MAT_RILEY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/MATT_RILEY_hvzcam.webp',
-
+  LIVING_THE_MESSAGE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Living_the_Message_jxvd6v.webp',
   JAKE_HUNTER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/JAKE_HUNTER_pyb2ji.webp',
   AVA_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/AVA_BROOKS_yysmgc.webp',
   SCOTT_TURNER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/SCOTT_TURNER_wy3hrd.webp',
   DJ_ZION: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/DJ_ZION_hyjxbd.webp',
   SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/SARAH_JORDAN_oehx8m.webp',
-
   WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820658/Praise_FM_Worship_gz29id.webp',
 };
 
 const weekday: Program[] = [
   { id: '1', title: 'Midnight Grace', host: 'Daniel Brooks', startTime: '00:00', endTime: '06:00', description: 'Peaceful music for the night hours.', image: IMAGES.DANIEL_BROOKS },
 
-  { id: '2', title: 'Praise FM Worship', host: 'Praise FM Team', startTime: '06:00', endTime: '07:00', description: 'Morning adoration and praise.', image: IMAGES.WORSHIP },
+  { id: '2', title: 'Worship', host: "DJ's", startTime: '06:00', endTime: '07:00', description: 'Morning adoration and praise.', image: IMAGES.WORSHIP },
 
   { id: '3', title: 'Morning Show', host: 'Stancy Campbell', startTime: '07:00', endTime: '12:00', description: 'Life, music, and the Morning Show crew.', image: IMAGES.STANCY_CAMPBELL },
 
-  { id: '4', title: 'Praise FM Worship', host: 'Praise FM Team', startTime: '12:00', endTime: '13:00', description: 'Midday reflection and worship.', image: IMAGES.WORSHIP },
+  { id: '4', title: 'Worship', host: 'Praise FM Team', startTime: '12:00', endTime: '13:00', description: 'Midday reflection and worship.', image: IMAGES.WORSHIP },
 
   { id: '5', title: 'Midday Grace', host: 'Michael Ray', startTime: '13:00', endTime: '16:00', description: 'Soulful sounds for your afternoon.', image: IMAGES.MICHAEL_RAY },
 
@@ -49,11 +48,11 @@ const weekday: Program[] = [
 const sunday: Program[] = [
   { id: 's1', title: 'Midnight Grace', host: 'Daniel Brooks', startTime: '00:00', endTime: '06:00', description: 'Peaceful music for the night hours.', image: IMAGES.DANIEL_BROOKS },
 
-  { id: 's2', title: 'Praise FM Worship', host: 'Praise FM Team', startTime: '06:00', endTime: '07:00', description: 'Morning adoration and praise.', image: IMAGES.WORSHIP },
+  { id: 's2', title: 'Worship', host: "DJ'S", startTime: '06:00', endTime: '07:00', description: 'Morning adoration and praise.', image: IMAGES.WORSHIP },
 
   { id: 's3', title: 'Sunday With Christ', host: 'Matt Riley', startTime: '07:00', endTime: '12:00', description: 'A holy morning experience.', image: IMAGES.MAT_RILEY },
 
-  { id: 's4', title: 'Praise FM Worship', host: 'Praise FM Team', startTime: '12:00', endTime: '13:00', description: 'Midday worship.', image: IMAGES.WORSHIP },
+  { id: 's4', title: 'Worship', host: "DJ'S", startTime: '12:00', endTime: '13:00', description: 'Midday worship.', image: IMAGES.WORSHIP },
 
   { id: 's5', title: 'Midday Grace', host: 'Michael Ray', startTime: '13:00', endTime: '16:00', description: 'Soulful sounds.', image: IMAGES.MICHAEL_RAY },
 
@@ -61,9 +60,9 @@ const sunday: Program[] = [
 
   { id: 's7', title: 'Future Artists', host: 'Sarah Jordan', startTime: '17:00', endTime: '18:00', description: 'New talents.', image: IMAGES.SARAH_JORDAN },
 
-  { id: 's8', title: 'Praise FM Worship', host: 'Praise FM Team', startTime: '18:00', endTime: '20:00', description: 'Evening worship.', image: IMAGES.WORSHIP },
+  { id: 's8', title: 'Worship', host: "DJ'S", startTime: '18:00', endTime: '20:00', description: 'Evening worship.', image: IMAGES.WORSHIP },
 
-  { id: 's9', title: 'The Word', host: 'Guest Pastors', startTime: '20:00', endTime: '21:00', description: 'A powerful message.', image: IMAGES.WORSHIP },
+  { id: 's9', title: 'Living The Message', host: 'Guest Pastors', startTime: '20:00', endTime: '21:00', description: 'A powerful message.', image: IMAGES.LIVING_THE_MESSAGE },
 
   { id: 's10', title: 'Praise FM Classics', host: 'Scott Turner', startTime: '21:00', endTime: '22:00', description: 'Timeless hits.', image: IMAGES.SCOTT_TURNER },
 

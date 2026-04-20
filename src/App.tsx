@@ -236,7 +236,9 @@ const AppContent: React.FC = () => {
             <Route path="/events" element={<EventsPage />} />
             <Route path="/new-releases" element={<NewReleasesPage />} />
             <Route path="/artists" element={<FeaturedArtistsPage />} />
-            <Route path="/presenters" element={<PresentersPage />} />
+            <Route path="/presenters" element={<PresentersPage onNavigateToProgram={function (program: Program): void {
+                throw new Error('Function not implemented.');
+              } } />} />
             <Route path="/live-recordings" element={<LiveRecordingsPage />} />
             <Route path="/help" element={<HelpCenterPage />} />
             <Route path="/feedback" element={<FeedbackPage />} />
