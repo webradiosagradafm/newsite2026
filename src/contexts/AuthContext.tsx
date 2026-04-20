@@ -25,7 +25,7 @@ interface AuthContextType {
   session: any | null;
   loading: boolean;
   avatarUrl: string | null;
-  refreshAvatar: () => Promise<void>;
+  refreshAvatar: (userId?: string) => Promise<void>;
   favorites: FavoriteItem[];
   toggleFavorite: (item: ToggleFavoriteInput) => Promise<void>;
   isFavorite: (id: string) => boolean;
@@ -58,8 +58,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const refreshAvatar = async () => {
-    if (user?.id) await fetchAvatar(user.id);
+  // Aceita userId opcional para evitar problema de closure com user state
+  const refreshAvatar = async (userId?: string) => {
+    const id = userId || user?.id;
+    if (id) await fetchAvatar(id);
   };
 
   const fetchFavorites = async (userId: string) => {
@@ -90,6 +92,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: authListener } = auth.onAuthStateChange(
       async (event: any, nextSession: any) => {
         if (!isMounted) return;
+
+        // Limpa tudo ao deslogar
+        if (event === 'SIGNED_OUT') {
+          setUser(null);
+          setSession(null);
+          setAvatarUrl(null);
+          setFavorites([]);
+          if (isMounted) setLoading(false);
+          return;
+        }
 
         setSession(nextSession ?? null);
         setUser(nextSession?.user ?? null);
@@ -171,9 +183,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       await auth.signOut();
+      // onAuthStateChange com SIGNED_OUT cuida de limpar o estado
+      window.location.href = '/login';
     } catch (e: any) {
       console.error('Sign out error:', e?.message || String(e));
-    } finally {
+      // Força limpeza em caso de erro
       setUser(null);
       setSession(null);
       setAvatarUrl(null);
