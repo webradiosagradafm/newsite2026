@@ -1,14 +1,13 @@
-declare module '*.css';
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import './index.css';
+import './index.css' with { type: 'css' };
 
 async function registerPWA() {
   if (!('serviceWorker' in navigator)) return;
 
   try {
+    // @ts-ignore
     const { registerSW } = await import('virtual:pwa-register');
 
     registerSW({
