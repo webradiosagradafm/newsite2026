@@ -400,29 +400,45 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
               </div>
 
               <div className="flex items-center gap-3 shrink-0">
-                <button
-                  onClick={onTogglePlayback}
-                  className="w-11 h-11 rounded-full border-2 border-white flex items-center justify-center"
-                  aria-label={isPlaying ? 'Pause' : 'Play'}
-                >
-                  {isPlaying ? <IconPause className="w-4 h-4" /> : <IconPlay className="w-4 h-4 ml-0.5" />}
-                </button>
+  <button
+    onClick={toggleMute}
+    className="text-gray-300"
+    aria-label="Volume"
+  >
+    <VolumeIcon />
+  </button>
 
-                <button
-                  onClick={() => setShowSchedule(true)}
-                  className="text-gray-300"
-                  aria-label="Open schedule"
-                >
-                  <IconList className="w-5 h-5" />
-                </button>
+  <input
+    type="range"
+    min="0"
+    max="1"
+    step="0.01"
+    value={isMuted ? 0 : volume}
+    onChange={handleVolumeChange}
+    className="w-16 h-1 accent-[#ff6600]"
+  />
 
-                <div className="flex items-center gap-1 text-[#00d9c9]">
-                  <div className="w-2 h-2 rounded-full bg-[#00d9c9] animate-pulse" />
-                  <span className="text-xs font-bold">LIVE</span>
-                </div>
-              </div>
-            </div>
-          </div>
+  <button
+    onClick={onTogglePlayback}
+    className="w-11 h-11 rounded-full border-2 border-white flex items-center justify-center"
+    aria-label={isPlaying ? 'Pause' : 'Play'}
+  >
+    {isPlaying ? <IconPause className="w-4 h-4" /> : <IconPlay className="w-4 h-4 ml-0.5" />}
+  </button>
+
+  <button
+    onClick={() => setShowSchedule(true)}
+    className="text-gray-300"
+    aria-label="Open schedule"
+  >
+    <IconList className="w-5 h-5" />
+  </button>
+
+  <div className="flex items-center gap-1 text-[#00d9c9]">
+    <div className="w-2 h-2 rounded-full bg-[#00d9c9] animate-pulse" />
+    <span className="text-xs font-bold">LIVE</span>
+  </div>
+</div>
 
           {/* DESKTOP BAR */}
           <div className="fixed bottom-0 left-0 right-0 z-[60] hidden md:block border-t border-black/10 dark:border-white/10 bg-white/95 dark:bg-[#0b0b0b]/95 backdrop-blur-md text-black dark:text-white">
