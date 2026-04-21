@@ -7,7 +7,7 @@ export const COLORS = {
 };
 
 const IMAGES = {
-  DANIEL_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/DANEL_BROOKS_mdg7aa.webp',
+  DANIEL_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776767866/DANIEL_BROOKS_phqo8w.webp',
   RACHEL_HARRIS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/RACHEL_HARRIS_rd59sb.webp',
   MICHAEL_RAY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/MICHAEL_RAY_yv1ehj.webp',
   STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/STANCY_CAMPBELL_xjkigb.webp',
