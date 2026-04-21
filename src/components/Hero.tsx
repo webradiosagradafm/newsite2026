@@ -271,7 +271,7 @@ const Hero: React.FC<HeroProps> = ({
               </p>
 
               <p className="text-[11px] text-gray-400 dark:text-gray-500 uppercase font-medium tracking-widest mb-4">
-                Produced by PRAISE FM USA for PRAISE FM Global.
+                Produced by PRAISE FM Global.
               </p>
             </>
           )}
