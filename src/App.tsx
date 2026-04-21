@@ -135,16 +135,22 @@ const AppContent: React.FC = () => {
   }, [theme])
 
   useEffect(() => {
-    const audio = new Audio(STREAM_URL)
-
+    const audio = new Audio()
+    audio.src = STREAM_URL
+    audio.preload = 'none'
     audio.volume = parseFloat(localStorage.getItem('praise-volume') || '0.8')
 
-    audio.addEventListener('play', () => setIsPlaying(true))
-    audio.addEventListener('pause', () => setIsPlaying(false))
+    const handlePlay = () => setIsPlaying(true)
+    const handlePause = () => setIsPlaying(false)
+
+    audio.addEventListener('play', handlePlay)
+    audio.addEventListener('pause', handlePause)
 
     audioRef.current = audio
 
     return () => {
+      audio.removeEventListener('play', handlePlay)
+      audio.removeEventListener('pause', handlePause)
       audio.pause()
       audio.src = ''
     }
@@ -156,7 +162,9 @@ const AppContent: React.FC = () => {
     if (isPlaying) {
       audioRef.current.pause()
     } else {
-      audioRef.current.play().catch(() => {})
+      audioRef.current.play().catch((err) => {
+        console.error('Playback failed:', err)
+      })
     }
   }
 
@@ -172,6 +180,8 @@ const AppContent: React.FC = () => {
 
         const [artist, ...rest] = streamTitle.split(' - ')
         const title = rest.join(' - ')
+
+        if (!artist?.trim() || !title?.trim()) return
 
         if (
           BLOCKED_METADATA_KEYWORDS.some((k) =>
@@ -194,7 +204,13 @@ const AppContent: React.FC = () => {
           setTrackHistory((h) => [meta, ...h].slice(0, 10))
           return meta
         })
-      } catch {}
+      } catch (err) {
+        console.error('Metadata parse error:', err)
+      }
+    }
+
+    es.onerror = () => {
+      console.warn('Metadata EventSource disconnected')
     }
 
     return () => es.close()
@@ -208,7 +224,7 @@ const AppContent: React.FC = () => {
         onToggleTheme={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
       />
 
-      <main className={`flex-grow ${isPlaying ? 'pb-[100px]' : ''}`}>
+      <main className={`flex-grow ${isPlaying ? 'pb-[110px] md:pb-[96px]' : ''}`}>
         {selectedProgram ? (
           <ProgramDetail
             program={selectedProgram}
