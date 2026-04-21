@@ -11,7 +11,7 @@ const IMAGES = {
   RACHEL_HARRIS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/RACHEL_HARRIS_rd59sb.webp',
   MICHAEL_RAY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/MICHAEL_RAY_yv1ehj.webp',
   STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/STANCY_CAMPBELL_xjkigb.webp',
-  MAT_RILEY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Matt_Riley_Sunday_Morning_jdvkyz.webp',
+  MAT_RILEY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/MATT_RILEY_hvzcam.webp',
   LIVING_THE_MESSAGE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776755226/LIVING_THE_MESSAGE_vb6hkk.webp',
   JAKE_HUNTER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/JAKE_HUNTER_pyb2ji.webp',
   AVA_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/AVA_BROOKS_yysmgc.webp',
