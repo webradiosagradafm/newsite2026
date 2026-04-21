@@ -7,17 +7,17 @@ export const COLORS = {
 };
 
 const IMAGES = {
-  DANIEL_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Daniel_Brooks_iukwmr.webp',
-  RACHEL_HARRIS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Rachael_Harris_gywdjb.webp',
-  MICHAEL_RAY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Michael_Ray_kz8rea.webp',
-  STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Stancy_Campbell_xkwprb.webp',
+  DANIEL_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/DANEL_BROOKS_mdg7aa.webp',
+  RACHEL_HARRIS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/RACHEL_HARRIS_rd59sb.webp',
+  MICHAEL_RAY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/MICHAEL_RAY_yv1ehj.webp',
+  STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/STANCY_CAMPBELL_xjkigb.webp',
   MAT_RILEY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Matt_Riley_Sunday_Morning_jdvkyz.webp',
   LIVING_THE_MESSAGE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776755226/LIVING_THE_MESSAGE_vb6hkk.webp',
   JAKE_HUNTER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/JAKE_HUNTER_pyb2ji.webp',
   AVA_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/AVA_BROOKS_yysmgc.webp',
-  SCOTT_TURNER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Scott_Turner_qxn3o8.webp',
+  SCOTT_TURNER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/SCOTT_TURNER_wy3hrd.webp',
   DJ_ZION: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/DJ_ZION_hyjxbd.webp',
-  SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Sarah_Jordan_zgvxuu.webp',
+  SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/SARAH_JORDAN_oehx8m.webp',
   WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776755226/WORSHIP_z2fam3.webp',
 };
 
