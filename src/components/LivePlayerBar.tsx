@@ -14,19 +14,18 @@ import { Program } from '../types'
 import { supabase } from '../lib/supabase'
 import { connectListener } from '../lib/listeners'
 
-// Add global CSS for the live pulse animation
 const LivePulseAnimation = () => {
   useEffect(() => {
     const style = document.createElement('style')
     style.textContent = `
       @keyframes live-pulse {
-        0%, 100% { 
-          opacity: 0.7; 
-          transform: translate(-50%, -50%) scale(0.9); 
+        0%, 100% {
+          opacity: 0.7;
+          transform: translate(-50%, -50%) scale(0.9);
         }
-        50% { 
-          opacity: 1; 
-          transform: translate(-50%, -50%) scale(1.3); 
+        50% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1.3);
         }
       }
       .animate-live-pulse {
@@ -53,23 +52,20 @@ interface LivePlayerBarProps {
 }
 
 const TUNEIN_DEFAULT = 2
+const ACTIVE_WINDOW_MS = 45000
 
 const formatTimeToAmPm = (timeString: string): string => {
   try {
-    if (timeString.includes('AM') || timeString.includes('PM')) {
-      return timeString
-    }
+    if (timeString.includes('AM') || timeString.includes('PM')) return timeString
 
     const [hours, minutes] = timeString.split(':')
     let hour = parseInt(hours)
     const period = hour >= 12 ? 'PM' : 'AM'
-
     hour = hour % 12
     hour = hour ? hour : 12
 
     return `${hour}:${minutes || '00'} ${period}`
-  } catch (error) {
-    console.error('Error formatting time:', error)
+  } catch {
     return timeString
   }
 }
@@ -88,6 +84,7 @@ const getListenerInfo = async () => {
 
   const isMobile = /Mobile|Android|iPhone|iPad|iPod/i.test(userAgent)
   const isTablet = /iPad|Android(?!.*Mobile)/i.test(userAgent)
+
   let device = 'Desktop'
   if (isMobile) device = 'Mobile'
   if (isTablet) device = 'Tablet'
@@ -114,9 +111,7 @@ const getListenerInfo = async () => {
       country: data.country_name || 'Unknown',
       city: data.city || 'Unknown',
     }
-  } catch (error) {
-    console.log('Could not get location:', error)
-  }
+  } catch {}
 
   return {
     device,
@@ -145,30 +140,54 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
   const [showVolumeSlider, setShowVolumeSlider] = useState(false)
   const [playbackRate, setPlaybackRate] = useState(1)
 
-  // Global audience
   const [siteListeners, setSiteListeners] = useState(0)
   const [tuneInListeners] = useState(TUNEIN_DEFAULT)
   const [country, setCountry] = useState<string | null>(null)
 
-  // Tracking
   const sessionIdRef = useRef<string | null>(null)
   const startTimeRef = useRef<number>(0)
   const durationIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const totalListeners = siteListeners + tuneInListeners
 
-  // Connect lightweight site listener counter
   useEffect(() => {
     connectListener()
   }, [])
 
-  // Fetch current site listeners
   useEffect(() => {
     const fetchListeners = async () => {
       try {
-        const { data, error } = await supabase.from('listeners_now').select('id')
+        const staleIso = new Date(Date.now() - ACTIVE_WINDOW_MS).toISOString()
+
+        await supabase.from('listeners_now').delete().lt('last_seen', staleIso)
+
+        const { data, error } = await supabase
+          .from('listeners_now')
+          .select('id,country,last_seen')
+
         if (error) throw error
-        setSiteListeners(data?.length || 0)
+
+        const active = (data || []).filter((row) => {
+          const lastSeen = new Date(row.last_seen).getTime()
+          return Date.now() - lastSeen <= ACTIVE_WINDOW_MS
+        })
+
+        setSiteListeners(active.length)
+
+        if (active.length > 0) {
+          const grouped = active.reduce<Record<string, number>>((acc, row) => {
+            const c = row.country || 'Unknown'
+            acc[c] = (acc[c] || 0) + 1
+            return acc
+          }, {})
+
+          const topCountry =
+            Object.entries(grouped).sort((a, b) => b[1] - a[1])[0]?.[0] || null
+
+          setCountry(topCountry)
+        } else {
+          setCountry(null)
+        }
       } catch (err) {
         console.error('Listeners fetch error:', err)
       }
@@ -177,22 +196,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
     fetchListeners()
     const interval = setInterval(fetchListeners, 10000)
     return () => clearInterval(interval)
-  }, [])
-
-  // Country for global vibe
-  useEffect(() => {
-    const fetchCountry = async () => {
-      try {
-        const res = await fetch('https://ipapi.co/json/')
-        if (!res.ok) return
-        const data = await res.json()
-        if (data?.country_name) {
-          setCountry(data.country_name)
-        }
-      } catch {}
-    }
-
-    fetchCountry()
   }, [])
 
   const trackListeningStart = async () => {
@@ -221,10 +224,10 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
       const { error } = await supabase.from('listeners').insert(dataToInsert)
 
       if (error) {
-        console.error('❌ Error registering listener:', error)
+        console.error('Error registering listener:', error)
       }
     } catch (err) {
-      console.error('❌ Error connecting to Supabase:', err)
+      console.error('Error connecting to Supabase:', err)
     }
   }
 
@@ -327,12 +330,14 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value)
     setVolume(val)
+
     if (val > 0) {
       setIsMuted(false)
       setPrevVolume(val)
     } else {
       setIsMuted(true)
     }
+
     localStorage.setItem('praise-volume', val.toString())
   }
 
@@ -373,6 +378,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
     } else {
       document.body.style.overflow = 'unset'
     }
+
     return () => {
       document.body.style.overflow = 'unset'
     }
@@ -382,7 +388,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
     <>
       <LivePulseAnimation />
 
-      {/* SCHEDULE DRAWER */}
       <div
         className={`fixed top-0 right-0 bottom-0 w-full md:w-96 z-[100] bg-white dark:bg-[#121212] transition-transform duration-300 flex flex-col shadow-2xl ${
           showSchedule ? 'translate-x-0' : 'translate-x-full'
@@ -450,7 +455,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
         />
       )}
 
-      {/* MOBILE MINI PLAYER */}
       {isPlaying && (
         <div
           className={`fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 md:hidden transition-all duration-300 ${
@@ -636,7 +640,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
         </div>
       )}
 
-      {/* DESKTOP PLAYER BAR */}
       {isPlaying && (
         <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 hidden md:flex flex-col transition-colors duration-300">
           <div className="w-full h-1.5 bg-gray-100 dark:bg-white/5 relative overflow-hidden">
@@ -650,10 +653,9 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
           </div>
 
           <div className="flex items-center justify-between px-8 py-4">
-            {/* LEFT */}
             <div className="flex items-center space-x-4 w-[34%] min-w-0">
               <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#ff6600] shadow-sm">
-                <img src={program.image} alt={program.title} className="w-full h-full object-cover" />
+                <img src={program.image} alt="" className="w-full h-full object-cover" />
               </div>
               <div className="min-w-0">
                 <div className="text-[10px] uppercase tracking-widest text-gray-400 truncate">
@@ -670,7 +672,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
               </div>
             </div>
 
-            {/* CENTER */}
             <div className="flex items-center justify-center space-x-6 w-[32%]">
               <button
                 onClick={skip30Backward}
@@ -709,7 +710,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
               </div>
             </div>
 
-            {/* RIGHT */}
             <div className="flex items-center justify-end space-x-4 w-[34%]">
               <div
                 className="flex items-center space-x-2 relative"
