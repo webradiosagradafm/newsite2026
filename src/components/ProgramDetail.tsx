@@ -165,7 +165,9 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
               'spot',
               'promo',
               'station id',
-              'sweeper'
+              'sweeper' ,
+              'RAMPS' ,
+              'ramp' ,
             ].some(
               (k) =>
                 title.toLowerCase().includes(k) || artist.toLowerCase().includes(k)
