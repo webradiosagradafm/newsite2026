@@ -160,20 +160,18 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
             if (!artist || !title) return;
 
             const blocked = [
-              'praise fm',
-              'commercial',
-              'spot',
-              'promo',
-              'station id',
-              'sweeper' ,
-              'RAMPS' ,
-              'ramp' ,
+            'praise fm',
+            'commercial',
+            'spot',
+            'promo',
+            'station id',
+            'sweeper',
+            'ramp'
             ].some(
-              (k) =>
-                title.toLowerCase().includes(k) || artist.toLowerCase().includes(k)
-            );
-            if (blocked) return;
-
+            (k) =>
+            title.toLowerCase().includes(k) ||
+            artist.toLowerCase().includes(k)
+          );
             const todayKey = getLocalDateString();
             const trackTimestamp = Date.now();
             const imageUrl = `https://picsum.photos/seed/${encodeURIComponent(
