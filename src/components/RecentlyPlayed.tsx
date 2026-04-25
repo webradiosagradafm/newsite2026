@@ -20,8 +20,28 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
   const { user } = useAuth()
   const navigate = useNavigate()
 
+  // 🔥 BLOQUEIO PROFISSIONAL CENTRALIZADO
+  const blockedKeywords = [
+    'ramp',
+    'commercial',
+    'spot',
+    'promo',
+    'sweeper',
+    'station id'
+  ]
+
   const displayedTracks = Array.isArray(tracks)
-    ? tracks.filter((track) => track.isMusic !== false).slice(0, 4)
+    ? tracks
+        .filter((track) => {
+          const text = `${track.title} ${track.artist}`.toLowerCase()
+
+          const isBlocked = blockedKeywords.some((word) =>
+            text.includes(word)
+          )
+
+          return track.isMusic !== false && !isBlocked
+        })
+        .slice(0, 4)
     : []
 
   useEffect(() => {
