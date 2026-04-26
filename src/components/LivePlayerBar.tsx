@@ -87,8 +87,15 @@ const parseTimeToMinutes = (timeString: string): number => {
 // Hook: returns progress percentage (0–100) for the current program, updates every 10s
 const useProgramProgress = (program: Program): number => {
   const getProgress = () => {
-    const now = new Date();
-    const nowMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+    // Use Chicago time, same as App.tsx schedule logic
+    const chicagoDate = new Date(
+      new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })
+    );
+    const nowMinutes =
+      chicagoDate.getHours() * 60 +
+      chicagoDate.getMinutes() +
+      chicagoDate.getSeconds() / 60;
+
     const start = parseTimeToMinutes(program.startTime);
     let end = parseTimeToMinutes(program.endTime);
 
