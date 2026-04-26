@@ -593,7 +593,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                 </div>
                 <div className="w-full h-1 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#00d9c9] rounded-full transition-all duration-[10000ms] ease-linear"
+                    className="h-full bg-[#ff6600] rounded-full transition-all duration-[10000ms] ease-linear"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -668,7 +668,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
           {/* REAL PROGRAM PROGRESS BAR - DESKTOP */}
           <div className="w-full h-1.5 bg-gray-100 dark:bg-white/5 relative overflow-hidden">
             <div
-              className="h-full bg-[#00d9c9] transition-all duration-[10000ms] ease-linear"
+              className="h-full bg-[#ff6600] transition-all duration-[10000ms] ease-linear"
               style={{ width: `${progress}%` }}
             />
           </div>
