@@ -126,4 +126,3 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
 };
 
 export default LivePlayerBar;
-```
