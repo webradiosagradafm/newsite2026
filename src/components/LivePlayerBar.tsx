@@ -30,7 +30,7 @@ const isProgramLiveNow = (program: Program) => {
   return nowMinutes >= start && nowMinutes < end
 }
 
-const formatTimeToAmPm = (time: string) => {
+const formatTimeToAmPm = (time: string): string => {
   const [h, m] = time.split(':').map(Number)
   const period = h >= 12 ? 'PM' : 'AM'
   const hour = h % 12 || 12
@@ -44,63 +44,72 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
 }) => {
   const [isLiveNow, setIsLiveNow] = useState(false)
 
-  // 🔥 sincroniza com schedule
+  // 🔥 sincroniza LIVE com schedule
   useEffect(() => {
-    const update = () => setIsLiveNow(isProgramLiveNow(program))
-    update()
+    const updateLive = () => {
+      setIsLiveNow(isProgramLiveNow(program))
+    }
 
-    const interval = setInterval(update, 30000)
+    updateLive()
+    const interval = setInterval(updateLive, 30000)
+
     return () => clearInterval(interval)
   }, [program])
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-black text-white p-4">
+    <>
+      {/* PLAYER BAR */}
+      <div className="fixed bottom-0 left-0 right-0 z-[60] bg-black text-white border-t border-white/10">
 
-      {/* 🔥 HEADER */}
-      <div className="flex items-center justify-between">
-
-        <div>
-          <div className="text-xs text-gray-400 uppercase">
-            {program.title}
-          </div>
-
-          {/* 🔥 STATUS */}
-          <div className="flex items-center gap-2 text-sm">
-            {isLiveNow ? (
-              <>
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <span className="text-green-400 font-semibold">LIVE</span>
-              </>
-            ) : (
-              <span className="text-gray-500">Off Air</span>
-            )}
-          </div>
+        {/* PROGRESS BAR (visual original mantido) */}
+        <div className="h-1 bg-white/10">
+          <div className="h-full bg-[#ff6600]" style={{ width: '100%' }} />
         </div>
 
-        {/* 🔥 BOTÃO PLAY */}
-        <button
-          onClick={onTogglePlayback}
-          className="bg-[#ff6600] px-4 py-2 rounded font-semibold"
-        >
-          {isPlaying ? 'Pause' : 'Play'}
-        </button>
-      </div>
+        <div className="h-[82px] px-4 flex items-center justify-between">
 
-      {/* 🔥 SCHEDULE INFO */}
-      <div className="mt-3 text-xs text-gray-400 flex items-center gap-2">
-        <span>
-          {formatTimeToAmPm(program.startTime)} - {formatTimeToAmPm(program.endTime)}
-        </span>
+          {/* INFO */}
+          <div className="flex flex-col">
+            <span className="text-[10px] uppercase tracking-widest text-gray-400">
+              {program.title}
+            </span>
 
-        {isLiveNow && (
-          <span className="flex items-center gap-1 text-[#ff6600]">
-            <span className="w-2 h-2 bg-[#ff6600] rounded-full animate-pulse" />
-            LIVE
+            <div className="flex items-center gap-2 text-sm">
+              {isLiveNow ? (
+                <>
+                  <span className="w-2 h-2 bg-[#00d9c9] rounded-full animate-pulse" />
+                  <span className="text-[#00d9c9] font-bold text-xs">LIVE</span>
+                </>
+              ) : (
+                <span className="text-gray-500 text-xs">OFF AIR</span>
+              )}
+            </div>
+          </div>
+
+          {/* CONTROLES */}
+          <button
+            onClick={onTogglePlayback}
+            className="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center"
+          >
+            {isPlaying ? 'II' : '▶'}
+          </button>
+        </div>
+
+        {/* HORÁRIO + LIVE CONTROLADO */}
+        <div className="px-4 pb-2 text-xs text-gray-400 flex items-center gap-2">
+          <span>
+            {formatTimeToAmPm(program.startTime)} - {formatTimeToAmPm(program.endTime)}
           </span>
-        )}
-      </div>
 
-    </div>
+          {isLiveNow && (
+            <span className="flex items-center gap-1 text-[#ff6600]">
+              <span className="w-2 h-2 bg-[#ff6600] rounded-full animate-pulse" />
+              LIVE
+            </span>
+          )}
+        </div>
+      </div>
+    </>
   )
 }
 
