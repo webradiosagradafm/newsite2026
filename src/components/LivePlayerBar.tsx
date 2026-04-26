@@ -66,6 +66,53 @@ const formatTimeToAmPm = (timeString: string): string => {
   }
 };
 
+// Helper: parse "HH:MM" or "H:MM AM/PM" into minutes since midnight
+const parseTimeToMinutes = (timeString: string): number => {
+  try {
+    if (timeString.includes('AM') || timeString.includes('PM')) {
+      const [time, period] = timeString.trim().split(' ');
+      const [h, m] = time.split(':').map(Number);
+      let hours = h;
+      if (period === 'PM' && h !== 12) hours += 12;
+      if (period === 'AM' && h === 12) hours = 0;
+      return hours * 60 + (m || 0);
+    }
+    const [h, m] = timeString.split(':').map(Number);
+    return h * 60 + (m || 0);
+  } catch {
+    return 0;
+  }
+};
+
+// Hook: returns progress percentage (0–100) for the current program, updates every 10s
+const useProgramProgress = (program: Program): number => {
+  const getProgress = () => {
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+    const start = parseTimeToMinutes(program.startTime);
+    let end = parseTimeToMinutes(program.endTime);
+
+    // Handle overnight programs (e.g. 23:00 – 01:00)
+    if (end <= start) end += 24 * 60;
+
+    const total = end - start;
+    if (total <= 0) return 0;
+
+    const elapsed = nowMinutes - start;
+    return Math.min(100, Math.max(0, (elapsed / total) * 100));
+  };
+
+  const [progress, setProgress] = useState(getProgress);
+
+  useEffect(() => {
+    setProgress(getProgress());
+    const interval = setInterval(() => setProgress(getProgress()), 10000);
+    return () => clearInterval(interval);
+  }, [program.startTime, program.endTime]);
+
+  return progress;
+};
+
 // Função para gerar/pegar ID único do ouvinte
 const getListenerId = (): string => {
   let listenerId = localStorage.getItem('listener_id');
@@ -135,6 +182,9 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
   const [prevVolume, setPrevVolume] = useState(0.8);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
+
+  // Real program progress
+  const progress = useProgramProgress(program);
 
   // Estados para rastreamento
   const sessionIdRef = useRef<string | null>(null);
@@ -524,16 +574,20 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                 </div>
               </div>
 
-              {/* REALISTIC LIVE INDICATOR - REPLACED STATIC BAR */}
+              {/* REAL PROGRAM PROGRESS BAR - MOBILE */}
               <div className="px-4 py-3">
-                <div className="w-full h-1 bg-gray-200 dark:bg-white/10 rounded-full relative overflow-hidden">
-                  {/* Moving pulse dot for live streams */}
-                  <div 
-                    className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#ff6600] shadow-[0_0_8px_rgba(255,102,0,0.8)] animate-live-pulse"
-                    style={{ 
-                      left: `${((Date.now() / 500) % 100)}%`,
-                      transition: 'left 0.5s linear'
-                    }}
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                    {formatTimeToAmPm(program.startTime)}
+                  </span>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                    {formatTimeToAmPm(program.endTime)}
+                  </span>
+                </div>
+                <div className="w-full h-1 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#00d9c9] rounded-full transition-all duration-[10000ms] ease-linear"
+                    style={{ width: `${progress}%` }}
                   />
                 </div>
               </div>
@@ -604,15 +658,11 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
       {/* DESKTOP PLAYER BAR */}
       {isPlaying && (
         <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 hidden md:flex flex-col transition-colors duration-300">
-          {/* REALISTIC LIVE INDICATOR - REPLACED STATIC BAR */}
+          {/* REAL PROGRAM PROGRESS BAR - DESKTOP */}
           <div className="w-full h-1.5 bg-gray-100 dark:bg-white/5 relative overflow-hidden">
-            {/* Moving pulse dot for live streams */}
-            <div 
-              className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#ff6600] shadow-[0_0_10px_rgba(255,102,0,0.9)] animate-live-pulse"
-              style={{ 
-                left: `${((Date.now() / 400) % 100)}%`,
-                transition: 'left 0.4s linear'
-              }}
+            <div
+              className="h-full bg-[#00d9c9] transition-all duration-[10000ms] ease-linear"
+              style={{ width: `${progress}%` }}
             />
           </div>
 
