@@ -125,4 +125,4 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
   );
 };
 
-export default LivePlayerBar;
+import LivePlayerBar from './components/LivePlayerBar';
