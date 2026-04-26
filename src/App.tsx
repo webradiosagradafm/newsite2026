@@ -54,6 +54,10 @@ const BLOCKED_METADATA_KEYWORDS = [
   'jingle',
   'bumper',
   'midnight grace',
+  'RAMP' ,
+  'RAMPS' ,
+  'ramps' ,
+  'ramp' ,
 ]
 
 interface LiveMetadata {
