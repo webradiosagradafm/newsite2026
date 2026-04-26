@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Program } from '../types'
-import { supabase } from '../lib/supabase'
 import { connectListener } from '../lib/listeners'
 
 interface LivePlayerBarProps {
@@ -23,7 +22,7 @@ const getChicagoMinutesNow = () => {
   return chicago.getHours() * 60 + chicago.getMinutes()
 }
 
-// 🔥 NOVO: controle de LIVE real
+// 🔥 FUNÇÃO CENTRAL (NÃO DEPENDE DE STATE)
 const isProgramLiveNow = (program: Program) => {
   if (!program?.startTime || !program?.endTime) return false
 
@@ -50,10 +49,14 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
   queue = []
 }) => {
   const [isLiveNow, setIsLiveNow] = useState(false)
+  const [showQueue, setShowQueue] = useState(false)
 
-  // 🔥 sincroniza LIVE com schedule
+  // 🔥 sincroniza LIVE corretamente
   useEffect(() => {
-    const update = () => setIsLiveNow(isProgramLiveNow(program))
+    const update = () => {
+      setIsLiveNow(isProgramLiveNow(program))
+    }
+
     update()
     const interval = setInterval(update, 30000)
     return () => clearInterval(interval)
@@ -76,7 +79,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
               {program.title}
             </span>
 
-            {/* 🔥 LIVE CONTROLADO */}
+            {/* 🔥 LIVE REAL */}
             <div className="flex items-center gap-2 text-sm">
               {isLiveNow ? (
                 <>
@@ -89,13 +92,22 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
             </div>
           </div>
 
-          {/* PLAY BUTTON */}
-          <button
-            onClick={onTogglePlayback}
-            className="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center"
-          >
-            {isPlaying ? 'II' : '▶'}
-          </button>
+          {/* CONTROLES */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowQueue(true)}
+              className="text-xs text-gray-400 hover:text-white"
+            >
+              Schedule
+            </button>
+
+            <button
+              onClick={onTogglePlayback}
+              className="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center"
+            >
+              {isPlaying ? 'II' : '▶'}
+            </button>
+          </div>
         </div>
 
         {/* HORÁRIO */}
@@ -113,29 +125,39 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
         </div>
       </div>
 
-      {/* 🔥 QUEUE (SEM CONTADORES) */}
-      {queue.length > 0 && (
+      {/* 🔥 QUEUE LIMPO (SEM CONTADOR E SEM BUG DE LIVE) */}
+      {showQueue && (
         <div className="fixed right-0 top-0 w-80 h-full bg-black text-white z-[100] overflow-y-auto">
 
-          <div className="p-4 border-b border-white/10">
+          <div className="p-4 border-b border-white/10 flex justify-between items-center">
             <h3 className="text-sm uppercase tracking-widest text-gray-400">
               Schedule
             </h3>
+
+            <button onClick={() => setShowQueue(false)}>✕</button>
           </div>
 
-          {queue.map((prog) => (
-            <div key={prog.id} className="p-4 border-b border-white/10">
+          {queue.map((prog) => {
+            const live = isProgramLiveNow(prog) // 🔥 calcula direto (sem state bug)
 
-              <div className="font-semibold">{prog.title}</div>
+            return (
+              <div key={prog.id} className="p-4 border-b border-white/10">
 
-              {/* 🔥 LIVE CORRIGIDO */}
-              <div className="text-sm text-gray-500 mt-1">
-                {formatTimeToAmPm(prog.startTime)} - {formatTimeToAmPm(prog.endTime)}
-                {isProgramLiveNow(prog) && ' • LIVE'}
+                <div className="font-semibold">{prog.title}</div>
+
+                <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
+                  {formatTimeToAmPm(prog.startTime)} - {formatTimeToAmPm(prog.endTime)}
+
+                  {live && (
+                    <span className="text-[#ff6600] text-xs font-bold">
+                      • LIVE
+                    </span>
+                  )}
+                </div>
+
               </div>
-
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </>
