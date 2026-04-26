@@ -128,10 +128,16 @@ const AppContent: React.FC = () => {
       return total >= start && total < end
     })
 
-    return {
-      currentProgram: schedule[index !== -1 ? index : 0],
-      queue: schedule.slice(index + 1, index + 5),
-    }
+    const currentIndex = index !== -1 ? index : 0
+    const currentProgram = schedule[currentIndex]
+
+    // Pega os próximos da grade atual; se acabar, wraparound pro dia seguinte
+    const remaining = schedule.slice(currentIndex + 1)
+    const nextDay = (day + 1) % 7
+    const nextSchedule = SCHEDULES[nextDay] || SCHEDULES[1]
+    const queue = [...remaining, ...nextSchedule].slice(0, 4)
+
+    return { currentProgram, queue }
   }, [day, total])
 
   useEffect(() => {
