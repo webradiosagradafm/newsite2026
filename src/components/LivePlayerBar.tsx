@@ -9,12 +9,13 @@ interface Props {
   audioRef: React.RefObject<HTMLAudioElement>
 }
 
-const formatTime = (time: string) => {
-  const [h, m] = time.split(':').map(Number)
-  const period = h >= 12 ? 'PM' : 'AM'
-  const hour = h % 12 || 12
-  return `${hour}:${m.toString().padStart(2, '0')} ${period}`
-}
+const VolumeIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M4 10h4l5-4v12l-5-4H4z"/>
+    <path d="M16 9a4 4 0 0 1 0 6"/>
+    <path d="M18.5 6.5a7.5 7.5 0 0 1 0 11"/>
+  </svg>
+)
 
 const LiveMiniPlayer: React.FC<Props> = ({
   isPlaying,
@@ -23,150 +24,134 @@ const LiveMiniPlayer: React.FC<Props> = ({
   queue = [],
   audioRef
 }) => {
-  const [open, setOpen] = useState(false)
+  const [openMobile, setOpenMobile] = useState(false)
   const [volume, setVolume] = useState(0.8)
   const [showSlider, setShowSlider] = useState(false)
   const [dark, setDark] = useState(false)
 
-  // 🔥 DETECTA DARK MODE DO SITE
+  // detectar dark mode
   useEffect(() => {
-    const checkDark = () => {
-      const isDark = document.documentElement.classList.contains('dark')
-      setDark(isDark)
-    }
+    const check = () =>
+      setDark(document.documentElement.classList.contains('dark'))
+    check()
 
-    checkDark()
-
-    const observer = new MutationObserver(checkDark)
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class']
-    })
-
-    return () => observer.disconnect()
+    const obs = new MutationObserver(check)
+    obs.observe(document.documentElement, { attributes: true })
+    return () => obs.disconnect()
   }, [])
 
-  // 🔊 volume real
+  // volume real
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume
-    }
+    if (audioRef.current) audioRef.current.volume = volume
   }, [volume])
+
+  // ❗ NÃO RENDERIZA SE NÃO TIVER PLAY
+  if (!isPlaying) return null
 
   return (
     <>
-      {/* OVERLAY */}
-      {open && (
-        <div
-          className="fixed inset-0 bg-black/60 z-[90]"
-          onClick={() => setOpen(false)}
-        />
-      )}
+      {/* 📱 FULL PLAYER MOBILE */}
+      {openMobile && (
+        <div className={`fixed inset-0 z-[100] ${dark ? 'bg-black text-white' : 'bg-white text-black'}`}>
 
-      {/* DRAWER */}
-      <div
-        className={`fixed right-0 top-0 h-full w-80 z-[100] transform transition-transform duration-300 ${
-          open ? 'translate-x-0' : 'translate-x-full'
-        } ${dark ? 'bg-[#111]' : 'bg-white'}`}
-      >
-        <div className="p-4 border-b flex justify-between">
-          <span className="font-semibold">Schedule</span>
-          <button onClick={() => setOpen(false)}>✕</button>
-        </div>
+          <div className="flex justify-between items-center p-4 border-b">
+            <span className="font-semibold">Now Playing</span>
+            <button onClick={() => setOpenMobile(false)}>✕</button>
+          </div>
 
-        {/* 🔥 COM IMAGEM DO PRESENTER */}
-        {queue.slice(0, 5).map((prog) => (
-          <div key={prog.id} className="p-4 border-b flex gap-3">
+          <div className="p-4">
+
             <img
-              src={prog.image}
-              className="w-12 h-12 rounded object-cover"
+              src={program.image}
+              className="w-32 h-32 mx-auto rounded-full object-cover mb-4"
             />
 
-            <div>
-              <div className="font-semibold text-sm">{prog.title}</div>
-              <div className="text-xs text-gray-500">
-                {formatTime(prog.startTime)} - {formatTime(prog.endTime)}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+            <h2 className="text-center font-bold text-lg">{program.title}</h2>
 
-      {/* MINIPLAYER */}
+            {/* 🔊 VOLUME SVG */}
+            <div className="mt-6 flex items-center gap-3">
+              <VolumeIcon />
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={(e) => setVolume(parseFloat(e.target.value))}
+                className="w-full accent-[#ff6600]"
+              />
+            </div>
+
+            {/* 👤 PRESENTERS */}
+            <div className="mt-8">
+              {queue.slice(0, 5).map((prog) => (
+                <div key={prog.id} className="flex items-center gap-3 mb-4">
+                  <img src={prog.image} className="w-12 h-12 rounded object-cover"/>
+                  <div>
+                    <div className="font-semibold text-sm">{prog.title}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* 🎧 MINIPLAYER */}
       <div
-        className={`fixed bottom-0 left-0 right-0 z-[80] border-t transition-colors ${
-          dark
-            ? 'bg-[#0b0b0b] text-white border-white/10'
-            : 'bg-white text-black border-gray-200'
+        className={`fixed bottom-0 left-0 right-0 z-[80] border-t ${
+          dark ? 'bg-[#0b0b0b] text-white border-white/10' : 'bg-white text-black border-gray-200'
         }`}
+        onClick={() => setOpenMobile(true)} // 📱 abre no mobile
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 h-[70px]">
 
           {/* LEFT */}
           <div className="flex items-center gap-3">
-            <img
-              src={program.image}
-              className="w-10 h-10 rounded-full object-cover"
-            />
-
+            <img src={program.image} className="w-10 h-10 rounded-full"/>
             <div>
-              <div className="text-xs uppercase opacity-60">
-                {program.title}
-              </div>
-              <div className="text-sm font-semibold">
-                LIVE ON PRAISE FM
-              </div>
+              <div className="text-xs uppercase opacity-60">{program.title}</div>
+              <div className="text-sm font-semibold">LIVE ON PRAISE FM</div>
             </div>
           </div>
 
           {/* CENTER */}
           <button
-            onClick={onTogglePlayback}
+            onClick={(e) => {
+              e.stopPropagation()
+              onTogglePlayback()
+            }}
             className="w-12 h-12 rounded-full bg-[#ff6600] text-white flex items-center justify-center"
           >
             {isPlaying ? '❚❚' : '▶'}
           </button>
 
           {/* RIGHT */}
-          <div className="flex items-center gap-4">
+          <div
+            className="flex items-center gap-3"
+            onClick={(e) => e.stopPropagation()}
+            onMouseEnter={() => setShowSlider(true)}
+            onMouseLeave={() => setShowSlider(false)}
+          >
+            <VolumeIcon />
 
-            {/* 🔊 VOLUME BBC STYLE */}
-            <div
-              className="flex items-center gap-2"
-              onMouseEnter={() => setShowSlider(true)}
-              onMouseLeave={() => setShowSlider(false)}
-            >
-              🔊
-
-              <div
-                className={`overflow-hidden transition-all duration-300 ${
-                  showSlider ? 'w-24 opacity-100' : 'w-0 opacity-0'
-                }`}
-              >
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value={volume}
-                  onChange={(e) => setVolume(parseFloat(e.target.value))}
-                  className="w-full accent-[#ff6600]"
-                />
-              </div>
+            {/* 🔥 SLIDER DESLIZA */}
+            <div className={`transition-all duration-300 overflow-hidden ${
+              showSlider ? 'w-24 opacity-100' : 'w-0 opacity-0'
+            }`}>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={(e) => setVolume(parseFloat(e.target.value))}
+                className="w-full accent-[#ff6600]"
+              />
             </div>
-
-            {/* LIVE */}
-            <div className="flex items-center gap-1 text-green-500 text-xs">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              LIVE
-            </div>
-
-            {/* MENU */}
-            <button onClick={() => setOpen(true)}>
-              ☰
-            </button>
-
           </div>
+
         </div>
       </div>
     </>
