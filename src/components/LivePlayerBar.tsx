@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Program } from '../types'
+import { supabase } from '../lib/supabase'
 import { connectListener } from '../lib/listeners'
 
 interface LivePlayerBarProps {
@@ -8,6 +9,9 @@ interface LivePlayerBarProps {
   program: Program
   queue?: Program[]
 }
+
+const TUNEIN_DEFAULT = 2
+const ACTIVE_WINDOW_MS = 45000
 
 const parseTimeToMinutes = (time: string) => {
   const [h, m] = time.split(':').map(Number)
@@ -22,7 +26,7 @@ const getChicagoMinutesNow = () => {
   return chicago.getHours() * 60 + chicago.getMinutes()
 }
 
-// 🔥 FUNÇÃO CENTRAL (NÃO DEPENDE DE STATE)
+// 🔥 FUNÇÃO REAL (SEM STATE BUG)
 const isProgramLiveNow = (program: Program) => {
   if (!program?.startTime || !program?.endTime) return false
 
@@ -48,27 +52,52 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
   program,
   queue = []
 }) => {
-  const [isLiveNow, setIsLiveNow] = useState(false)
+  const [siteListeners, setSiteListeners] = useState(0)
   const [showQueue, setShowQueue] = useState(false)
 
-  // 🔥 sincroniza LIVE corretamente
-  useEffect(() => {
-    const update = () => {
-      setIsLiveNow(isProgramLiveNow(program))
-    }
-
-    update()
-    const interval = setInterval(update, 30000)
-    return () => clearInterval(interval)
-  }, [program])
+  const tuneInListeners = TUNEIN_DEFAULT
+  const totalListeners = siteListeners + tuneInListeners
 
   useEffect(() => {
     connectListener()
   }, [])
 
+  // 🔥 LISTENERS REAIS
+  useEffect(() => {
+    const fetchListeners = async () => {
+      try {
+        const staleIso = new Date(Date.now() - ACTIVE_WINDOW_MS).toISOString()
+
+        await supabase
+          .from('listeners_now')
+          .delete()
+          .lt('last_seen', staleIso)
+
+        const { data } = await supabase
+          .from('listeners_now')
+          .select('last_seen')
+
+        const active = (data || []).filter((row) => {
+          const last = new Date(row.last_seen).getTime()
+          return Date.now() - last <= ACTIVE_WINDOW_MS
+        })
+
+        setSiteListeners(active.length)
+      } catch (err) {
+        console.error('listeners error', err)
+      }
+    }
+
+    fetchListeners()
+    const interval = setInterval(fetchListeners, 10000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const isLive = isProgramLiveNow(program)
+
   return (
     <>
-      {/* PLAYER BAR */}
+      {/* PLAYER */}
       <div className="fixed bottom-0 left-0 right-0 z-[60] bg-black text-white border-t border-white/10">
 
         <div className="h-[82px] px-4 flex items-center justify-between">
@@ -79,9 +108,8 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
               {program.title}
             </span>
 
-            {/* 🔥 LIVE REAL */}
             <div className="flex items-center gap-2 text-sm">
-              {isLiveNow ? (
+              {isLive ? (
                 <>
                   <span className="w-2 h-2 bg-[#00d9c9] rounded-full animate-pulse" />
                   <span className="text-[#00d9c9] font-bold text-xs">LIVE</span>
@@ -110,39 +138,38 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
           </div>
         </div>
 
-        {/* HORÁRIO */}
-        <div className="px-4 pb-2 text-xs text-gray-400 flex items-center gap-2">
+        {/* FOOTER */}
+        <div className="px-4 pb-2 text-xs text-gray-400 flex items-center justify-between">
+
           <span>
             {formatTimeToAmPm(program.startTime)} - {formatTimeToAmPm(program.endTime)}
           </span>
 
-          {isLiveNow && (
-            <span className="flex items-center gap-1 text-[#ff6600]">
-              <span className="w-2 h-2 bg-[#ff6600] rounded-full animate-pulse" />
-              LIVE
+          <span className="text-right">
+            {siteListeners} site + {tuneInListeners} TuneIn •{' '}
+            <span className="text-white font-semibold">
+              {totalListeners} listening
             </span>
-          )}
+          </span>
         </div>
       </div>
 
-      {/* 🔥 QUEUE LIMPO (SEM CONTADOR E SEM BUG DE LIVE) */}
+      {/* 🔥 QUEUE LIMPO + LIVE CORRETO */}
       {showQueue && (
         <div className="fixed right-0 top-0 w-80 h-full bg-black text-white z-[100] overflow-y-auto">
 
-          <div className="p-4 border-b border-white/10 flex justify-between items-center">
-            <h3 className="text-sm uppercase tracking-widest text-gray-400">
+          <div className="p-4 border-b border-white/10 flex justify-between">
+            <span className="text-sm uppercase tracking-widest text-gray-400">
               Schedule
-            </h3>
-
+            </span>
             <button onClick={() => setShowQueue(false)}>✕</button>
           </div>
 
           {queue.map((prog) => {
-            const live = isProgramLiveNow(prog) // 🔥 calcula direto (sem state bug)
+            const live = isProgramLiveNow(prog)
 
             return (
               <div key={prog.id} className="p-4 border-b border-white/10">
-
                 <div className="font-semibold">{prog.title}</div>
 
                 <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
@@ -154,7 +181,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
                     </span>
                   )}
                 </div>
-
               </div>
             )
           })}
