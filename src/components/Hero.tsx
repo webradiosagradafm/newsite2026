@@ -48,46 +48,37 @@ const Hero: React.FC<HeroProps> = ({
 
   const chicago = useMemo(() => getChicagoInfo(), [tick])
 
-  const currentProgram = useMemo(() => {
+  const { currentProgram, nextPrograms } = useMemo(() => {
     const schedule = SCHEDULES[chicago.day] || SCHEDULES[1]
 
-    return (
-      schedule.find((p) => {
-        const start = parseTime(p.startTime)
-        const end = parseTime(p.endTime)
+    const index = schedule.findIndex((p) => {
+      const start = parseTime(p.startTime)
+      const end = parseTime(p.endTime)
 
-        const startMin = start.h * 60 + start.m
-        let endMin = end.h * 60 + end.m
+      const startMin = start.h * 60 + start.m
+      let endMin = end.h * 60 + end.m
 
-        if (endMin === 0 || endMin <= startMin) endMin = 1440
+      if (endMin === 0 || endMin <= startMin) endMin = 1440
 
-        return chicago.totalMinutes >= startMin && chicago.totalMinutes < endMin
-      }) || schedule[0]
-    )
+      return chicago.totalMinutes >= startMin && chicago.totalMinutes < endMin
+    })
+
+    const current = schedule[index] || schedule[0]
+
+    const next = [
+      schedule[index + 1],
+      schedule[index + 2],
+    ].filter(Boolean)
+
+    return {
+      currentProgram: current,
+      nextPrograms: next,
+    }
   }, [chicago])
-
-  const progress = useMemo(() => {
-    if (!currentProgram) return 0
-
-    const start = parseTime(currentProgram.startTime)
-    const end = parseTime(currentProgram.endTime)
-
-    const startMin = start.h * 60 + start.m
-    let endMin = end.h * 60 + end.m
-
-    if (endMin === 0 || endMin <= startMin) endMin = 1440
-
-    const elapsed = chicago.totalMinutes - startMin
-    const duration = endMin - startMin
-
-    return Math.min(Math.max(elapsed / duration, 0), 1)
-  }, [currentProgram, chicago.totalMinutes])
 
   const size = 240
   const stroke = 6
   const radius = (size - stroke) / 2
-  const circumference = 2 * Math.PI * radius
-  const offset = circumference - progress * circumference
 
   if (!currentProgram) return null
 
@@ -95,50 +86,25 @@ const Hero: React.FC<HeroProps> = ({
     <section className="bg-white dark:bg-black py-14">
       <div className="max-w-6xl mx-auto px-4">
 
-        {/* HEADER */}
         <p className="text-sm uppercase tracking-widest text-[#ff6600] font-semibold mb-6 text-center md:text-left">
           Live Gospel Radio 24/7
         </p>
 
         <div className="flex flex-col md:flex-row items-center gap-12">
 
-          {/* CIRCLE */}
+          {/* CÍRCULO */}
           <div
             className="relative cursor-pointer"
             onClick={() => onNavigateToProgram(currentProgram)}
-            role="button"
-            aria-label={`Open program ${currentProgram.title}`}
           >
-            <svg width={size} height={size} className="-rotate-90 absolute">
-              <circle
-                cx={size / 2}
-                cy={size / 2}
-                r={radius}
-                stroke="#e5e5e5"
-                strokeWidth={stroke}
-                fill="none"
-              />
-              <circle
-                cx={size / 2}
-                cy={size / 2}
-                r={radius}
-                stroke="#ff6600"
-                strokeWidth={stroke}
-                fill="none"
-                strokeDasharray={circumference}
-                strokeDashoffset={offset}
-                strokeLinecap="round"
-              />
-            </svg>
-
             <img
               src={currentProgram.image || "/default.jpg"}
-              alt={currentProgram.host || "Radio Host"}
+              alt={currentProgram.host}
               className="w-[240px] h-[240px] rounded-full object-cover"
             />
           </div>
 
-          {/* TEXT */}
+          {/* TEXTO */}
           <div className="flex-1 text-center md:text-left">
 
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
@@ -156,57 +122,61 @@ const Hero: React.FC<HeroProps> = ({
               {currentProgram.description}
             </p>
 
-            {/* BUTTON */}
+            {/* BOTÃO */}
             <button
               onClick={onListenClick}
-              aria-label={isPlaying ? "Pause live radio" : "Listen live to Praise FM"}
-              className="bg-[#ff6600] text-white px-8 py-4 rounded-xl flex items-center gap-3 mx-auto md:mx-0 hover:bg-[#e65c00]"
+              className="bg-[#ff6600] text-white px-8 py-4 rounded-xl flex items-center gap-3 mx-auto md:mx-0"
             >
-              {isPlaying ? (
-                <svg width="20" height="20" fill="currentColor">
-                  <rect x="3" y="2" width="5" height="16" />
-                  <rect x="12" y="2" width="5" height="16" />
-                </svg>
-              ) : (
-                <svg width="20" height="20" fill="currentColor">
-                  <polygon points="3,2 18,10 3,18" />
-                </svg>
-              )}
-
-              <span className="font-bold text-lg">
-                {isPlaying ? 'Pause Live Radio' : 'Listen Live Now'}
-              </span>
+              {isPlaying ? 'Pause Live Radio' : 'Listen Live Now'}
             </button>
 
             {/* NOW PLAYING */}
             {liveMetadata && (
-              <p className="mt-4 text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2 justify-center md:justify-start">
-                <svg width="16" height="16" fill="currentColor" className="text-purple-500">
-                  <path d="M9 18V5l12-2v13" />
-                  <circle cx="6" cy="18" r="3" />
-                  <circle cx="18" cy="16" r="3" />
-                </svg>
-
-                <span>
-                  Now Playing: <strong>{liveMetadata.artist} – {liveMetadata.title}</strong>
-                </span>
+              <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                Now Playing: <strong>{liveMetadata.artist} – {liveMetadata.title}</strong>
               </p>
             )}
 
-            {/* GLOBAL */}
-            <p className="mt-3 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 justify-center md:justify-start">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M2 12h20" />
-                <path d="M12 2a15 15 0 0 1 0 20" />
-                <path d="M12 2a15 15 0 0 0 0 20" />
-              </svg>
-
-              Heard worldwide • USA • Brazil • Europe
-            </p>
-
           </div>
         </div>
+
+        {/* 🔥 UP NEXT (VOLTOU) */}
+        {nextPrograms.length > 0 && (
+          <div className="mt-12 border-t border-gray-200 dark:border-white/10 pt-8">
+            <h3 className="text-xl font-bold mb-6">Up Next</h3>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {nextPrograms.map((prog) => (
+                <div
+                  key={prog.id}
+                  onClick={() => onNavigateToProgram(prog)}
+                  className="flex items-center gap-4 cursor-pointer group"
+                >
+                  <img
+                    src={prog.image}
+                    alt={prog.title}
+                    className="w-20 h-20 object-cover rounded-lg"
+                  />
+
+                  <div>
+                    <p className="text-sm text-gray-500">
+                      {format12h(prog.startTime)}
+                    </p>
+
+                    <h4 className="font-semibold group-hover:text-[#ff6600]">
+                      {prog.title}
+                    </h4>
+
+                    <p className="text-sm text-gray-500">
+                      {prog.host}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
     </section>
   )
