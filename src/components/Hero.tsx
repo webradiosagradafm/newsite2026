@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { Play, Pause } from 'lucide-react'
 import { SCHEDULES } from '../constants'
 import { Program } from '../types'
 
@@ -84,8 +83,9 @@ const Hero: React.FC<HeroProps> = ({
     return Math.min(Math.max(elapsed / duration, 0), 1)
   }, [currentProgram, chicago.totalMinutes])
 
-  const size = 180
-  const stroke = 5
+  // 🔥 CÍRCULO MAIOR
+  const size = 240
+  const stroke = 6
   const radius = (size - stroke) / 2
   const circumference = 2 * Math.PI * radius
   const offset = circumference - progress * circumference
@@ -93,19 +93,18 @@ const Hero: React.FC<HeroProps> = ({
   if (!currentProgram) return null
 
   return (
-    <section className="bg-white dark:bg-black py-12">
+    <section className="bg-white dark:bg-black py-14">
       <div className="max-w-6xl mx-auto px-4">
 
-        {/* 🔥 IDENTIDADE */}
-        <p className="text-sm uppercase tracking-widest text-[#ff6600] font-semibold mb-4 text-center md:text-left">
+        <p className="text-sm uppercase tracking-widest text-[#ff6600] font-semibold mb-6 text-center md:text-left">
           🎧 Live Gospel Radio 24/7
         </p>
 
-        <div className="flex flex-col md:flex-row items-center gap-10">
+        <div className="flex flex-col md:flex-row items-center gap-12">
 
-          {/* 🎧 CÍRCULO COM PROGRESSO */}
+          {/* 🎧 CÍRCULO */}
           <div
-            className="relative cursor-pointer group"
+            className="relative cursor-pointer"
             onClick={() => onNavigateToProgram(currentProgram)}
             role="button"
             aria-label={`Open program ${currentProgram.title}`}
@@ -132,23 +131,24 @@ const Hero: React.FC<HeroProps> = ({
               />
             </svg>
 
+            {/* 🔥 FOTO DA STACY */}
             <img
-              src={currentProgram.image}
-              alt={currentProgram.title}
-              className="w-[180px] h-[180px] rounded-full object-cover"
+              src="/stacy.jpg" // 👉 coloca sua imagem aqui
+              alt="Stacy - Host"
+              className="w-[240px] h-[240px] rounded-full object-cover"
             />
           </div>
 
-          {/* 📄 TEXTO */}
+          {/* TEXTO */}
           <div className="flex-1 text-center md:text-left">
 
-            <p className="text-sm text-gray-500 mb-1">
+            <p className="text-sm text-gray-500 mb-2">
               {format12h(currentProgram.startTime)} - {format12h(currentProgram.endTime)}
             </p>
 
-            <h2 className="text-3xl md:text-4xl font-bold mb-2">
+            <h2 className="text-4xl font-bold mb-2">
               {currentProgram.title}
-              <span className="block text-base font-normal text-gray-500">
+              <span className="block text-lg font-normal text-gray-500">
                 with {currentProgram.host}
               </span>
             </h2>
@@ -157,26 +157,38 @@ const Hero: React.FC<HeroProps> = ({
               {currentProgram.description}
             </p>
 
-            {/* 🔥 BOTÃO */}
+            {/* 🔥 BOTÃO COM SVG */}
             <button
               onClick={onListenClick}
               aria-label={isPlaying ? "Pause live radio" : "Listen live to Praise FM"}
-              className="bg-[#ff6600] text-white px-8 py-4 rounded-xl flex items-center justify-center gap-3 mx-auto md:mx-0 hover:bg-[#e65c00]"
+              className="bg-[#ff6600] text-white px-8 py-4 rounded-xl flex items-center gap-3 mx-auto md:mx-0 hover:bg-[#e65c00]"
             >
-              {isPlaying ? <Pause /> : <Play />}
+              {isPlaying ? (
+                // ⏸ SVG PAUSE
+                <svg width="20" height="20" fill="currentColor">
+                  <rect x="3" y="2" width="5" height="16" />
+                  <rect x="12" y="2" width="5" height="16" />
+                </svg>
+              ) : (
+                // ▶️ SVG PLAY
+                <svg width="20" height="20" fill="currentColor">
+                  <polygon points="3,2 18,10 3,18" />
+                </svg>
+              )}
+
               <span className="font-bold text-lg">
                 {isPlaying ? 'Pause Live Radio' : 'Listen Live Now'}
               </span>
             </button>
 
-            {/* 🎶 NOW PLAYING */}
+            {/* NOW PLAYING */}
             {liveMetadata && (
               <p className="mt-4 text-sm text-gray-500">
                 🎶 Now Playing: <strong>{liveMetadata.artist} – {liveMetadata.title}</strong>
               </p>
             )}
 
-            {/* 🌍 PROVA SOCIAL */}
+            {/* PROVA SOCIAL */}
             <p className="mt-3 text-sm text-gray-400">
               🌍 Heard worldwide • USA • Brazil • Europe
             </p>
