@@ -234,22 +234,3 @@ export const SCHEDULES: Record<number, Program[]> = {
   6: weekday,
   0: sunday
 };
-
-export const DEVOTIONAL_PODCASTS: Podcast[] = [
-  {
-    id: 'p1',
-    title: 'Deep Roots',
-    category: 'Bible Study',
-    duration: '42 min',
-    author: 'Dr. Jane Smith',
-    image: 'https://picsum.photos/seed/pod1/400/400'
-  },
-  {
-    id: 'p2',
-    title: 'Daily Bread',
-    category: 'Inspiration',
-    duration: '15 min',
-    author: 'Markus Doe',
-    image: 'https://picsum.photos/seed/pod2/400/400'
-  },
-];
