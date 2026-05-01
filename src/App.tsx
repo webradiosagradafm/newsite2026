@@ -38,6 +38,33 @@ import { SCHEDULES } from './constants'
 import { Program } from './types'
 
 const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv'
+const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv'
+
+const BLOCKED_METADATA_KEYWORDS = [
+  'praise fm',
+  'praisefm',
+  'commercial',
+  'spot',
+  'promo',
+  'ident',
+  'sweeper',
+  'intro',
+  'program',
+  'announcement',
+  'station id',
+  'jingle',
+  'bumper',
+  'midnight grace',
+  'ramp',
+  'ramps',
+]
+
+interface LiveMetadata {
+  artist: string
+  title: string
+  playedAt?: Date
+  isMusic?: boolean
+}
 
 const getChicagoDayAndTotalMinutes = () => {
   const now = new Date()
@@ -53,7 +80,11 @@ const getChicagoDayAndTotalMinutes = () => {
 
 const ScrollToTop = () => {
   const { pathname } = useLocation()
-  useEffect(() => window.scrollTo(0, 0), [pathname])
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
   return null
 }
 
@@ -69,8 +100,8 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 const AppContent: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false)
-  const [liveMetadata, setLiveMetadata] = useState<any>(null)
-  const [trackHistory, setTrackHistory] = useState<any[]>([])
+  const [liveMetadata, setLiveMetadata] = useState<LiveMetadata | null>(null)
+  const [trackHistory, setTrackHistory] = useState<LiveMetadata[]>([])
   const [theme, setTheme] = useState<'light' | 'dark'>(
     () => (localStorage.getItem('praise-theme') as 'light' | 'dark') || 'light'
   )
@@ -83,20 +114,28 @@ const AppContent: React.FC = () => {
 
   const { day, total } = getChicagoDayAndTotalMinutes()
 
-  const currentProgram = useMemo(() => {
+  const { currentProgram, queue } = useMemo(() => {
     const schedule = SCHEDULES[day] || SCHEDULES[1]
 
-    return (
-      schedule.find((p) => {
-        const [sH, sM] = p.startTime.split(':').map(Number)
-        const [eH, eM] = p.endTime.split(':').map(Number)
+    const index = schedule.findIndex((p) => {
+      const [sH, sM] = p.startTime.split(':').map(Number)
+      const [eH, eM] = p.endTime.split(':').map(Number)
 
-        const start = sH * 60 + sM
-        const end = (eH === 0 ? 24 : eH) * 60 + eM
+      const start = sH * 60 + sM
+      const end = (eH === 0 ? 24 : eH) * 60 + eM
 
-        return total >= start && total < end
-      }) || schedule[0]
-    )
+      return total >= start && total < end
+    })
+
+    const currentIndex = index !== -1 ? index : 0
+    const currentProgram = schedule[currentIndex]
+
+    const remaining = schedule.slice(currentIndex + 1)
+    const nextDay = (day + 1) % 7
+    const nextSchedule = SCHEDULES[nextDay] || SCHEDULES[1]
+    const queue = [...remaining, ...nextSchedule].slice(0, 4)
+
+    return { currentProgram, queue }
   }, [day, total])
 
   useEffect(() => {
@@ -105,8 +144,25 @@ const AppContent: React.FC = () => {
   }, [theme])
 
   useEffect(() => {
-    const audio = new Audio(STREAM_URL)
+    const audio = new Audio()
+    audio.src = STREAM_URL
+    audio.preload = 'none'
+    audio.volume = parseFloat(localStorage.getItem('praise-volume') || '0.8')
+
+    const handlePlay = () => setIsPlaying(true)
+    const handlePause = () => setIsPlaying(false)
+
+    audio.addEventListener('play', handlePlay)
+    audio.addEventListener('pause', handlePause)
+
     audioRef.current = audio
+
+    return () => {
+      audio.removeEventListener('play', handlePlay)
+      audio.removeEventListener('pause', handlePause)
+      audio.pause()
+      audio.src = ''
+    }
   }, [])
 
   const togglePlayback = () => {
@@ -115,22 +171,69 @@ const AppContent: React.FC = () => {
     if (isPlaying) {
       audioRef.current.pause()
     } else {
-      audioRef.current.play().catch(() => {})
+      audioRef.current.play().catch((err) => {
+        console.error('Playback failed:', err)
+      })
+    }
+  }
+
+  useEffect(() => {
+    const es = new EventSource(METADATA_URL)
+
+    es.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data)
+        const streamTitle = data.streamTitle || ''
+
+        if (!streamTitle.includes(' - ')) return
+
+        const [artist, ...rest] = streamTitle.split(' - ')
+        const title = rest.join(' - ')
+
+        if (!artist?.trim() || !title?.trim()) return
+
+        if (
+          BLOCKED_METADATA_KEYWORDS.some((k) =>
+            `${artist} ${title}`.toLowerCase().includes(k)
+          )
+        ) {
+          return
+        }
+
+        setLiveMetadata((prev) => {
+          if (prev && prev.title === title && prev.artist === artist) return prev
+
+          const meta: LiveMetadata = {
+            artist,
+            title,
+            playedAt: new Date(),
+            isMusic: true,
+          }
+
+          setTrackHistory((h) => [meta, ...h].slice(0, 10))
+          return meta
+        })
+      } catch (err) {
+        console.error('Metadata parse error:', err)
+      }
     }
 
-    setIsPlaying(!isPlaying)
-  }
+    es.onerror = () => {
+      console.warn('Metadata EventSource disconnected')
+    }
+
+    return () => es.close()
+  }, [])
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">
-
       <Navbar
         activeTab={location.pathname === '/' ? 'home' : location.pathname.split('/')[1]}
         theme={theme}
         onToggleTheme={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
       />
 
-      <main className={`flex-grow ${isPlaying ? 'pb-[110px]' : ''}`}>
+      <main className={`flex-grow ${isPlaying ? 'pb-[110px] md:pb-[96px]' : ''}`}>
         {selectedProgram ? (
           <ProgramDetail
             program={selectedProgram}
@@ -141,7 +244,6 @@ const AppContent: React.FC = () => {
           />
         ) : (
           <Routes>
-
             <Route
               path="/"
               element={
@@ -214,7 +316,6 @@ const AppContent: React.FC = () => {
             <Route path="/cookies" element={<CookiesPolicyPage />} />
 
             <Route path="*" element={<Navigate to="/" replace />} />
-
           </Routes>
         )}
       </main>
@@ -227,6 +328,7 @@ const AppContent: React.FC = () => {
           onTogglePlayback={togglePlayback}
           program={currentProgram}
           liveMetadata={liveMetadata}
+          queue={queue}
           audioRef={audioRef}
         />
       )}
