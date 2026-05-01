@@ -83,7 +83,6 @@ const Hero: React.FC<HeroProps> = ({
     return Math.min(Math.max(elapsed / duration, 0), 1)
   }, [currentProgram, chicago.totalMinutes])
 
-  // 🔥 TAMANHO MAIOR
   const size = 240
   const stroke = 6
   const radius = (size - stroke) / 2
@@ -96,14 +95,14 @@ const Hero: React.FC<HeroProps> = ({
     <section className="bg-white dark:bg-black py-14">
       <div className="max-w-6xl mx-auto px-4">
 
-        {/* IDENTIDADE */}
+        {/* HEADER */}
         <p className="text-sm uppercase tracking-widest text-[#ff6600] font-semibold mb-6 text-center md:text-left">
-          🎧 Live Gospel Radio 24/7
+          Live Gospel Radio 24/7
         </p>
 
         <div className="flex flex-col md:flex-row items-center gap-12">
 
-          {/* 🎧 CÍRCULO COM PROGRESSO */}
+          {/* CIRCLE */}
           <div
             className="relative cursor-pointer"
             onClick={() => onNavigateToProgram(currentProgram)}
@@ -132,7 +131,6 @@ const Hero: React.FC<HeroProps> = ({
               />
             </svg>
 
-            {/* 🔥 IMAGEM DINÂMICA (CORRIGIDO) */}
             <img
               src={currentProgram.image || "/default.jpg"}
               alt={currentProgram.host || "Radio Host"}
@@ -140,25 +138,25 @@ const Hero: React.FC<HeroProps> = ({
             />
           </div>
 
-          {/* TEXTO */}
+          {/* TEXT */}
           <div className="flex-1 text-center md:text-left">
 
-            <p className="text-sm text-gray-500 mb-2">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
               {format12h(currentProgram.startTime)} - {format12h(currentProgram.endTime)}
             </p>
 
             <h2 className="text-4xl font-bold mb-2">
               {currentProgram.title}
-              <span className="block text-lg font-normal text-gray-500">
+              <span className="block text-lg font-normal text-gray-600 dark:text-gray-400">
                 with {currentProgram.host}
               </span>
             </h2>
 
-            <p className="text-gray-500 mb-6">
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
               {currentProgram.description}
             </p>
 
-            {/* 🔥 BOTÃO SVG */}
+            {/* BUTTON */}
             <button
               onClick={onListenClick}
               aria-label={isPlaying ? "Pause live radio" : "Listen live to Praise FM"}
@@ -180,16 +178,31 @@ const Hero: React.FC<HeroProps> = ({
               </span>
             </button>
 
-            {/* 🎶 NOW PLAYING */}
+            {/* NOW PLAYING */}
             {liveMetadata && (
-              <p className="mt-4 text-sm text-gray-500">
-                🎶 Now Playing: <strong>{liveMetadata.artist} – {liveMetadata.title}</strong>
+              <p className="mt-4 text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2 justify-center md:justify-start">
+                <svg width="16" height="16" fill="currentColor" className="text-purple-500">
+                  <path d="M9 18V5l12-2v13" />
+                  <circle cx="6" cy="18" r="3" />
+                  <circle cx="18" cy="16" r="3" />
+                </svg>
+
+                <span>
+                  Now Playing: <strong>{liveMetadata.artist} – {liveMetadata.title}</strong>
+                </span>
               </p>
             )}
 
-            {/* 🌍 PROVA SOCIAL */}
-            <p className="mt-3 text-sm text-gray-400">
-              🌍 Heard worldwide • USA • Brazil • Europe
+            {/* GLOBAL */}
+            <p className="mt-3 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 justify-center md:justify-start">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M2 12h20" />
+                <path d="M12 2a15 15 0 0 1 0 20" />
+                <path d="M12 2a15 15 0 0 0 0 20" />
+              </svg>
+
+              Heard worldwide • USA • Brazil • Europe
             </p>
 
           </div>
