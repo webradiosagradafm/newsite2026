@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 
@@ -342,6 +343,7 @@ export default function App() {
       <BrowserRouter>
         <ScrollToTop />
         <AppContent />
+        <SpeedInsights />
       </BrowserRouter>
     </AuthProvider>
   )
