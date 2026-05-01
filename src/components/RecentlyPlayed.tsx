@@ -20,30 +20,54 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
   const { user } = useAuth()
   const navigate = useNavigate()
 
-  // 🔥 BLOQUEIO PROFISSIONAL CENTRALIZADO
+  // 🔥 BLOQUEIO PESADO (nível rádio)
   const blockedKeywords = [
-    'ramp',
     'commercial',
-    'spot',
     'promo',
     'sweeper',
     'station id',
-    'shows',
+    'ident',
+    'program',
     'show',
+    'radio',
+    'live',
+    'talk',
+    'news',
+    'interview',
+    'announcement',
+    'prayer',
+    'devotional',
+    'worship flow',
+    'grace hour',
+    'faith talks',
+    'drive with',
+    'voices of praise',
+    'night encounter',
+    'daily devotional',
   ]
 
+  const isValidMusic = (track: Track) => {
+    const text = `${track.artist} ${track.title}`.toLowerCase()
+
+    // 🚫 bloqueio forte
+    if (blockedKeywords.some((word) => text.includes(word))) {
+      return false
+    }
+
+    // 🚫 precisa ter artista e título reais
+    if (!track.artist || !track.title) return false
+
+    // 🚫 evita lixo tipo "Praise FM"
+    if (track.artist.length < 2 || track.title.length < 2) return false
+
+    // 🚫 evita coisas repetitivas ou genéricas
+    if (track.artist === track.title) return false
+
+    return true
+  }
+
   const displayedTracks = Array.isArray(tracks)
-    ? tracks
-        .filter((track) => {
-          const text = `${track.title} ${track.artist}`.toLowerCase()
-
-          const isBlocked = blockedKeywords.some((word) =>
-            text.includes(word)
-          )
-
-          return track.isMusic !== false && !isBlocked
-        })
-        .slice(0, 4)
+    ? tracks.filter(isValidMusic).slice(0, 6)
     : []
 
   useEffect(() => {
@@ -56,34 +80,25 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
 
         if (!newArtworks[key] && !track.artwork) {
           try {
-            const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(
+            const url = `https://itunes.apple.com/search?term=${encodeURIComponent(
               `${track.artist} ${track.title}`
             )}&media=music&limit=1`
 
-            const itunesResponse = await fetch(itunesUrl)
-            let foundImage = ''
+            const res = await fetch(url)
+            let image = ''
 
-            if (itunesResponse.ok && itunesResponse.status !== 204) {
-              const text = await itunesResponse.text()
-
-              if (text && text.trim().length > 0) {
-                try {
-                  const itunesData = JSON.parse(text)
-
-                  if (itunesData.results && itunesData.results.length > 0) {
-                    foundImage = itunesData.results[0].artworkUrl100 || ''
-                  }
-                } catch {
-                  console.debug('iTunes parse error')
-                }
+            if (res.ok) {
+              const data = await res.json()
+              if (data.results?.length) {
+                image = data.results[0].artworkUrl100
               }
             }
 
-            if (!foundImage) {
-              foundImage = `https://picsum.photos/seed/${encodeURIComponent(key)}/100/100`
+            if (!image) {
+              image = `https://picsum.photos/seed/${encodeURIComponent(key)}/100/100`
             }
 
-            newArtworks[key] = foundImage
+            newArtworks[key] = image
             changed = true
           } catch {
             newArtworks[key] = `https://picsum.photos/seed/${encodeURIComponent(key)}/100/100`
@@ -92,101 +107,84 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
         }
       }
 
-      if (changed) {
-        setArtworks(newArtworks)
-      }
+      if (changed) setArtworks(newArtworks)
     }
 
     if (displayedTracks.length > 0) {
       fetchArtworks()
     }
-  }, [tracks])
+  }, [displayedTracks])
 
   const handleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation()
 
     if (!user) {
       navigate('/login')
-      return
     }
   }
 
-  if (displayedTracks.length === 0) return null
-
   return (
-    <section className="bg-white dark:bg-[#000] py-12 transition-colors duration-300">
+    <section className="bg-white dark:bg-black py-12">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-regular text-gray-900 dark:text-white mb-6 tracking-tight">
+
+        <h2 className="text-3xl text-gray-900 dark:text-white mb-6">
           Recent Tracks
         </h2>
 
-        <div className="w-full">
-          <div className="grid grid-cols-12 gap-4 pb-2 border-b border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-gray-100 mb-1">
-            <div className="col-span-7 md:col-span-6">Track</div>
-            <div className="col-span-3 md:col-span-5">Artist</div>
-            <div className="col-span-2 md:col-span-1" />
-          </div>
-
+        {displayedTracks.length === 0 ? (
+          <p className="text-gray-500 dark:text-gray-400">
+            Waiting for music...
+          </p>
+        ) : (
           <div className="flex flex-col">
+
             {displayedTracks.map((track, idx) => {
               const key = `${track.artist}-${track.title}`
-              const artworkUrl =
+
+              const artwork =
                 artworks[key] ||
                 track.artwork ||
                 `https://picsum.photos/seed/${encodeURIComponent(key)}/100/100`
 
-              const favorited = false
-
               return (
                 <div
                   key={key}
-                  className="grid grid-cols-12 gap-4 py-4 border-b border-gray-100 dark:border-white/5 items-center hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group"
+                  className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 px-2 transition group"
                 >
-                  <div className="col-span-7 md:col-span-6 flex items-center space-x-4">
-                    <span className="text-[13px] text-gray-500 w-5 font-normal">{idx + 1}.</span>
+                  <div className="flex items-center gap-4">
 
-                    <div className="w-10 h-10 md:w-11 md:h-11 bg-gray-200 dark:bg-gray-800 flex-shrink-0">
-                      <img
-                        src={artworkUrl}
-                        alt=""
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          ;(e.target as HTMLImageElement).src = `https://picsum.photos/seed/${encodeURIComponent(
-                            key
-                          )}/100/100`
-                        }}
-                      />
+                    <span className="text-sm text-gray-400 w-5">
+                      {idx + 1}
+                    </span>
+
+                    <img
+                      src={artwork}
+                      className="w-11 h-11 object-cover rounded"
+                    />
+
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-black dark:text-white">
+                        {track.title}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {track.artist}
+                      </span>
                     </div>
-
-                    <span className="text-sm md:text-[15px] font-normal text-gray-900 dark:text-gray-100 truncate pr-4">
-                      {track.title}
-                    </span>
                   </div>
 
-                  <div className="col-span-3 md:col-span-5">
-                    <span className="text-sm md:text-[15px] text-gray-500 dark:text-gray-400 truncate block font-normal">
-                      {track.artist}
-                    </span>
-                  </div>
-
-                  <div className="col-span-2 md:col-span-1 flex justify-end pr-2">
-                    <button
-                      onClick={handleFavorite}
-                      className={`p-2 rounded-full transition-all duration-200 ${
-                        favorited
-                          ? 'text-red-500 opacity-100'
-                          : 'text-gray-400 dark:text-gray-600 opacity-0 group-hover:opacity-100 hover:text-red-400'
-                      }`}
-                      title={favorited ? 'Remove from favorites' : 'Save to favorites'}
-                    >
-                      <Heart className={`w-4 h-4 ${favorited ? 'fill-current' : ''}`} />
-                    </button>
-                  </div>
+                  <button
+                    onClick={handleFavorite}
+                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition"
+                  >
+                    <Heart className="w-4 h-4" />
+                  </button>
                 </div>
               )
             })}
+
           </div>
-        </div>
+        )}
+
       </div>
     </section>
   )
