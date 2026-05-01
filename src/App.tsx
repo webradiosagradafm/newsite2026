@@ -38,13 +38,6 @@ import { SCHEDULES } from './constants'
 import { Program } from './types'
 
 const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv'
-const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv'
-
-interface LiveMetadata {
-  artist: string
-  title: string
-  playedAt?: Date
-}
 
 const getChicagoDayAndTotalMinutes = () => {
   const now = new Date()
@@ -76,10 +69,12 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 const AppContent: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false)
-  const [liveMetadata, setLiveMetadata] = useState<LiveMetadata | null>(null)
+  const [liveMetadata, setLiveMetadata] = useState<any>(null)
+  const [trackHistory, setTrackHistory] = useState<any[]>([])
   const [theme, setTheme] = useState<'light' | 'dark'>(
     () => (localStorage.getItem('praise-theme') as 'light' | 'dark') || 'light'
   )
+  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
@@ -91,15 +86,17 @@ const AppContent: React.FC = () => {
   const currentProgram = useMemo(() => {
     const schedule = SCHEDULES[day] || SCHEDULES[1]
 
-    return schedule.find((p) => {
-      const [sH, sM] = p.startTime.split(':').map(Number)
-      const [eH, eM] = p.endTime.split(':').map(Number)
+    return (
+      schedule.find((p) => {
+        const [sH, sM] = p.startTime.split(':').map(Number)
+        const [eH, eM] = p.endTime.split(':').map(Number)
 
-      const start = sH * 60 + sM
-      const end = (eH === 0 ? 24 : eH) * 60 + eM
+        const start = sH * 60 + sM
+        const end = (eH === 0 ? 24 : eH) * 60 + eM
 
-      return total >= start && total < end
-    })
+        return total >= start && total < end
+      }) || schedule[0]
+    )
   }, [day, total])
 
   useEffect(() => {
@@ -114,7 +111,13 @@ const AppContent: React.FC = () => {
 
   const togglePlayback = () => {
     if (!audioRef.current) return
-    isPlaying ? audioRef.current.pause() : audioRef.current.play()
+
+    if (isPlaying) {
+      audioRef.current.pause()
+    } else {
+      audioRef.current.play().catch(() => {})
+    }
+
     setIsPlaying(!isPlaying)
   }
 
@@ -127,23 +130,93 @@ const AppContent: React.FC = () => {
         onToggleTheme={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
       />
 
-      <main className="flex-grow">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <Hero
-                  onListenClick={togglePlayback}
-                  isPlaying={isPlaying}
-                  liveMetadata={liveMetadata}
-                  onNavigateToProgram={() => {}}
-                />
-                <RecentlyPlayed tracks={[]} />
-              </>
-            }
+      <main className={`flex-grow ${isPlaying ? 'pb-[110px]' : ''}`}>
+        {selectedProgram ? (
+          <ProgramDetail
+            program={selectedProgram}
+            onBack={() => setSelectedProgram(null)}
+            onViewSchedule={() => navigate('/schedule')}
+            onListenClick={togglePlayback}
+            isPlaying={isPlaying}
           />
-        </Routes>
+        ) : (
+          <Routes>
+
+            <Route
+              path="/"
+              element={
+                <>
+                  <Hero
+                    onListenClick={togglePlayback}
+                    isPlaying={isPlaying}
+                    liveMetadata={liveMetadata}
+                    onNavigateToProgram={setSelectedProgram}
+                  />
+                  <RecentlyPlayed tracks={trackHistory} />
+                </>
+              }
+            />
+
+            <Route path="/music" element={<Playlist />} />
+
+            <Route
+              path="/schedule"
+              element={
+                <ScheduleList
+                  onNavigateToProgram={setSelectedProgram}
+                  onBack={() => navigate('/')}
+                />
+              }
+            />
+
+            <Route path="/devotional" element={<DevotionalPage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/new-releases" element={<NewReleasesPage />} />
+            <Route path="/artists" element={<FeaturedArtistsPage />} />
+
+            <Route
+              path="/presenters"
+              element={<PresentersPage onNavigateToProgram={setSelectedProgram} />}
+            />
+
+            <Route path="/live-recordings" element={<LiveRecordingsPage />} />
+            <Route path="/help" element={<HelpCenterPage />} />
+            <Route path="/feedback" element={<FeedbackPage />} />
+
+            <Route path="/programs" element={<ProgramsPage />} />
+            <Route path="/christian-radio" element={<ChristianRadioPage />} />
+            <Route path="/gospel-radio" element={<GospelRadioPage />} />
+            <Route path="/worship-radio" element={<WorshipRadioPage />} />
+
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+
+            <Route
+              path="/my-sounds"
+              element={
+                <ProtectedRoute>
+                  <MySoundsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsOfUsePage />} />
+            <Route path="/cookies" element={<CookiesPolicyPage />} />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
+
+          </Routes>
+        )}
       </main>
 
       <Footer />
