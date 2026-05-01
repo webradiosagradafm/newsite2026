@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { Play, Pause, ChevronRight, Zap, ArrowRight } from 'lucide-react'
+import { Play, Pause } from 'lucide-react'
 import { SCHEDULES } from '../constants'
 import { Program } from '../types'
-import { useNavigate } from 'react-router-dom'
 
 const getChicagoInfo = () => {
   const now = new Date()
@@ -17,9 +16,7 @@ const getChicagoInfo = () => {
 }
 
 const parseTime = (time24: string) => {
-  const parts = time24.split(':')
-  const h = parseInt(parts[0] || '0', 10)
-  const m = parseInt(parts[1] || '0', 10)
+  const [h, m] = time24.split(':').map(Number)
   return { h, m }
 }
 
@@ -44,7 +41,6 @@ const Hero: React.FC<HeroProps> = ({
   onNavigateToProgram,
 }) => {
   const [tick, setTick] = useState(0)
-  const navigate = useNavigate()
 
   useEffect(() => {
     const interval = setInterval(() => setTick((t) => t + 1), 30000)
@@ -53,55 +49,98 @@ const Hero: React.FC<HeroProps> = ({
 
   const chicago = useMemo(() => getChicagoInfo(), [tick])
 
-  const { currentProgram } = useMemo(() => {
+  const currentProgram = useMemo(() => {
     const schedule = SCHEDULES[chicago.day] || SCHEDULES[1]
 
-    const currentIndex = schedule.findIndex((p) => {
-      const start = parseTime(p.startTime)
-      const end = parseTime(p.endTime)
+    return (
+      schedule.find((p) => {
+        const start = parseTime(p.startTime)
+        const end = parseTime(p.endTime)
 
-      const startMin = start.h * 60 + start.m
-      let endMin = end.h * 60 + end.m
+        const startMin = start.h * 60 + start.m
+        let endMin = end.h * 60 + end.m
 
-      if (endMin === 0 || endMin <= startMin) endMin = 1440
+        if (endMin === 0 || endMin <= startMin) endMin = 1440
 
-      return chicago.totalMinutes >= startMin && chicago.totalMinutes < endMin
-    })
-
-    return {
-      currentProgram: schedule[currentIndex] || schedule[0],
-    }
+        return chicago.totalMinutes >= startMin && chicago.totalMinutes < endMin
+      }) || schedule[0]
+    )
   }, [chicago])
+
+  const progress = useMemo(() => {
+    if (!currentProgram) return 0
+
+    const start = parseTime(currentProgram.startTime)
+    const end = parseTime(currentProgram.endTime)
+
+    const startMin = start.h * 60 + start.m
+    let endMin = end.h * 60 + end.m
+
+    if (endMin === 0 || endMin <= startMin) endMin = 1440
+
+    const elapsed = chicago.totalMinutes - startMin
+    const duration = endMin - startMin
+
+    return Math.min(Math.max(elapsed / duration, 0), 1)
+  }, [currentProgram, chicago.totalMinutes])
+
+  const size = 180
+  const stroke = 5
+  const radius = (size - stroke) / 2
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference - progress * circumference
 
   if (!currentProgram) return null
 
   return (
-    <section className="bg-white dark:bg-black py-10">
-      <div className="max-w-6xl mx-auto px-4 text-center md:text-left">
+    <section className="bg-white dark:bg-black py-12">
+      <div className="max-w-6xl mx-auto px-4">
 
         {/* 🔥 IDENTIDADE */}
-        <p className="text-sm uppercase tracking-widest text-[#ff6600] font-semibold mb-2">
+        <p className="text-sm uppercase tracking-widest text-[#ff6600] font-semibold mb-4 text-center md:text-left">
           🎧 Live Gospel Radio 24/7
         </p>
 
         <div className="flex flex-col md:flex-row items-center gap-10">
 
-          {/* IMAGEM */}
+          {/* 🎧 CÍRCULO COM PROGRESSO */}
           <div
-            className="cursor-pointer"
+            className="relative cursor-pointer group"
+            onClick={() => onNavigateToProgram(currentProgram)}
             role="button"
             aria-label={`Open program ${currentProgram.title}`}
-            onClick={() => onNavigateToProgram(currentProgram)}
           >
+            <svg width={size} height={size} className="-rotate-90 absolute">
+              <circle
+                cx={size / 2}
+                cy={size / 2}
+                r={radius}
+                stroke="#e5e5e5"
+                strokeWidth={stroke}
+                fill="none"
+              />
+              <circle
+                cx={size / 2}
+                cy={size / 2}
+                r={radius}
+                stroke="#ff6600"
+                strokeWidth={stroke}
+                fill="none"
+                strokeDasharray={circumference}
+                strokeDashoffset={offset}
+                strokeLinecap="round"
+              />
+            </svg>
+
             <img
               src={currentProgram.image}
               alt={currentProgram.title}
-              className="w-40 h-40 rounded-full object-cover"
+              className="w-[180px] h-[180px] rounded-full object-cover"
             />
           </div>
 
-          {/* TEXTO */}
-          <div className="flex-1">
+          {/* 📄 TEXTO */}
+          <div className="flex-1 text-center md:text-left">
 
             <p className="text-sm text-gray-500 mb-1">
               {format12h(currentProgram.startTime)} - {format12h(currentProgram.endTime)}
