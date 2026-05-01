@@ -27,7 +27,9 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
     'spot',
     'promo',
     'sweeper',
-    'station id'
+    'station id',
+    'shows',
+    'show',
   ]
 
   const displayedTracks = Array.isArray(tracks)
