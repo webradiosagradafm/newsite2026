@@ -83,7 +83,7 @@ const Hero: React.FC<HeroProps> = ({
     return Math.min(Math.max(elapsed / duration, 0), 1)
   }, [currentProgram, chicago.totalMinutes])
 
-  // 🔥 CÍRCULO MAIOR
+  // 🔥 TAMANHO MAIOR
   const size = 240
   const stroke = 6
   const radius = (size - stroke) / 2
@@ -96,13 +96,14 @@ const Hero: React.FC<HeroProps> = ({
     <section className="bg-white dark:bg-black py-14">
       <div className="max-w-6xl mx-auto px-4">
 
+        {/* IDENTIDADE */}
         <p className="text-sm uppercase tracking-widest text-[#ff6600] font-semibold mb-6 text-center md:text-left">
           🎧 Live Gospel Radio 24/7
         </p>
 
         <div className="flex flex-col md:flex-row items-center gap-12">
 
-          {/* 🎧 CÍRCULO */}
+          {/* 🎧 CÍRCULO COM PROGRESSO */}
           <div
             className="relative cursor-pointer"
             onClick={() => onNavigateToProgram(currentProgram)}
@@ -131,10 +132,10 @@ const Hero: React.FC<HeroProps> = ({
               />
             </svg>
 
-            {/* 🔥 FOTO DA STACY */}
+            {/* 🔥 IMAGEM DINÂMICA (CORRIGIDO) */}
             <img
-              src="/stacy.jpg" // 👉 coloca sua imagem aqui
-              alt="Stacy - Host"
+              src={currentProgram.image || "/default.jpg"}
+              alt={currentProgram.host || "Radio Host"}
               className="w-[240px] h-[240px] rounded-full object-cover"
             />
           </div>
@@ -157,20 +158,18 @@ const Hero: React.FC<HeroProps> = ({
               {currentProgram.description}
             </p>
 
-            {/* 🔥 BOTÃO COM SVG */}
+            {/* 🔥 BOTÃO SVG */}
             <button
               onClick={onListenClick}
               aria-label={isPlaying ? "Pause live radio" : "Listen live to Praise FM"}
               className="bg-[#ff6600] text-white px-8 py-4 rounded-xl flex items-center gap-3 mx-auto md:mx-0 hover:bg-[#e65c00]"
             >
               {isPlaying ? (
-                // ⏸ SVG PAUSE
                 <svg width="20" height="20" fill="currentColor">
                   <rect x="3" y="2" width="5" height="16" />
                   <rect x="12" y="2" width="5" height="16" />
                 </svg>
               ) : (
-                // ▶️ SVG PLAY
                 <svg width="20" height="20" fill="currentColor">
                   <polygon points="3,2 18,10 3,18" />
                 </svg>
@@ -181,14 +180,14 @@ const Hero: React.FC<HeroProps> = ({
               </span>
             </button>
 
-            {/* NOW PLAYING */}
+            {/* 🎶 NOW PLAYING */}
             {liveMetadata && (
               <p className="mt-4 text-sm text-gray-500">
                 🎶 Now Playing: <strong>{liveMetadata.artist} – {liveMetadata.title}</strong>
               </p>
             )}
 
-            {/* PROVA SOCIAL */}
+            {/* 🌍 PROVA SOCIAL */}
             <p className="mt-3 text-sm text-gray-400">
               🌍 Heard worldwide • USA • Brazil • Europe
             </p>
