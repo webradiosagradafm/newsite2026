@@ -55,10 +55,8 @@ const BLOCKED_METADATA_KEYWORDS = [
   'jingle',
   'bumper',
   'midnight grace',
-  'RAMP' ,
-  'RAMPS' ,
-  'ramps' ,
-  'ramp' ,
+  'ramp',
+  'ramps',
 ]
 
 interface LiveMetadata {
@@ -94,7 +92,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   const { user, loading } = useAuth()
 
   if (loading) {
-    return <div className="min-h-screen bg-white dark:bg-[#121212]" />
+    return <div className="min-h-screen bg-white dark:bg-black" />
   }
 
   return user ? <>{children}</> : <Navigate to="/login" replace />
@@ -132,7 +130,6 @@ const AppContent: React.FC = () => {
     const currentIndex = index !== -1 ? index : 0
     const currentProgram = schedule[currentIndex]
 
-    // Pega os próximos da grade atual; se acabar, wraparound pro dia seguinte
     const remaining = schedule.slice(currentIndex + 1)
     const nextDay = (day + 1) % 7
     const nextSchedule = SCHEDULES[nextDay] || SCHEDULES[1]
@@ -229,7 +226,7 @@ const AppContent: React.FC = () => {
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-[#121212]">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">
       <Navbar
         activeTab={location.pathname === '/' ? 'home' : location.pathname.split('/')[1]}
         theme={theme}
@@ -278,10 +275,12 @@ const AppContent: React.FC = () => {
             <Route path="/events" element={<EventsPage />} />
             <Route path="/new-releases" element={<NewReleasesPage />} />
             <Route path="/artists" element={<FeaturedArtistsPage />} />
+
             <Route
               path="/presenters"
               element={<PresentersPage onNavigateToProgram={setSelectedProgram} />}
             />
+
             <Route path="/live-recordings" element={<LiveRecordingsPage />} />
             <Route path="/help" element={<HelpCenterPage />} />
             <Route path="/feedback" element={<FeedbackPage />} />
@@ -343,8 +342,8 @@ export default function App() {
       <BrowserRouter>
         <ScrollToTop />
         <AppContent />
-        <SpeedInsights />
       </BrowserRouter>
+      <SpeedInsights />
     </AuthProvider>
   )
 }
