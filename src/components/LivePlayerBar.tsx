@@ -16,30 +16,36 @@ interface LivePlayerBarProps {
   isPlaying: boolean
   onTogglePlayback: () => void
   program: Program
-  liveMetadata?: { artist: string; title: string }
+  liveMetadata?: { artist: string; title: string } | null
   queue?: Program[]
   audioRef: React.RefObject<HTMLAudioElement | null>
 }
 
-// 🔥 PROGRESSO REAL DO PROGRAMA
+// 🔥 PROGRESSO REAL
 const useProgramProgress = (program: Program) => {
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
     const update = () => {
-      const now = new Date()
-      const minutes = now.getHours() * 60 + now.getMinutes()
+      try {
+        const now = new Date()
+        const minutes = now.getHours() * 60 + now.getMinutes()
 
-      const [sh, sm] = program.startTime.split(':').map(Number)
-      const [eh, em] = program.endTime.split(':').map(Number)
+        const [sh, sm] = program.startTime.split(':').map(Number)
+        const [eh, em] = program.endTime.split(':').map(Number)
 
-      const start = sh * 60 + sm
-      const end = eh * 60 + em
+        let start = sh * 60 + sm
+        let end = eh * 60 + em
 
-      const total = end - start
-      const current = minutes - start
+        if (end <= start) end += 1440 // overnight
 
-      setProgress(Math.max(0, Math.min(100, (current / total) * 100)))
+        const current = minutes - start
+        const total = end - start
+
+        setProgress(Math.max(0, Math.min(100, (current / total) * 100)))
+      } catch {
+        setProgress(0)
+      }
     }
 
     update()
@@ -80,7 +86,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
 
   return (
     <>
-      {/* 🔥 DRAWER SCHEDULE */}
+      {/* 🔥 SCHEDULE DRAWER */}
       {showSchedule && (
         <div className="fixed top-0 right-0 w-full md:w-96 h-full bg-white dark:bg-black z-50 shadow-xl">
           <div className="flex justify-between p-4 border-b">
@@ -94,7 +100,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
             <div>
               <strong>{program.title}</strong>
               <p>{program.host}</p>
-              <span>LIVE</span>
+              <span className="text-green-500 text-sm">LIVE</span>
             </div>
 
             {queue.map((p) => (
@@ -110,10 +116,10 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
       {/* 🔥 PLAYER */}
       <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-black border-t z-40">
 
-        {/* PROGRESSO */}
+        {/* PROGRESS BAR */}
         <div className="h-1 bg-gray-200">
           <div
-            className="h-full bg-orange-500"
+            className="h-full bg-orange-500 transition-all"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -123,18 +129,22 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
           {/* INFO */}
           <div className="flex items-center gap-3 w-[30%]">
             <img
-              src={program.image}
+              src={program?.image || '/logo.png'}
               className="w-12 h-12 rounded object-cover"
               alt=""
             />
 
-            <div>
-              <p className="font-semibold">{program.title}</p>
-              <p className="text-sm opacity-60">{program.host}</p>
+            <div className="min-w-0">
+              <p className="font-semibold truncate">
+                {liveMetadata?.title || program.title}
+              </p>
+              <p className="text-sm opacity-60 truncate">
+                {liveMetadata?.artist || program.host}
+              </p>
             </div>
           </div>
 
-          {/* CONTROLES */}
+          {/* CONTROLS */}
           <div className="flex items-center gap-6">
 
             <button>
