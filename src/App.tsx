@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 
-import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { AuthProvider } from './contexts/AuthContext'
 
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
@@ -14,9 +14,6 @@ import Playlist from './components/Playlist'
 import ScheduleList from './components/ScheduleList'
 
 import DevotionalPage from './pages/DevotionalPage'
-import LoginPage from './pages/LoginPage'
-import SignUpPage from './pages/SignUpPage'
-import MySoundsPage from './pages/MySoundsPage'
 import ProfilePage from './pages/ProfilePage'
 import FeaturedArtistsPage from './pages/FeaturedArtistsPage'
 import PresentersPage from './pages/PresentersPage'
@@ -88,16 +85,6 @@ const ScrollToTop = () => {
   return null
 }
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useAuth()
-
-  if (loading) {
-    return <div className="min-h-screen bg-white dark:bg-black" />
-  }
-
-  return user ? <>{children}</> : <Navigate to="/login" replace />
-}
-
 const SvgIcon = ({
   type,
 }: {
@@ -122,12 +109,7 @@ const SvgIcon = ({
     return (
       <svg className={common} viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M4 5h16v14H4V5Z" stroke="currentColor" strokeWidth="2" />
-        <path
-          d="m4 7 8 6 8-6"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
+        <path d="m4 7 8 6 8-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       </svg>
     )
   }
@@ -192,7 +174,7 @@ const HomeActionButtons = () => {
     },
     {
       href: '/advertise',
-      label: 'Advertise With Us',
+      label: 'Sales & Advertising',
       icon: 'ads' as const,
       className: 'bg-yellow-500 text-black hover:bg-yellow-600 font-semibold',
     },
@@ -437,26 +419,51 @@ const AppContent: React.FC = () => {
             <Route
               path="/advertise"
               element={
-                <SimplePage title="Advertise With Praise FM">
+                <SimplePage title="Sales & Advertising">
                   <p>
-                    Promote your business, ministry, event, or brand to a loyal
-                    Christian audience.
+                    Promote your business, church, event, ministry, or brand with Praise FM.
+                    Reach a loyal Christian audience every day through online radio and website visibility.
                   </p>
 
+                  <h2 className="text-xl font-semibold mt-6">Advertising Packages</h2>
+
+                  <div className="grid gap-4 md:grid-cols-3 mt-4">
+                    <div className="p-5 rounded-2xl bg-gray-100 dark:bg-gray-900">
+                      <h3 className="text-lg font-bold">Starter</h3>
+                      <p className="mt-2">5 radio ads per day</p>
+                      <p className="mt-2 font-semibold">R$120/month</p>
+                    </div>
+
+                    <div className="p-5 rounded-2xl bg-yellow-100 dark:bg-yellow-500/10 border border-yellow-400">
+                      <h3 className="text-lg font-bold">Standard</h3>
+                      <p className="mt-2">10 radio ads per day</p>
+                      <p className="mt-2 font-semibold">R$200/month</p>
+                    </div>
+
+                    <div className="p-5 rounded-2xl bg-gray-100 dark:bg-gray-900">
+                      <h3 className="text-lg font-bold">Premium</h3>
+                      <p className="mt-2">20 radio ads per day + priority placement</p>
+                      <p className="mt-2 font-semibold">R$350/month</p>
+                    </div>
+                  </div>
+
+                  <h2 className="text-xl font-semibold mt-6">Why Advertise With Us?</h2>
+
                   <ul className="list-disc pl-5">
-                    <li>Daily radio ads</li>
-                    <li>Program sponsorships</li>
-                    <li>Featured promotions</li>
-                    <li>Website and app visibility</li>
+                    <li>Christian audience 24/7</li>
+                    <li>Daily exposure for your brand</li>
+                    <li>Affordable monthly packages</li>
+                    <li>Radio + website promotion opportunities</li>
+                    <li>Ideal for churches, events, local businesses, and ministries</li>
                   </ul>
 
                   <a
                     href="https://wa.me/5521971099200"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-yellow-500 text-black font-semibold hover:bg-yellow-600 transition"
+                    className="inline-flex items-center justify-center mt-6 px-6 py-3 rounded-xl bg-yellow-500 text-black font-semibold hover:bg-yellow-600 transition"
                   >
-                    Start Advertising
+                    Start Advertising Now
                   </a>
                 </SimplePage>
               }
@@ -517,26 +524,7 @@ const AppContent: React.FC = () => {
             <Route path="/gospel-radio" element={<GospelRadioPage />} />
             <Route path="/worship-radio" element={<WorshipRadioPage />} />
 
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
-
-            <Route
-              path="/my-sounds"
-              element={
-                <ProtectedRoute>
-                  <MySoundsPage />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/profile" element={<ProfilePage />} />
 
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfUsePage />} />
