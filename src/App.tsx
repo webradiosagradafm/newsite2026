@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 
+import { AuthProvider } from './contexts/AuthContext'
+
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Footer from './components/Footer'
@@ -11,6 +13,23 @@ import ProgramDetail from './components/ProgramDetail'
 import Playlist from './components/Playlist'
 import ScheduleList from './components/ScheduleList'
 
+import DevotionalPage from './pages/DevotionalPage'
+import ProfilePage from './pages/ProfilePage'
+import FeaturedArtistsPage from './pages/FeaturedArtistsPage'
+import PresentersPage from './pages/PresentersPage'
+import NewReleasesPage from './pages/NewReleasesPage'
+import LiveRecordingsPage from './pages/LiveRecordingsPage'
+import HelpCenterPage from './pages/HelpCenterPage'
+import FeedbackPage from './pages/FeedbackPage'
+import EventsPage from './pages/EventsPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
+import TermsOfUsePage from './pages/TermsOfUsePage'
+import CookiesPolicyPage from './pages/CookiesPolicyPage'
+
+import ProgramsPage from './pages/ProgramsPage'
+import ChristianRadioPage from './pages/ChristianRadioPage'
+import GospelRadioPage from './pages/GospelRadioPage'
+import WorshipRadioPage from './pages/WorshipRadioPage'
 import AdvertiserPanel from './pages/AdvertiserPanel'
 
 import { SCHEDULES } from './constants'
@@ -19,121 +38,240 @@ import { Program } from './types'
 const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv'
 const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv'
 
-const DEFAULT_ARTWORK =
-  'https://res.cloudinary.com/dtecypmsh/image/upload/v1769820657/logo_hochsa.webp'
+const BLOCKED_METADATA_KEYWORDS = [
+  'praise fm',
+  'praisefm',
+  'commercial',
+  'spot',
+  'promo',
+  'ident',
+  'sweeper',
+  'intro',
+  'program',
+  'announcement',
+  'station id',
+  'jingle',
+  'bumper',
+  'midnight grace',
+  'ramp',
+  'ramps',
+]
 
 interface LiveMetadata {
   artist: string
   title: string
-  artwork?: string
+  playedAt?: Date
+  isMusic?: boolean
+}
+
+const getChicagoDayAndTotalMinutes = () => {
+  const now = new Date()
+  const chicagoDate = new Date(
+    now.toLocaleString('en-US', { timeZone: 'America/Chicago' })
+  )
+
+  return {
+    day: chicagoDate.getDay(),
+    total: chicagoDate.getHours() * 60 + chicagoDate.getMinutes(),
+  }
 }
 
 const ScrollToTop = () => {
   const { pathname } = useLocation()
-  useEffect(() => window.scrollTo(0, 0), [pathname])
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
   return null
 }
 
 const AdBanner = () => {
   const navigate = useNavigate()
+
   return (
-    <div className="max-w-6xl mx-auto px-4 mt-6">
+    <section className="max-w-6xl mx-auto px-4 mt-6">
       <button
         onClick={() => navigate('/advertise')}
-        className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 p-5 rounded-2xl text-black"
+        className="w-full rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 text-black p-5 text-left shadow-md hover:scale-[1.01] transition"
       >
-        <h2 className="text-xl font-bold">Promote Your Brand on Praise FM</h2>
-        <p>Global audience 24/7</p>
+        <p className="text-xs uppercase font-bold tracking-widest">
+          Advertising Opportunity
+        </p>
+        <h2 className="text-xl md:text-2xl font-extrabold">
+          Promote Your Brand on Praise FM
+        </h2>
+        <p className="text-sm md:text-base mt-1">
+          Reach a global Christian audience with daily radio ads.
+        </p>
       </button>
-    </div>
+    </section>
   )
 }
 
-const SimplePage = ({ title, children }: any) => {
+const SimplePage = ({
+  title,
+  children,
+}: {
+  title: string
+  children: React.ReactNode
+}) => {
   const navigate = useNavigate()
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
-      <button onClick={() => navigate('/')} className="mb-4">← Back</button>
+      <button
+        onClick={() => navigate('/')}
+        className="mb-6 text-sm text-gray-600 dark:text-gray-300 hover:underline"
+      >
+        ← Back to Home
+      </button>
+
       <h1 className="text-3xl font-bold mb-4">{title}</h1>
-      {children}
+
+      <div className="text-gray-700 dark:text-gray-300 space-y-4">
+        {children}
+      </div>
     </div>
   )
 }
 
-const AppContent = () => {
+const AppContent: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [liveMetadata, setLiveMetadata] = useState<LiveMetadata | null>(null)
   const [trackHistory, setTrackHistory] = useState<LiveMetadata[]>([])
+  const [theme, setTheme] = useState<'light' | 'dark'>(
+    () => (localStorage.getItem('praise-theme') as 'light' | 'dark') || 'light'
+  )
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
+
   const location = useLocation()
   const navigate = useNavigate()
 
+  const { day, total } = getChicagoDayAndTotalMinutes()
+
+  const { currentProgram, queue } = useMemo(() => {
+    const schedule = SCHEDULES[day] || SCHEDULES[1] || []
+
+    const index = schedule.findIndex((p) => {
+      const [sH, sM] = p.startTime.split(':').map(Number)
+      const [eH, eM] = p.endTime.split(':').map(Number)
+
+      const start = sH * 60 + sM
+      const end = (eH === 0 ? 24 : eH) * 60 + eM
+
+      return total >= start && total < end
+    })
+
+    const currentIndex = index !== -1 ? index : 0
+    const currentProgram = schedule[currentIndex]
+
+    const remaining = schedule.slice(currentIndex + 1)
+    const nextDay = (day + 1) % 7
+    const nextSchedule = SCHEDULES[nextDay] || SCHEDULES[1] || []
+    const queue = [...remaining, ...nextSchedule].slice(0, 4)
+
+    return { currentProgram, queue }
+  }, [day, total])
+
   useEffect(() => {
-    const audio = new Audio(STREAM_URL)
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+    localStorage.setItem('praise-theme', theme)
+  }, [theme])
+
+  useEffect(() => {
+    const audio = new Audio()
+    audio.src = STREAM_URL
+    audio.preload = 'none'
+    audio.volume = parseFloat(localStorage.getItem('praise-volume') || '0.8')
+
+    const handlePlay = () => setIsPlaying(true)
+    const handlePause = () => setIsPlaying(false)
+
+    audio.addEventListener('play', handlePlay)
+    audio.addEventListener('pause', handlePause)
+
     audioRef.current = audio
+
+    return () => {
+      audio.removeEventListener('play', handlePlay)
+      audio.removeEventListener('pause', handlePause)
+      audio.pause()
+      audio.src = ''
+    }
   }, [])
 
   const togglePlayback = () => {
     if (!audioRef.current) return
-    isPlaying ? audioRef.current.pause() : audioRef.current.play()
-    setIsPlaying(!isPlaying)
+
+    if (isPlaying) {
+      audioRef.current.pause()
+    } else {
+      audioRef.current.play().catch((err) => {
+        console.error('Playback failed:', err)
+        setIsPlaying(false)
+      })
+    }
   }
 
-  // 🔥 METADATA CORRIGIDA (SEM ERRO)
   useEffect(() => {
     const es = new EventSource(METADATA_URL)
 
     es.onmessage = (e) => {
       try {
         const data = JSON.parse(e.data || '{}')
-        const streamTitle = data?.streamTitle || ''
+        const streamTitle = String(data?.streamTitle || '').trim()
 
         if (!streamTitle || !streamTitle.includes(' - ')) return
 
-        const [artist, ...rest] = streamTitle.split(' - ')
-        const title = rest.join(' - ')
+        const [rawArtist, ...rest] = streamTitle.split(' - ')
+        const artist = rawArtist.trim()
+        const title = rest.join(' - ').trim()
 
         if (!artist || !title) return
 
-        const meta = {
-          artist,
-          title,
-          artwork: DEFAULT_ARTWORK,
+        const combined = `${artist} ${title}`.toLowerCase()
+
+        if (BLOCKED_METADATA_KEYWORDS.some((k) => combined.includes(k))) {
+          return
         }
 
-        setLiveMetadata(meta)
-        setTrackHistory((prev) => [meta, ...prev].slice(0, 10))
+        setLiveMetadata((prev) => {
+          if (prev && prev.title === title && prev.artist === artist) return prev
 
-        // MEDIA SESSION (sem quebrar)
-        if ('mediaSession' in navigator) {
-          try {
-            navigator.mediaSession.metadata = new window.MediaMetadata({
-              title,
-              artist,
-              artwork: [{ src: DEFAULT_ARTWORK, sizes: '512x512', type: 'image/webp' }],
-            })
-          } catch {}
-        }
+          const meta: LiveMetadata = {
+            artist,
+            title,
+            playedAt: new Date(),
+            isMusic: true,
+          }
 
-      } catch {}
+          setTrackHistory((h) => [meta, ...h].slice(0, 10))
+          return meta
+        })
+      } catch (err) {
+        console.error('Metadata parse error:', err)
+      }
+    }
+
+    es.onerror = () => {
+      console.warn('Metadata EventSource disconnected')
     }
 
     return () => es.close()
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col">
-
+    <div className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">
       <Navbar
-        activeTab={location.pathname === '/' ? 'home' : location.pathname.replace('/', '')}
-        theme="light"
-        onToggleTheme={() => {}}
+        activeTab={location.pathname === '/' ? 'home' : location.pathname.split('/')[1]}
+        theme={theme}
+        onToggleTheme={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
       />
 
-      <main className="flex-grow">
-
+      <main className={`flex-grow ${isPlaying ? 'pb-[110px] md:pb-[96px]' : ''}`}>
         {selectedProgram ? (
           <ProgramDetail
             program={selectedProgram}
@@ -144,91 +282,158 @@ const AppContent = () => {
           />
         ) : (
           <Routes>
+            <Route
+              path="/"
+              element={
+                <>
+                  <Hero
+                    onListenClick={togglePlayback}
+                    isPlaying={isPlaying}
+                    liveMetadata={liveMetadata}
+                    onNavigateToProgram={setSelectedProgram}
+                  />
 
-            <Route path="/" element={
-              <>
-                <Hero
-                  onListenClick={togglePlayback}
-                  isPlaying={isPlaying}
-                  liveMetadata={liveMetadata}
-                  onNavigateToProgram={setSelectedProgram}
-                />
+                  <AdBanner />
 
-                <AdBanner />
-
-                <RecentlyPlayed tracks={trackHistory} />
-              </>
-            } />
-
-            <Route path="/schedule" element={
-              <ScheduleList
-                onNavigateToProgram={setSelectedProgram}
-                onBack={() => navigate('/')}
-              />
-            } />
+                  <RecentlyPlayed tracks={trackHistory} />
+                </>
+              }
+            />
 
             <Route path="/music" element={<Playlist />} />
 
-            {/* SALES */}
-            <Route path="/advertise" element={
-              <SimplePage title="Sales & Advertising">
+            <Route
+              path="/schedule"
+              element={
+                <ScheduleList
+                  onNavigateToProgram={setSelectedProgram}
+                  onBack={() => navigate('/')}
+                />
+              }
+            />
 
-                <div className="grid md:grid-cols-3 gap-4 mt-6">
+            <Route
+              path="/advertise"
+              element={
+                <SimplePage title="Sales & Advertising">
+                  <p>
+                    Promote your business, church, event, ministry, or brand with Praise FM.
+                    Reach a global Christian audience every day through online radio and website visibility.
+                  </p>
 
-                  <div className="p-4 bg-gray-100 rounded-xl">
-                    <h3>Starter</h3>
-                    <p>$25 / €23</p>
+                  <h2 className="text-xl font-semibold mt-6">
+                    Advertising Packages
+                  </h2>
+
+                  <div className="grid gap-4 md:grid-cols-3 mt-4">
+                    <div className="p-5 rounded-2xl bg-gray-100 dark:bg-gray-900">
+                      <h3 className="text-lg font-bold">Starter</h3>
+                      <p className="mt-2">5 radio ads per day</p>
+                      <p className="mt-2 font-semibold">$25/month or €23/month</p>
+                    </div>
+
+                    <div className="p-5 rounded-2xl bg-yellow-100 dark:bg-yellow-500/10 border border-yellow-400">
+                      <h3 className="text-lg font-bold">Standard</h3>
+                      <p className="mt-2">10 radio ads per day</p>
+                      <p className="mt-2 font-semibold">$40/month or €37/month</p>
+                    </div>
+
+                    <div className="p-5 rounded-2xl bg-gray-100 dark:bg-gray-900">
+                      <h3 className="text-lg font-bold">Premium</h3>
+                      <p className="mt-2">20 radio ads per day + priority placement</p>
+                      <p className="mt-2 font-semibold">$70/month or €65/month</p>
+                    </div>
                   </div>
 
-                  <div className="p-4 bg-yellow-100 rounded-xl">
-                    <h3>Standard</h3>
-                    <p>$40 / €37</p>
+                  <h2 className="text-xl font-semibold mt-6">
+                    Why Advertise With Us?
+                  </h2>
+
+                  <ul className="list-disc pl-5">
+                    <li>Global Christian audience 24/7</li>
+                    <li>Daily exposure for your brand</li>
+                    <li>Affordable monthly packages</li>
+                    <li>Radio + website promotion opportunities</li>
+                    <li>Ideal for churches, events, local businesses, and ministries</li>
+                  </ul>
+
+                  <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                    <a
+                      href="https://wa.me/5521971099200"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-yellow-500 text-black font-semibold hover:bg-yellow-600 transition"
+                    >
+                      Get Your Ad On Air
+                    </a>
+
+                    <a
+                      href="/advertiser"
+                      className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-gray-900 text-white dark:bg-white dark:text-black font-semibold hover:opacity-90 transition"
+                    >
+                      Access Advertiser Dashboard
+                    </a>
                   </div>
-
-                  <div className="p-4 bg-gray-100 rounded-xl">
-                    <h3>Premium</h3>
-                    <p>$70 / €65</p>
-                  </div>
-
-                </div>
-
-                <a href="/advertiser" className="block mt-6 text-blue-500">
-                  Access Advertiser Dashboard
-                </a>
-
-              </SimplePage>
-            } />
+                </SimplePage>
+              }
+            />
 
             <Route path="/advertiser" element={<AdvertiserPanel />} />
 
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="/devotional" element={<DevotionalPage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/new-releases" element={<NewReleasesPage />} />
+            <Route path="/artists" element={<FeaturedArtistsPage />} />
 
+            <Route
+              path="/presenters"
+              element={<PresentersPage onNavigateToProgram={setSelectedProgram} />}
+            />
+
+            <Route path="/live-recordings" element={<LiveRecordingsPage />} />
+            <Route path="/help" element={<HelpCenterPage />} />
+            <Route path="/feedback" element={<FeedbackPage />} />
+
+            <Route path="/programs" element={<ProgramsPage />} />
+            <Route path="/christian-radio" element={<ChristianRadioPage />} />
+            <Route path="/gospel-radio" element={<GospelRadioPage />} />
+            <Route path="/worship-radio" element={<WorshipRadioPage />} />
+
+            <Route path="/profile" element={<ProfilePage />} />
+
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsOfUsePage />} />
+            <Route path="/cookies" element={<CookiesPolicyPage />} />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         )}
-
       </main>
 
       <Footer />
 
-      <LivePlayerBar
-        isPlaying={isPlaying}
-        onTogglePlayback={togglePlayback}
-        program={{} as any}
-        liveMetadata={liveMetadata}
-        queue={[]}
-        audioRef={audioRef}
-      />
-
+      {currentProgram && (
+        <LivePlayerBar
+          isPlaying={isPlaying}
+          onTogglePlayback={togglePlayback}
+          program={currentProgram}
+          liveMetadata={liveMetadata}
+          queue={queue}
+          audioRef={audioRef}
+        />
+      )}
     </div>
   )
 }
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <AppContent />
+    <AuthProvider>
+      <BrowserRouter>
+        <ScrollToTop />
+        <AppContent />
+      </BrowserRouter>
       <SpeedInsights />
-    </BrowserRouter>
+    </AuthProvider>
   )
 }
