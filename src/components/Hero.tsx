@@ -37,20 +37,22 @@ const Hero: React.FC<HeroProps> = ({
           </div>
         )}
 
-        {/* 🔥 BOTÃO COM ANEL */}
+        {/* 🔥 BOTÃO ORIGINAL COM ANEL */}
         <div className="flex items-center gap-6 mt-6">
 
           <button
             onClick={onListenClick}
             className="relative w-20 h-20 flex items-center justify-center rounded-full bg-yellow-500 text-black shadow-lg"
           >
+            {/* ANEL BASE (sempre visível) */}
+            <span className="absolute inset-0 rounded-full border-4 border-yellow-300 opacity-40"></span>
+
+            {/* ANEL GIRANDO (quando toca) */}
             {isPlaying && (
-              <>
-                <span className="absolute inset-0 rounded-full border-4 border-yellow-400 border-t-transparent animate-spin"></span>
-                <span className="absolute inset-0 rounded-full border-4 border-yellow-300 opacity-30"></span>
-              </>
+              <span className="absolute inset-0 rounded-full border-4 border-yellow-400 border-t-transparent animate-spin"></span>
             )}
 
+            {/* ÍCONE */}
             <span className="z-10 text-xl font-bold">
               {isPlaying ? '⏸' : '▶'}
             </span>
