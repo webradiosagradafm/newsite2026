@@ -37,12 +37,33 @@ const Hero: React.FC<HeroProps> = ({
           </div>
         )}
 
-        <button
-          onClick={onListenClick}
-          className="bg-yellow-500 text-black px-6 py-3 rounded-xl font-semibold"
-        >
-          {isPlaying ? 'Pause' : 'Listen Live'}
-        </button>
+        {/* 🔥 BOTÃO COM ANEL */}
+        <div className="flex items-center gap-6 mt-6">
+
+          <button
+            onClick={onListenClick}
+            className="relative w-20 h-20 flex items-center justify-center rounded-full bg-yellow-500 text-black font-bold shadow-lg"
+          >
+            {isPlaying && (
+              <>
+                <span className="absolute inset-0 rounded-full border-4 border-yellow-300 border-t-transparent animate-spin"></span>
+                <span className="absolute inset-0 rounded-full border-4 border-yellow-200 animate-ping opacity-50"></span>
+              </>
+            )}
+
+            <span className="z-10 text-xl">
+              {isPlaying ? '⏸' : '▶'}
+            </span>
+          </button>
+
+          <div>
+            <p className="text-sm opacity-70">Live Radio</p>
+            <p className="font-semibold">
+              {isPlaying ? 'Now Playing' : 'Click to Listen'}
+            </p>
+          </div>
+
+        </div>
 
       </div>
 
