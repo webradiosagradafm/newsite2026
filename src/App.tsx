@@ -13,29 +13,15 @@ import ProgramDetail from './components/ProgramDetail'
 import Playlist from './components/Playlist'
 import ScheduleList from './components/ScheduleList'
 
-import DevotionalPage from './pages/DevotionalPage'
-import ProfilePage from './pages/ProfilePage'
-import FeaturedArtistsPage from './pages/FeaturedArtistsPage'
-import PresentersPage from './pages/PresentersPage'
-import NewReleasesPage from './pages/NewReleasesPage'
-import LiveRecordingsPage from './pages/LiveRecordingsPage'
-import HelpCenterPage from './pages/HelpCenterPage'
-import FeedbackPage from './pages/FeedbackPage'
-import EventsPage from './pages/EventsPage'
-import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
-import TermsOfUsePage from './pages/TermsOfUsePage'
-import CookiesPolicyPage from './pages/CookiesPolicyPage'
+import AdvertiserPanel from './pages/AdvertiserPanel'
 
-import ProgramsPage from './pages/ProgramsPage'
-import ChristianRadioPage from './pages/ChristianRadioPage'
-import GospelRadioPage from './pages/GospelRadioPage'
-import WorshipRadioPage from './pages/WorshipRadioPage'
+import DevotionalPage from './pages/DevotionalPage'
+import EventsPage from './pages/EventsPage'
 
 import { SCHEDULES } from './constants'
 import { Program } from './types'
 
 const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv'
-const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv'
 
 const ScrollToTop = () => {
   const { pathname } = useLocation()
@@ -43,19 +29,16 @@ const ScrollToTop = () => {
   return null
 }
 
-/* 🔥 BANNER DE ANÚNCIO */
 const AdBanner = () => {
   const navigate = useNavigate()
-
   return (
     <div className="max-w-6xl mx-auto px-4 mt-6">
       <button
         onClick={() => navigate('/advertise')}
-        className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 p-5 rounded-2xl text-black text-left hover:scale-[1.01] transition"
+        className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 p-5 rounded-2xl text-black"
       >
-        <p className="text-xs uppercase font-bold">Advertising Opportunity</p>
         <h2 className="text-xl font-bold">Promote Your Brand on Praise FM</h2>
-        <p className="text-sm">Reach a global Christian audience 24/7</p>
+        <p>Global Christian audience 24/7</p>
       </button>
     </div>
   )
@@ -64,41 +47,24 @@ const AdBanner = () => {
 const SimplePage = ({ title, children }: any) => {
   const navigate = useNavigate()
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
-      <button onClick={() => navigate('/')} className="mb-6 text-sm hover:underline">
-        ← Back to Home
-      </button>
-      <h1 className="text-3xl font-bold mb-4">{title}</h1>
-      <div className="space-y-4">{children}</div>
+    <div className="max-w-4xl mx-auto p-6">
+      <button onClick={() => navigate('/')}>← Back</button>
+      <h1 className="text-3xl font-bold mt-4">{title}</h1>
+      {children}
     </div>
   )
 }
 
 const AppContent = () => {
   const [isPlaying, setIsPlaying] = useState(false)
-  const [liveMetadata, setLiveMetadata] = useState<any>(null)
-  const [trackHistory, setTrackHistory] = useState<any[]>([])
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
-
   const location = useLocation()
   const navigate = useNavigate()
 
-  const { day, total } = useMemo(() => {
-    const now = new Date()
-    return { day: now.getDay(), total: now.getHours() * 60 + now.getMinutes() }
-  }, [])
-
-  const { currentProgram, queue } = useMemo(() => {
-    const schedule = SCHEDULES[day] || SCHEDULES[1]
-    const currentProgram = schedule[0]
-    return { currentProgram, queue: [] }
-  }, [day])
-
   useEffect(() => {
-    const audio = new Audio(STREAM_URL)
-    audioRef.current = audio
+    audioRef.current = new Audio(STREAM_URL)
   }, [])
 
   const togglePlayback = () => {
@@ -117,6 +83,7 @@ const AppContent = () => {
       />
 
       <main className="flex-grow">
+
         {selectedProgram ? (
           <ProgramDetail
             program={selectedProgram}
@@ -130,82 +97,64 @@ const AppContent = () => {
 
             <Route path="/" element={
               <>
-                <Hero
-                  onListenClick={togglePlayback}
-                  isPlaying={isPlaying}
-                  liveMetadata={liveMetadata}
-                  onNavigateToProgram={setSelectedProgram}
-                />
-
-                {/* 🔥 BANNER NOVO */}
+                <Hero onListenClick={togglePlayback} isPlaying={isPlaying} />
                 <AdBanner />
-
-                <RecentlyPlayed tracks={trackHistory} />
+                <RecentlyPlayed tracks={[]} />
               </>
             } />
 
-            <Route path="/schedule" element={
-              <ScheduleList onNavigateToProgram={setSelectedProgram} onBack={() => navigate('/')} />
-            } />
-
+            <Route path="/schedule" element={<ScheduleList onNavigateToProgram={setSelectedProgram} onBack={() => navigate('/')} />} />
             <Route path="/music" element={<Playlist />} />
 
             {/* 💰 SALES */}
             <Route path="/advertise" element={
               <SimplePage title="Sales & Advertising">
-
-                <p>Promote your brand globally.</p>
+                <p>Reach global listeners.</p>
 
                 <div className="grid md:grid-cols-3 gap-4 mt-6">
-
                   <div className="p-4 bg-gray-100 rounded-xl">
                     <h3>Starter</h3>
                     <p>$25 / €23</p>
                   </div>
-
                   <div className="p-4 bg-yellow-100 rounded-xl">
                     <h3>Standard</h3>
                     <p>$40 / €37</p>
                   </div>
-
                   <div className="p-4 bg-gray-100 rounded-xl">
                     <h3>Premium</h3>
                     <p>$70 / €65</p>
                   </div>
-
                 </div>
 
-                <a
-                  href="https://wa.me/5521971099200"
-                  className="mt-6 inline-block bg-yellow-500 px-6 py-3 rounded-xl"
-                >
-                  Get Your Ad On Air
+                <a href="/advertiser" className="block mt-4 text-blue-500">
+                  Access Advertiser Dashboard
                 </a>
-
               </SimplePage>
             } />
 
+            {/* 🔥 PAINEL */}
+            <Route path="/advertiser" element={<AdvertiserPanel />} />
+
             <Route path="/events" element={<EventsPage />} />
-            <Route path="/artists" element={<FeaturedArtistsPage />} />
+            <Route path="/devotional" element={<DevotionalPage />} />
 
             <Route path="*" element={<Navigate to="/" />} />
 
           </Routes>
         )}
+
       </main>
 
       <Footer />
 
-      {currentProgram && (
-        <LivePlayerBar
-          isPlaying={isPlaying}
-          onTogglePlayback={togglePlayback}
-          program={currentProgram}
-          liveMetadata={liveMetadata}
-          queue={queue}
-          audioRef={audioRef}
-        />
-      )}
+      <LivePlayerBar
+        isPlaying={isPlaying}
+        onTogglePlayback={togglePlayback}
+        program={{} as any}
+        liveMetadata={null}
+        queue={[]}
+        audioRef={audioRef}
+      />
 
     </div>
   )
