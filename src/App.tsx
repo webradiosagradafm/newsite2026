@@ -37,26 +37,28 @@ import { Program } from './types'
 const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv'
 const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv'
 
-interface LiveMetadata {
-  artist: string
-  title: string
-  playedAt?: Date
-  isMusic?: boolean
-}
-
-const getChicagoTime = () => {
-  const now = new Date()
-  const chicago = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }))
-  return {
-    day: chicago.getDay(),
-    total: chicago.getHours() * 60 + chicago.getMinutes(),
-  }
-}
-
 const ScrollToTop = () => {
   const { pathname } = useLocation()
   useEffect(() => window.scrollTo(0, 0), [pathname])
   return null
+}
+
+/* 🔥 BANNER DE ANÚNCIO */
+const AdBanner = () => {
+  const navigate = useNavigate()
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 mt-6">
+      <button
+        onClick={() => navigate('/advertise')}
+        className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 p-5 rounded-2xl text-black text-left hover:scale-[1.01] transition"
+      >
+        <p className="text-xs uppercase font-bold">Advertising Opportunity</p>
+        <h2 className="text-xl font-bold">Promote Your Brand on Praise FM</h2>
+        <p className="text-sm">Reach a global Christian audience 24/7</p>
+      </button>
+    </div>
+  )
 }
 
 const SimplePage = ({ title, children }: any) => {
@@ -74,8 +76,8 @@ const SimplePage = ({ title, children }: any) => {
 
 const AppContent = () => {
   const [isPlaying, setIsPlaying] = useState(false)
-  const [liveMetadata, setLiveMetadata] = useState<LiveMetadata | null>(null)
-  const [trackHistory, setTrackHistory] = useState<LiveMetadata[]>([])
+  const [liveMetadata, setLiveMetadata] = useState<any>(null)
+  const [trackHistory, setTrackHistory] = useState<any[]>([])
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -83,30 +85,16 @@ const AppContent = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const { day, total } = getChicagoTime()
+  const { day, total } = useMemo(() => {
+    const now = new Date()
+    return { day: now.getDay(), total: now.getHours() * 60 + now.getMinutes() }
+  }, [])
 
   const { currentProgram, queue } = useMemo(() => {
     const schedule = SCHEDULES[day] || SCHEDULES[1]
-
-    const index = schedule.findIndex((p) => {
-      const [sH, sM] = p.startTime.split(':').map(Number)
-      const [eH, eM] = p.endTime.split(':').map(Number)
-
-      const start = sH * 60 + sM
-      const end = (eH === 0 ? 24 : eH) * 60 + eM
-
-      return total >= start && total < end
-    })
-
-    const currentIndex = index !== -1 ? index : 0
-    const currentProgram = schedule[currentIndex]
-
-    const remaining = schedule.slice(currentIndex + 1)
-    const nextDay = (day + 1) % 7
-    const queue = [...remaining, ...(SCHEDULES[nextDay] || [])].slice(0, 4)
-
-    return { currentProgram, queue }
-  }, [day, total])
+    const currentProgram = schedule[0]
+    return { currentProgram, queue: [] }
+  }, [day])
 
   useEffect(() => {
     const audio = new Audio(STREAM_URL)
@@ -120,7 +108,7 @@ const AppContent = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">
+    <div className="min-h-screen flex flex-col">
 
       <Navbar
         activeTab={location.pathname === '/' ? 'home' : location.pathname.split('/')[1]}
@@ -148,54 +136,48 @@ const AppContent = () => {
                   liveMetadata={liveMetadata}
                   onNavigateToProgram={setSelectedProgram}
                 />
+
+                {/* 🔥 BANNER NOVO */}
+                <AdBanner />
+
                 <RecentlyPlayed tracks={trackHistory} />
               </>
             } />
 
-            <Route path="/music" element={<Playlist />} />
-
             <Route path="/schedule" element={
-              <ScheduleList
-                onNavigateToProgram={setSelectedProgram}
-                onBack={() => navigate('/')}
-              />
+              <ScheduleList onNavigateToProgram={setSelectedProgram} onBack={() => navigate('/')} />
             } />
 
-            {/* 💰 SALES PAGE */}
+            <Route path="/music" element={<Playlist />} />
+
+            {/* 💰 SALES */}
             <Route path="/advertise" element={
               <SimplePage title="Sales & Advertising">
 
-                <p>
-                  Promote your brand to a global Christian audience.
-                  Reach listeners worldwide 24/7.
-                </p>
+                <p>Promote your brand globally.</p>
 
-                <div className="grid gap-4 md:grid-cols-3 mt-6">
+                <div className="grid md:grid-cols-3 gap-4 mt-6">
 
-                  <div className="p-5 rounded-2xl bg-gray-100 dark:bg-gray-900">
-                    <h3 className="font-bold">Starter</h3>
-                    <p>5 ads/day</p>
-                    <p className="font-semibold">$25 / €23</p>
+                  <div className="p-4 bg-gray-100 rounded-xl">
+                    <h3>Starter</h3>
+                    <p>$25 / €23</p>
                   </div>
 
-                  <div className="p-5 rounded-2xl bg-yellow-100 dark:bg-yellow-500/10 border border-yellow-400">
-                    <h3 className="font-bold">Standard</h3>
-                    <p>10 ads/day</p>
-                    <p className="font-semibold">$40 / €37</p>
+                  <div className="p-4 bg-yellow-100 rounded-xl">
+                    <h3>Standard</h3>
+                    <p>$40 / €37</p>
                   </div>
 
-                  <div className="p-5 rounded-2xl bg-gray-100 dark:bg-gray-900">
-                    <h3 className="font-bold">Premium</h3>
-                    <p>20 ads/day</p>
-                    <p className="font-semibold">$70 / €65</p>
+                  <div className="p-4 bg-gray-100 rounded-xl">
+                    <h3>Premium</h3>
+                    <p>$70 / €65</p>
                   </div>
 
                 </div>
 
                 <a
                   href="https://wa.me/5521971099200"
-                  target="_blank"
-                  className="mt-6 inline-block bg-yellow-500 px-6 py-3 rounded-xl font-semibold"
+                  className="mt-6 inline-block bg-yellow-500 px-6 py-3 rounded-xl"
                 >
                   Get Your Ad On Air
                 </a>
@@ -205,13 +187,8 @@ const AppContent = () => {
 
             <Route path="/events" element={<EventsPage />} />
             <Route path="/artists" element={<FeaturedArtistsPage />} />
-            <Route path="/presenters" element={<PresentersPage onNavigateToProgram={setSelectedProgram} />} />
 
-            <Route path="/privacy" element={<PrivacyPolicyPage />} />
-            <Route path="/terms" element={<TermsOfUsePage />} />
-            <Route path="/cookies" element={<CookiesPolicyPage />} />
-
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/" />} />
 
           </Routes>
         )}
