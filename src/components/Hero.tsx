@@ -42,16 +42,16 @@ const Hero: React.FC<HeroProps> = ({
 
           <button
             onClick={onListenClick}
-            className="relative w-20 h-20 flex items-center justify-center rounded-full bg-yellow-500 text-black font-bold shadow-lg"
+            className="relative w-20 h-20 flex items-center justify-center rounded-full bg-yellow-500 text-black shadow-lg"
           >
             {isPlaying && (
               <>
-                <span className="absolute inset-0 rounded-full border-4 border-yellow-300 border-t-transparent animate-spin"></span>
-                <span className="absolute inset-0 rounded-full border-4 border-yellow-200 animate-ping opacity-50"></span>
+                <span className="absolute inset-0 rounded-full border-4 border-yellow-400 border-t-transparent animate-spin"></span>
+                <span className="absolute inset-0 rounded-full border-4 border-yellow-300 opacity-30"></span>
               </>
             )}
 
-            <span className="z-10 text-xl">
+            <span className="z-10 text-xl font-bold">
               {isPlaying ? '⏸' : '▶'}
             </span>
           </button>
