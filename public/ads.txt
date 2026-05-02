@@ -4,24 +4,20 @@
 MANAGERDOMAIN=zeno.fm
 CONTACT=support@zeno.fm
 
-zeno.fm, ${MOUNTNAME}, DIRECT
+zeno.fm, hvwifp8ezc6tv, DIRECT
 
 # Adswizz
-
 adswizz.com,233,RESELLER,52ded3ee71b94c84
 
 # Katz
-
 katzdigital.com,233,RESELLER
 katzdigital.com,80,RESELLER
 katzdigital.com,318,RESELLER
 
 # missionmedia
-
 missionmedia.ai,233,RESELLER
 
 # Triton
-
 tritondigital.com,25053,RESELLER,19b4454d0b87b58b
 
 #-----------End zeno.fm-----------------
