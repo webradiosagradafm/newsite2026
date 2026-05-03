@@ -10,7 +10,7 @@ interface SEOProps {
 const DEFAULT_IMAGE =
   "https://praisefmusa.com/discover-cover.jpg";
 
-const DEFAULT_URL = "https://praisefmusa.com";
+const DEFAULT_URL = "https://praisefmradio.com";
 
 const SEO: React.FC<SEOProps> = ({ title, description, image, url }) => {
   useEffect(() => {

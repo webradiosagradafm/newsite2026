@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { HashRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Play, Pause, Megaphone } from 'lucide-react';
 
 import Navbar from './components/Navbar';
@@ -9,6 +9,7 @@ import LivePlayerBar from './components/LivePlayerBar';
 import ProgramDetail from './components/ProgramDetail';
 import Playlist from './components/Playlist';
 import ScheduleList from './components/ScheduleList';
+import SEO from './components/SEO';
 
 import DevotionalPage from './pages/DevotionalPage';
 import FeaturedArtistsPage from './pages/FeaturedArtistsPage';
@@ -121,7 +122,7 @@ const HomeBBC = ({
     <>
       <section className="bg-white dark:bg-[#121212] text-gray-950 dark:text-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-10">
-          {/* ========== MAIN PLAYER ========== */}
+          {/* MAIN PLAYER */}
           <div className="flex flex-col md:grid md:grid-cols-[220px_1fr] gap-8 md:gap-10 items-center border-b border-gray-300 dark:border-white/10 pb-8 md:pb-10">
             {/* Capa + anel de progresso */}
             <div className="relative w-[190px] h-[190px] mx-auto md:mx-0 flex-shrink-0">
@@ -157,7 +158,7 @@ const HomeBBC = ({
             </div>
           </div>
 
-          {/* ========== UP NEXT ========== */}
+          {/* UP NEXT */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-8 border-b border-gray-300 dark:border-white/10">
             {nextOne && (
               <button onClick={() => onNavigateToProgram(nextOne)} className="flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full">
@@ -199,7 +200,7 @@ const HomeBBC = ({
             )}
           </div>
 
-          {/* ========== BOTÃO ADVERTISE ========== */}
+          {/* BOTÃO ADVERTISE */}
           <div className="flex justify-center md:justify-end mt-3 mb-5">
             <button
               onClick={() => navigate('/advertise')}
@@ -210,7 +211,7 @@ const HomeBBC = ({
             </button>
           </div>
 
-          {/* ========== DESCRIÇÃO ========== */}
+          {/* DESCRIÇÃO */}
           <div className="py-4">
             <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed text-center md:text-left">
               {currentProgram?.description || 'Listen live to Praise FM — Christian music, worship and devotionals.'}
@@ -326,11 +327,47 @@ const AppContent: React.FC = () => {
     return () => { es.close(); eventSourceRef.current = null; };
   }, []);
 
+  // SEO dinâmico baseado na rota
+  const getSEO = () => {
+    const path = location.pathname;
+    if (path === '/') return {
+      title: 'Praise FM USA - 24/7 Worship & Gospel Radio',
+      description: 'Listen live to Praise FM USA — 24/7 Christian radio streaming worship music, gospel hits, devotionals, and uplifting shows. Your home for faith and inspiration.'
+    };
+    if (path === '/schedule') return {
+      title: 'Full Schedule - Praise FM USA',
+      description: 'See the complete programming schedule for Praise FM USA. Find your favorite worship and gospel radio shows.'
+    };
+    if (path === '/advertise') return {
+      title: 'Advertise with Praise FM USA',
+      description: 'Reach thousands of engaged Christian listeners. Affordable radio advertising spots available now on Praise FM USA.'
+    };
+    if (path === '/events') return {
+      title: 'Events - Praise FM USA',
+      description: 'Discover Christian events, concerts, and gatherings promoted by Praise FM USA.'
+    };
+    if (path === '/devotional') return {
+      title: 'Daily Devotional - Praise FM USA',
+      description: 'Daily spiritual reflections and Bible-based devotionals from Praise FM USA.'
+    };
+    return {
+      title: 'Praise FM USA - Worship & Gospel Radio',
+      description: 'Listen live to Praise FM USA — 24/7 Christian radio streaming worship music, gospel hits, devotionals, and uplifting shows.'
+    };
+  };
+
+  const seo = getSEO();
   const isAppRoute = location.pathname === '/app';
 
   return (
     <div className="min-h-screen flex flex-col pb-[120px] bg-white dark:bg-[#121212] transition-colors">
       <h1 className="sr-only">Praise FM USA - 24/7 Gospel Radio Station</h1>
+
+      <SEO
+        title={seo.title}
+        description={seo.description}
+        url={window.location.href}
+      />
 
       {!isAppRoute && (
         <Navbar
@@ -390,9 +427,9 @@ const AppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <ScrollToTop />
       <AppContent />
-    </HashRouter>
+    </BrowserRouter>
   );
 }
