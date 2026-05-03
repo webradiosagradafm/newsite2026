@@ -143,42 +143,54 @@ const HomeBBC = ({
   const presenterImage = getProgramImage(currentProgram);
   const progress = getProgramProgress(currentProgram);
 
-  const radius = 88;
+  const size = 190;
+  const strokeWidth = 6;
+  const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
+  const center = size / 2;
 
   return (
     <>
       <section className="bg-white dark:bg-[#121212] text-gray-950 dark:text-white">
         <div className="max-w-7xl mx-auto px-6 py-10">
-
+          {/* LIVE NOW - Main Player Card */}
           <div className="grid md:grid-cols-[220px_1fr] gap-10 items-center border-b border-gray-300 dark:border-white/10 pb-10">
-
+            {/* Album Art with Progress Ring */}
             <div className="relative w-[190px] h-[190px]">
-              <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 190 190">
+              {/* Progress Ring */}
+              <svg 
+                className="absolute inset-0 w-full h-full -rotate-90" 
+                viewBox={`0 0 ${size} ${size}`}
+              >
+                {/* Background circle (track) */}
                 <circle
-                  cx="95"
-                  cy="95"
+                  cx={center}
+                  cy={center}
                   r={radius}
-                  stroke="rgba(249,115,22,0.22)"
-                  strokeWidth="8"
+                  stroke="currentColor"
+                  strokeWidth={strokeWidth}
                   fill="none"
+                  className="text-gray-300 dark:text-gray-700"
+                  opacity={0.3}
                 />
-
+                
+                {/* Progress circle */}
                 <circle
-                  cx="95"
-                  cy="95"
+                  cx={center}
+                  cy={center}
                   r={radius}
                   stroke="#f97316"
-                  strokeWidth="8"
+                  strokeWidth={strokeWidth}
                   fill="none"
                   strokeLinecap="round"
                   strokeDasharray={circumference}
                   strokeDashoffset={circumference * (1 - progress / 100)}
-                  className="transition-all duration-700 ease-out"
+                  className="transition-all duration-1000 ease-out"
                 />
               </svg>
 
-              <div className="absolute inset-[14px] rounded-full overflow-hidden bg-gray-200">
+              {/* Album Image */}
+              <div className="absolute inset-[14px] rounded-full overflow-hidden bg-gray-200 shadow-lg">
                 <img
                   src={presenterImage}
                   alt={currentProgram?.title || 'Praise FM'}
@@ -189,14 +201,16 @@ const HomeBBC = ({
                 />
               </div>
 
-              <div className="absolute -right-3 bottom-1 w-16 h-16 rounded-full bg-black text-white flex items-center justify-center text-4xl font-black border-4 border-white dark:border-[#121212]">
+              {/* Live Badge */}
+              <div className="absolute -right-3 bottom-1 w-16 h-16 rounded-full bg-black text-white flex items-center justify-center text-4xl font-black border-4 border-white dark:border-[#121212] shadow-lg">
                 1
               </div>
             </div>
 
+            {/* Program Info */}
             <div>
               <div className="flex items-center gap-2 text-sm mb-2">
-                <span className="font-black">LIVE</span>
+                <span className="font-black text-orange-500">LIVE</span>
                 <span className="text-gray-500">·</span>
                 <span className="text-gray-500">
                   {currentProgram
@@ -215,14 +229,15 @@ const HomeBBC = ({
                 </h1>
               </button>
 
-              <p className="mt-2 text-xl text-gray-900 dark:text-gray-200">
-                {liveMetadata?.title || 'Global Christian Radio'}
+              <p className="mt-2 text-lg text-gray-700 dark:text-gray-300">
+                {liveMetadata?.title || currentProgram?.description || 'Global Christian Radio'}
               </p>
 
-              <p className="mt-1 text-base text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 {liveMetadata?.artist || 'Streaming 24/7'}
               </p>
 
+              {/* Play Button - QUADRADO */}
               <button
                 onClick={onListenClick}
                 className="mt-7 bg-orange-500 hover:bg-orange-600 text-white px-12 py-4 font-black text-lg transition active:scale-95 inline-flex items-center gap-3"
@@ -233,19 +248,20 @@ const HomeBBC = ({
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-10 border-b border-gray-300 dark:border-white/10 py-4">
-
+          {/* UP NEXT & LATER */}
+          <div className="grid md:grid-cols-2 gap-10 border-b border-gray-300 dark:border-white/10 py-8">
             {nextOne && (
-              <button onClick={() => onNavigateToProgram(nextOne)} className="flex gap-4 text-left">
-                <img
-                  src={getProgramImage(nextOne)}
-                  alt={nextOne.title}
-                  className="w-24 h-24 object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = DEFAULT_COVER;
-                  }}
-                />
-
+              <button onClick={() => onNavigateToProgram(nextOne)} className="flex gap-4 text-left group">
+                <div className="relative w-24 h-24 flex-shrink-0">
+                  <img
+                    src={getProgramImage(nextOne)}
+                    alt={nextOne.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = DEFAULT_COVER;
+                    }}
+                  />
+                </div>
                 <div>
                   <div className="flex items-center gap-2 text-xs mb-1">
                     <span className="font-black text-orange-500 uppercase">Up Next</span>
@@ -253,10 +269,8 @@ const HomeBBC = ({
                       {formatRangeToAmPm(nextOne.startTime, nextOne.endTime)}
                     </span>
                   </div>
-
-                  <h3 className="text-lg font-bold">{nextOne.title}</h3>
-
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <h3 className="text-lg font-bold group-hover:underline">{nextOne.title}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     {(nextOne as any).description || 'Christian music and inspiration.'}
                   </p>
                 </div>
@@ -264,41 +278,42 @@ const HomeBBC = ({
             )}
 
             {nextTwo && (
-              <button onClick={() => onNavigateToProgram(nextTwo)} className="hidden md:flex gap-4 text-left">
-                <img
-                  src={getProgramImage(nextTwo)}
-                  alt={nextTwo.title}
-                  className="w-24 h-24 object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = DEFAULT_COVER;
-                  }}
-                />
-
+              <button onClick={() => onNavigateToProgram(nextTwo)} className="hidden md:flex gap-4 text-left group">
+                <div className="relative w-24 h-24 flex-shrink-0">
+                  <img
+                    src={getProgramImage(nextTwo)}
+                    alt={nextTwo.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = DEFAULT_COVER;
+                    }}
+                  />
+                </div>
                 <div>
                   <p className="text-xs text-gray-400 mb-1">
                     {formatRangeToAmPm(nextTwo.startTime, nextTwo.endTime)}
                   </p>
-
-                  <h3 className="text-lg font-bold">{nextTwo.title}</h3>
-
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <h3 className="text-lg font-bold group-hover:underline">{nextTwo.title}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     {(nextTwo as any).description || 'More from Praise FM.'}
                   </p>
                 </div>
               </button>
             )}
-
           </div>
 
-          <div className="py-5">
-            <p className="text-gray-700 dark:text-gray-300">
-              Listen live to Praise FM — Christian music, worship and devotionals.
+          {/* Description */}
+          <div className="py-6">
+            <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+              {liveMetadata?.title 
+                ? `${liveMetadata.artist} - ${liveMetadata.title}` 
+                : 'Listen live to Praise FM — Christian music, worship and devotionals.'}
             </p>
           </div>
-
         </div>
       </section>
 
+      {/* Recent Tracks Section */}
       <RecentlyPlayed tracks={trackHistory} />
     </>
   );
