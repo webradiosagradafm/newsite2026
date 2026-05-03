@@ -3,61 +3,61 @@
   xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 >
   <url>
-    <loc>https://praisefmusa.com/</loc>
+    <loc>https://praisefmradio.vercel.app/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://praisefmusa.com/christian-radio</loc>
+    <loc>https://praisefmradio.vercel.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://praisefmusa.com/gospel-radio</loc>
+    <loc>https://praisefmradio.vercel.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://praisefmusa.com/worship-radio</loc>
+    <loc>https://praisefmradio.vercel.app/worship-radio</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://praisefmusa.com/programs</loc>
+    <loc>https://praisefmradio.vercel.app/programs</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://praisefmusa.com/programs/morning-show-with-stancy-campbell</loc>
+    <loc>https://praisefmradio.vercel.app/programs/morning-show-with-stancy-campbell</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://praisefmusa.com/programs/midday-grace</loc>
+    <loc>https://praisefmradio.vercel.app/programs/midday-grace</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://praisefmusa.com/programs/praise-fm-worship</loc>
+    <loc>https://praisefmradio.vercel.app/programs/praise-fm-worship</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://praisefmusa.com/listen-live</loc>
+    <loc>https://praisefmradio.vercel.app/listen-live</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://praisefmusa.com/about</loc>
+    <loc>https://praisefmradio.vercel.app/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
