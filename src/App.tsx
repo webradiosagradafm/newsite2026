@@ -143,7 +143,7 @@ const HomeBBC = ({
                 <span className="text-gray-500">{currentProgram ? formatRangeToAmPm(currentProgram.startTime, currentProgram.endTime) : '24/7'}</span>
               </div>
 
-              <button onClick={() => currentProgram && onNavigateToProgram(currentProgram)} className="group text-left w-full md:w-auto">
+              <button onClick={() => currentProgram && onNavigateToProgram(currentProgram)} className="group text-center md:text-left w-full md:w-auto">
                 <h1 className="text-3xl md:text-4xl font-black leading-tight">{currentProgram?.title || 'Praise FM Live'}<span className="text-orange-500 ml-2 group-hover:ml-3 transition-all">›</span></h1>
               </button>
 
