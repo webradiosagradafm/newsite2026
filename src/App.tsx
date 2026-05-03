@@ -79,6 +79,7 @@ const HomeBBC = ({
   isPlaying,
   liveMetadata,
   currentProgram,
+  queue,
   onListenClick,
   onNavigateToProgram,
   trackHistory
@@ -86,118 +87,133 @@ const HomeBBC = ({
   isPlaying: boolean;
   liveMetadata: LiveMetadata | null;
   currentProgram?: Program;
+  queue: Program[];
   onListenClick: () => void;
   onNavigateToProgram: (program: Program) => void;
   trackHistory: LiveMetadata[];
 }) => {
+  const nextOne = queue?.[0];
+  const nextTwo = queue?.[1];
+
   return (
     <>
-      <section className="bg-[#f4f4f4] dark:bg-[#121212] py-12 border-b border-black/10 dark:border-white/10">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-[320px_1fr] gap-8">
+      <section className="bg-white dark:bg-[#121212] text-gray-950 dark:text-white">
+        <div className="max-w-7xl mx-auto px-6 py-10">
 
-            <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-6 flex items-center justify-center shadow-sm border border-black/5 dark:border-white/10">
-              <div className="relative w-56 h-56">
+          <div className="grid md:grid-cols-[220px_1fr] gap-10 items-center border-b border-gray-300 dark:border-white/10 pb-10">
 
-                <div
-                  className={`absolute inset-0 rounded-full border-[5px] border-orange-500/25 ${
-                    isPlaying ? 'animate-pulse' : ''
-                  }`}
+            <div className="relative w-[190px] h-[190px]">
+              <div className="absolute inset-0 rounded-full border-[5px] border-orange-500" />
+
+              <div className="absolute inset-[10px] rounded-full overflow-hidden bg-gray-200">
+                <img
+                  src={DEFAULT_COVER}
+                  alt="Praise FM"
+                  className="w-full h-full object-cover"
                 />
+              </div>
 
-                <div
-                  className={`absolute inset-3 rounded-full border-[4px] border-transparent border-t-orange-500 border-r-orange-500 ${
-                    isPlaying ? 'animate-[spin_10s_linear_infinite]' : ''
-                  }`}
-                />
-
-                <div className="absolute inset-7 rounded-full overflow-hidden bg-gray-200 dark:bg-[#2a2a2a] shadow-xl">
-                  <img
-                    src={DEFAULT_COVER}
-                    alt="Praise FM"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = DEFAULT_COVER;
-                    }}
-                  />
-                </div>
-
+              <div className="absolute -right-3 bottom-1 w-16 h-16 rounded-full bg-black text-white flex items-center justify-center text-4xl font-black border-4 border-white dark:border-[#121212]">
+                1
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-sm border border-black/5 dark:border-white/10">
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <span className={`w-3 h-3 rounded-full ${isPlaying ? 'bg-orange-500 animate-pulse' : 'bg-gray-400'}`} />
-                  <p className="text-orange-500 font-black uppercase text-sm tracking-[0.22em]">
-                    On Air
-                  </p>
-                </div>
-
-                <h2 className="text-4xl sm:text-5xl font-black text-gray-950 dark:text-white">
-                  Praise FM
-                </h2>
-
-                <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg">
-                  Global Christian Radio — Streaming 24/7
-                </p>
-
-                <div className="mt-8 border-t border-black/10 dark:border-white/10 pt-6">
-                  <p className="text-xs uppercase tracking-[0.18em] text-gray-400 mb-2 font-bold">
-                    Now Playing
-                  </p>
-
-                  <h1 className="text-3xl sm:text-4xl font-black text-gray-950 dark:text-white leading-tight">
-                    {liveMetadata?.title || 'Praise FM Live'}
-                  </h1>
-
-                  <p className="text-xl text-gray-500 dark:text-gray-400 mt-2">
-                    {liveMetadata?.artist || 'Live Christian Radio'}
-                  </p>
-                </div>
-
-                {currentProgram && (
-                  <button
-                    onClick={() => onNavigateToProgram(currentProgram)}
-                    className="mt-6 w-full text-left bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 p-4 rounded-xl transition"
-                  >
-                    <p className="text-xs text-gray-400 mb-1 uppercase tracking-[0.16em] font-bold">
-                      Current Show
-                    </p>
-
-                    <h3 className="font-black text-gray-950 dark:text-white text-lg">
-                      {currentProgram.title}
-                    </h3>
-
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      {currentProgram.startTime} - {currentProgram.endTime}
-                    </p>
-                  </button>
-                )}
+            <div>
+              <div className="flex items-center gap-2 text-sm mb-2">
+                <span className="font-black">LIVE</span>
+                <span className="text-gray-500">·</span>
+                <span className="text-gray-500">
+                  {currentProgram ? `${currentProgram.startTime} - ${currentProgram.endTime}` : '24/7'}
+                </span>
               </div>
 
-              <div className="mt-8 flex items-center gap-4">
-                <button
-                  onClick={onListenClick}
-                  className="w-16 h-16 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center shadow-lg shadow-orange-500/25 transition active:scale-95"
-                >
-                  {isPlaying ? <Pause size={28} /> : <Play size={28} fill="currentColor" />}
-                </button>
+              <button
+                onClick={() => currentProgram && onNavigateToProgram(currentProgram)}
+                className="group text-left"
+              >
+                <h1 className="text-3xl md:text-4xl font-black leading-tight">
+                  {currentProgram?.title || 'Praise FM Live'}
+                  <span className="text-orange-500 ml-2 group-hover:ml-3 transition-all">›</span>
+                </h1>
+              </button>
+
+              <p className="mt-2 text-xl text-gray-900 dark:text-gray-200">
+                {liveMetadata?.title || 'Global Christian Radio'}
+              </p>
+
+              <p className="mt-1 text-base text-gray-500 dark:text-gray-400">
+                {liveMetadata?.artist || 'Streaming 24/7'}
+              </p>
+
+              <button
+                onClick={onListenClick}
+                className="mt-7 bg-orange-500 hover:bg-orange-600 text-white px-12 py-4 font-black text-lg transition active:scale-95 inline-flex items-center gap-3"
+              >
+                {isPlaying ? <Pause size={22} /> : <Play size={22} fill="currentColor" />}
+                {isPlaying ? 'Pause' : 'Play'}
+              </button>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-10 border-b border-gray-300 dark:border-white/10 py-4">
+
+            {nextOne && (
+              <button
+                onClick={() => onNavigateToProgram(nextOne)}
+                className="flex gap-4 text-left"
+              >
+                <img src={DEFAULT_COVER} alt="Next" className="w-24 h-24 object-cover" />
 
                 <div>
-                  <p className="font-black text-gray-950 dark:text-white">
-                    {isPlaying ? 'Live Now' : 'Start Listening'}
-                  </p>
+                  <div className="flex items-center gap-2 text-xs mb-1">
+                    <span className="font-black text-orange-500 uppercase">Up Next</span>
+                    <span className="text-gray-400">
+                      {nextOne.startTime} - {nextOne.endTime}
+                    </span>
+                  </div>
+
+                  <h3 className="text-lg font-bold">
+                    {nextOne.title}
+                  </h3>
 
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Praise FM stream
+                    {nextOne.description || 'Christian music and inspiration.'}
                   </p>
                 </div>
-              </div>
+              </button>
+            )}
 
-            </div>
+            {nextTwo && (
+              <button
+                onClick={() => onNavigateToProgram(nextTwo)}
+                className="hidden md:flex gap-4 text-left"
+              >
+                <img src={DEFAULT_COVER} alt="Coming later" className="w-24 h-24 object-cover" />
+
+                <div>
+                  <p className="text-xs text-gray-400 mb-1">
+                    {nextTwo.startTime} - {nextTwo.endTime}
+                  </p>
+
+                  <h3 className="text-lg font-bold">
+                    {nextTwo.title}
+                  </h3>
+
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {nextTwo.description || 'More from Praise FM.'}
+                  </p>
+                </div>
+              </button>
+            )}
 
           </div>
+
+          <div className="py-5">
+            <p className="text-gray-700 dark:text-gray-300">
+              Listen live to Praise FM — Christian music, worship and devotionals.
+            </p>
+          </div>
+
         </div>
       </section>
 
@@ -381,6 +397,7 @@ const AppContent: React.FC = () => {
                   isPlaying={isPlaying}
                   liveMetadata={liveMetadata}
                   currentProgram={currentProgram}
+                  queue={queue}
                   onListenClick={togglePlayback}
                   onNavigateToProgram={setSelectedProgram}
                   trackHistory={trackHistory}
