@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { HashRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, Megaphone } from 'lucide-react';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -103,6 +103,7 @@ const HomeBBC = ({
 
   const presenterImage = getProgramImage(currentProgram);
   const progress = getProgramProgress(currentProgram);
+  const navigate = useNavigate();
 
   const size = 190;
   const strokeWidth = 6;
@@ -114,6 +115,7 @@ const HomeBBC = ({
     <>
       <section className="bg-white dark:bg-[#121212] text-gray-950 dark:text-white">
         <div className="max-w-7xl mx-auto px-6 py-10">
+          {/* Player principal */}
           <div className="grid md:grid-cols-[220px_1fr] gap-10 items-center border-b border-gray-300 dark:border-white/10 pb-10">
             <div className="relative w-[190px] h-[190px]">
               <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox={`0 0 ${size} ${size}`}>
@@ -135,7 +137,7 @@ const HomeBBC = ({
               <button onClick={() => currentProgram && onNavigateToProgram(currentProgram)} className="group text-left">
                 <h1 className="text-3xl md:text-4xl font-black leading-tight">{currentProgram?.title || 'Praise FM Live'}<span className="text-orange-500 ml-2 group-hover:ml-3 transition-all">›</span></h1>
               </button>
-              <p className="mt-2 text-lg text-gray-700 dark:text-gray-300">{liveMetadata?.title || currentProgram?.description || 'Global Christian Radio'}</p>
+              <p className="mt-2 text-lg text-gray-700 dark:text-gray-300">{currentProgram?.description || 'Global Christian Radio'}</p>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{liveMetadata?.artist || 'Streaming 24/7'}</p>
               <button onClick={onListenClick} className="mt-7 bg-orange-500 hover:bg-orange-600 text-white px-12 py-4 font-black text-lg transition active:scale-95 inline-flex items-center gap-3">
                 {isPlaying ? <Pause size={22} /> : <Play size={22} fill="currentColor" />}{isPlaying ? 'Pause' : 'Play'}
@@ -143,6 +145,7 @@ const HomeBBC = ({
             </div>
           </div>
 
+          {/* Up Next */}
           <div className="grid md:grid-cols-3 gap-4 py-8 border-b border-gray-300 dark:border-white/10">
             {nextOne && (
               <button onClick={() => onNavigateToProgram(nextOne)} className="flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full">
@@ -182,9 +185,21 @@ const HomeBBC = ({
             )}
           </div>
 
+          {/* Botão Advertise discreto */}
+          <div className="flex justify-end mt-2 mb-4">
+            <button
+              onClick={() => navigate('/advertise')}
+              className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-orange-500 transition-colors group"
+            >
+              <Megaphone className="w-3.5 h-3.5 group-hover:text-orange-500" />
+              <span className="font-medium uppercase tracking-wider">Advertise with us</span>
+            </button>
+          </div>
+
+          {/* Descrição - SOMENTE descrição do programa, SEM liveMetadata.title */}
           <div className="py-6">
             <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-              {liveMetadata?.title ? `${liveMetadata.artist} - ${liveMetadata.title}` : currentProgram?.description || 'Listen live to Praise FM — Christian music, worship and devotionals.'}
+              {currentProgram?.description || 'Listen live to Praise FM — Christian music, worship and devotionals.'}
             </p>
           </div>
         </div>
