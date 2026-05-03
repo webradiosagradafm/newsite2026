@@ -49,10 +49,12 @@ interface LiveMetadata {
 
 const formatToAmPm = (time?: string) => {
   if (!time) return '';
+
   const [hourRaw, minuteRaw] = time.split(':').map(Number);
   const hour = hourRaw === 0 ? 12 : hourRaw > 12 ? hourRaw - 12 : hourRaw;
   const minute = String(minuteRaw || 0).padStart(2, '0');
   const period = hourRaw >= 12 ? 'PM' : 'AM';
+
   return `${hour}:${minute} ${period}`;
 };
 
@@ -64,6 +66,7 @@ const formatRangeToAmPm = (start?: string, end?: string) => {
 const getChicagoDayAndTotalMinutes = () => {
   const now = new Date();
   const chicagoDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+
   return {
     day: chicagoDate.getDay(),
     total: chicagoDate.getHours() * 60 + chicagoDate.getMinutes()
@@ -72,36 +75,51 @@ const getChicagoDayAndTotalMinutes = () => {
 
 const getProgramProgress = (program?: Program) => {
   if (!program) return 0;
+
   const { total } = getChicagoDayAndTotalMinutes();
+
   const [sH, sM] = program.startTime.split(':').map(Number);
   const [eH, eM] = program.endTime.split(':').map(Number);
+
   const start = sH * 60 + sM;
   const end = (eH === 0 ? 24 : eH) * 60 + eM;
+
   if (total <= start) return 0;
   if (total >= end) return 100;
+
   return Math.round(((total - start) / (end - start)) * 100);
 };
 
 const getProgramImage = (program?: Program) => {
   const p = program as any;
-  return p?.image || p?.cover || p?.presenterImage || p?.presenter?.image || DEFAULT_COVER;
+
+  return (
+    p?.image ||
+    p?.cover ||
+    p?.presenterImage ||
+    p?.presenter?.image ||
+    DEFAULT_COVER
+  );
 };
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return null;
 };
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
-  if (loading) return <div className="min-h-screen bg-black" />;
+
+  if (loading) return <div className="min-h-screen bg-white dark:bg-[#121212]" />;
+
   return user ? <>{children}</> : <Navigate to="/login" />;
 };
 
-// ============================================================
-// HOME COMPONENT - BBC RADIO 1 STYLE
-// ============================================================
 const HomeBBC = ({
   isPlaying,
   liveMetadata,
@@ -126,157 +144,227 @@ const HomeBBC = ({
   const presenterImage = getProgramImage(currentProgram);
   const progress = getProgramProgress(currentProgram);
 
-  const size = 220;
-  const strokeWidth = 5;
+  const size = 190;
+  const strokeWidth = 6;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
 
   return (
     <>
-      {/* HERO SECTION */}
-      <section className="bg-black text-white">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 md:py-16">
-          
-          {/* TITLE BAR */}
-          <div className="flex items-center gap-3 mb-10">
-            <div className="w-3 h-3 bg-[#00FFD1] rounded-full animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-[0.4em] text-[#00FFD1]">
-              On Air Now
-            </span>
-            <span className="text-xs text-gray-500 font-medium">
-              {currentProgram ? formatRangeToAmPm(currentProgram.startTime, currentProgram.endTime) : '24/7'}
-            </span>
-          </div>
-
-          {/* MAIN PLAYER */}
-          <div className="flex flex-col md:flex-row gap-10 items-center md:items-start mb-14">
-            
-            {/* ALBUM ART */}
-            <div className="relative w-[220px] h-[220px] flex-shrink-0">
-              <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox={`0 0 ${size} ${size}`}>
-                <circle cx={center} cy={center} r={radius} stroke="rgba(255,255,255,0.1)" strokeWidth={strokeWidth} fill="none" />
-                <circle cx={center} cy={center} r={radius} stroke="#00FFD1" strokeWidth={strokeWidth} fill="none" strokeLinecap="round"
+      <section className="bg-white dark:bg-[#121212] text-gray-950 dark:text-white">
+        <div className="max-w-7xl mx-auto px-6 py-10">
+          {/* LIVE NOW - Main Player Card */}
+          <div className="grid md:grid-cols-[220px_1fr] gap-10 items-center border-b border-gray-300 dark:border-white/10 pb-10">
+            {/* Album Art with Progress Ring */}
+            <div className="relative w-[190px] h-[190px]">
+              {/* Progress Ring */}
+              <svg 
+                className="absolute inset-0 w-full h-full -rotate-90" 
+                viewBox={`0 0 ${size} ${size}`}
+              >
+                {/* Background circle (track) */}
+                <circle
+                  cx={center}
+                  cy={center}
+                  r={radius}
+                  stroke="currentColor"
+                  strokeWidth={strokeWidth}
+                  fill="none"
+                  className="text-gray-300 dark:text-gray-700"
+                  opacity={0.3}
+                />
+                
+                {/* Progress circle */}
+                <circle
+                  cx={center}
+                  cy={center}
+                  r={radius}
+                  stroke="#f97316"
+                  strokeWidth={strokeWidth}
+                  fill="none"
+                  strokeLinecap="round"
                   strokeDasharray={circumference}
                   strokeDashoffset={circumference * (1 - progress / 100)}
                   className="transition-all duration-1000 ease-out"
                 />
               </svg>
-              <div className="absolute inset-[18px] overflow-hidden bg-gray-900">
-                <img src={presenterImage} alt={currentProgram?.title || 'Praise FM'}
-                  className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = DEFAULT_COVER; }} />
+
+              {/* Album Image */}
+              <div className="absolute inset-[14px] rounded-full overflow-hidden bg-gray-200 shadow-lg">
+                <img
+                  src={presenterImage}
+                  alt={currentProgram?.title || 'Praise FM'}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = DEFAULT_COVER;
+                  }}
+                />
               </div>
-              <div className="absolute -bottom-3 -right-3 bg-black text-[#00FFD1] px-4 py-2 font-black text-sm tracking-wider border-2 border-[#00FFD1]">
-                LIVE
+
+              {/* Live Badge */}
+              <div className="absolute -right-3 bottom-1 w-16 h-16 rounded-full bg-black text-white flex items-center justify-center text-4xl font-black border-4 border-white dark:border-[#121212] shadow-lg">
+                1
               </div>
             </div>
 
-            {/* PROGRAM INFO */}
-            <div className="flex-1 text-center md:text-left">
-              <div className="inline-block bg-[#00FFD1] text-black px-3 py-1 text-xs font-black uppercase tracking-wider mb-4">
-                {currentProgram?.host || 'Praise FM'}
+            {/* Program Info */}
+            <div>
+              <div className="flex items-center gap-2 text-sm mb-2">
+                <span className="font-black text-orange-500">LIVE</span>
+                <span className="text-gray-500">·</span>
+                <span className="text-gray-500">
+                  {currentProgram
+                    ? formatRangeToAmPm(currentProgram.startTime, currentProgram.endTime)
+                    : '24/7'}
+                </span>
               </div>
-              
-              <button onClick={() => currentProgram && onNavigateToProgram(currentProgram)} className="group w-full md:w-auto">
-                <h1 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tight hover:text-[#00FFD1] transition-colors">
-                  {currentProgram?.title || 'Praise FM'}
+
+              <button
+                onClick={() => currentProgram && onNavigateToProgram(currentProgram)}
+                className="group text-left"
+              >
+                <h1 className="text-3xl md:text-4xl font-black leading-tight">
+                  {currentProgram?.title || 'Praise FM Live'}
+                  <span className="text-orange-500 ml-2 group-hover:ml-3 transition-all">›</span>
                 </h1>
               </button>
 
-              <p className="mt-4 text-xl text-gray-300 font-medium max-w-xl">
-                {liveMetadata?.title || currentProgram?.description || 'The biggest tunes and nonstop vibes.'}
+              <p className="mt-2 text-lg text-gray-700 dark:text-gray-300">
+                {liveMetadata?.title || currentProgram?.description || 'Global Christian Radio'}
               </p>
 
-              {/* PLAY BUTTON */}
-              <button onClick={onListenClick}
-                className="mt-8 bg-[#00FFD1] hover:bg-white text-black px-12 py-5 font-black text-lg uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-3">
-                {isPlaying ? (
-                  <><Pause size={22} fill="currentColor" /><span>Stop</span></>
-                ) : (
-                  <><Play size={22} fill="currentColor" /><span>Listen Now</span></>
-                )}
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                {liveMetadata?.artist || 'Streaming 24/7'}
+              </p>
+
+              {/* Play Button - QUADRADO LARANJA */}
+              <button
+                onClick={onListenClick}
+                className="mt-7 bg-orange-500 hover:bg-orange-600 text-white px-12 py-4 font-black text-lg transition active:scale-95 inline-flex items-center gap-3"
+              >
+                {isPlaying ? <Pause size={22} /> : <Play size={22} fill="currentColor" />}
+                {isPlaying ? 'Pause' : 'Play'}
               </button>
             </div>
           </div>
 
-          {/* UP NEXT */}
-          <div className="border-t border-gray-800 pt-10">
-            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-gray-500 mb-6">
-              Up Next
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* NEXT 1 */}
-              {nextOne && (
-                <button onClick={() => onNavigateToProgram(nextOne)}
-                  className="group flex gap-4 items-center text-left bg-[#1A1A1A] hover:bg-[#252525] p-4 transition-all duration-200 w-full">
-                  <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden">
-                    <img src={getProgramImage(nextOne)} alt={nextOne.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      onError={(e) => { e.currentTarget.src = DEFAULT_COVER; }} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-black uppercase tracking-wider text-[#00FFD1] mb-1">Next</p>
-                    <h3 className="text-sm font-bold leading-tight group-hover:text-[#00FFD1] transition-colors truncate">{nextOne.title}</h3>
-                    <p className="text-xs text-gray-500 mt-1">{formatRangeToAmPm(nextOne.startTime, nextOne.endTime)}</p>
-                  </div>
-                </button>
-              )}
+          {/* UP NEXT & LATER */}
+          <div className="grid md:grid-cols-3 gap-4 py-8 border-b border-gray-300 dark:border-white/10">
+            {/* UP NEXT */}
+            {nextOne && (
+              <button 
+                onClick={() => onNavigateToProgram(nextOne)} 
+                className="flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full"
+              >
+                <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden">
+                  <img
+                    src={getProgramImage(nextOne)}
+                    alt={nextOne.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = DEFAULT_COVER;
+                    }}
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-black text-orange-500 uppercase tracking-wide mb-0.5">
+                    Up Next
+                  </p>
+                  <h3 className="text-sm font-bold leading-tight group-hover:text-orange-500 transition-colors truncate">
+                    {nextOne.title}
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {formatRangeToAmPm(nextOne.startTime, nextOne.endTime)}
+                  </p>
+                </div>
+              </button>
+            )}
 
-              {/* NEXT 2 */}
-              {nextTwo && (
-                <button onClick={() => onNavigateToProgram(nextTwo)}
-                  className="group hidden md:flex gap-4 items-center text-left bg-[#1A1A1A] hover:bg-[#252525] p-4 transition-all duration-200 w-full">
-                  <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden">
-                    <img src={getProgramImage(nextTwo)} alt={nextTwo.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      onError={(e) => { e.currentTarget.src = DEFAULT_COVER; }} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-black uppercase tracking-wider text-gray-500 mb-1">Later</p>
-                    <h3 className="text-sm font-bold leading-tight group-hover:text-[#00FFD1] transition-colors truncate">{nextTwo.title}</h3>
-                    <p className="text-xs text-gray-500 mt-1">{formatRangeToAmPm(nextTwo.startTime, nextTwo.endTime)}</p>
-                  </div>
-                </button>
-              )}
+            {/* LATER 1 */}
+            {nextTwo && (
+              <button 
+                onClick={() => onNavigateToProgram(nextTwo)} 
+                className="hidden md:flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full"
+              >
+                <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden">
+                  <img
+                    src={getProgramImage(nextTwo)}
+                    alt={nextTwo.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = DEFAULT_COVER;
+                    }}
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
+                    {formatRangeToAmPm(nextTwo.startTime, nextTwo.endTime)}
+                  </p>
+                  <h3 className="text-sm font-bold leading-tight group-hover:text-orange-500 transition-colors truncate">
+                    {nextTwo.title}
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                    {nextTwo.host}
+                  </p>
+                </div>
+              </button>
+            )}
 
-              {/* NEXT 3 */}
-              {nextThree && (
-                <button onClick={() => onNavigateToProgram(nextThree)}
-                  className="group hidden md:flex gap-4 items-center text-left bg-[#1A1A1A] hover:bg-[#252525] p-4 transition-all duration-200 w-full">
-                  <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden">
-                    <img src={getProgramImage(nextThree)} alt={nextThree.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      onError={(e) => { e.currentTarget.src = DEFAULT_COVER; }} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-black uppercase tracking-wider text-gray-500 mb-1">
-                      {formatRangeToAmPm(nextThree.startTime, nextThree.endTime)}
-                    </p>
-                    <h3 className="text-sm font-bold leading-tight group-hover:text-[#00FFD1] transition-colors truncate">{nextThree.title}</h3>
-                  </div>
-                </button>
-              )}
-            </div>
+            {/* LATER 2 */}
+            {nextThree && (
+              <button 
+                onClick={() => onNavigateToProgram(nextThree)} 
+                className="hidden md:flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full"
+              >
+                <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden">
+                  <img
+                    src={getProgramImage(nextThree)}
+                    alt={nextThree.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = DEFAULT_COVER;
+                    }}
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
+                    {formatRangeToAmPm(nextThree.startTime, nextThree.endTime)}
+                  </p>
+                  <h3 className="text-sm font-bold leading-tight group-hover:text-orange-500 transition-colors truncate">
+                    {nextThree.title}
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                    {nextThree.host}
+                  </p>
+                </div>
+              </button>
+            )}
+          </div>
+
+          {/* Description */}
+          <div className="py-6">
+            <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+              {liveMetadata?.title 
+                ? `${liveMetadata.artist} - ${liveMetadata.title}` 
+                : currentProgram?.description || 'Listen live to Praise FM — Christian music, worship and devotionals.'}
+            </p>
           </div>
         </div>
       </section>
 
-      {/* RECENT TRACKS */}
+      {/* Recent Tracks Section */}
       <RecentlyPlayed tracks={trackHistory} />
     </>
   );
 };
 
-// ============================================================
-// APP CONTENT
-// ============================================================
 const AppContent: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [liveMetadata, setLiveMetadata] = useState<LiveMetadata | null>(null);
   const [trackHistory, setTrackHistory] = useState<LiveMetadata[]>([]);
   const [theme, setTheme] = useState<'light' | 'dark'>(
-    () => (localStorage.getItem('praise-theme') as 'light' | 'dark') || 'dark'
+    () => (localStorage.getItem('praise-theme') as 'light' | 'dark') || 'light'
   );
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
 
@@ -294,13 +382,16 @@ const AppContent: React.FC = () => {
     const index = schedule.findIndex(p => {
       const [sH, sM] = p.startTime.split(':').map(Number);
       const [eH, eM] = p.endTime.split(':').map(Number);
+
       const start = sH * 60 + sM;
       const end = (eH === 0 ? 24 : eH) * 60 + eM;
+
       return total >= start && total < end;
     });
 
     const currentIdx = index !== -1 ? index : 0;
 
+    // Pega os próximos 4 programas, dando a volta no array se necessário
     const nextPrograms: Program[] = [];
     for (let i = 1; i <= 4; i++) {
       const nextIdx = (currentIdx + i) % schedule.length;
@@ -320,6 +411,7 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     const audio = new Audio(STREAM_URL);
+
     audio.crossOrigin = 'anonymous';
     (audio as any).playsInline = true;
     audio.preload = 'none';
@@ -327,8 +419,10 @@ const AppContent: React.FC = () => {
 
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
+
     audio.addEventListener('play', handlePlay);
     audio.addEventListener('pause', handlePause);
+
     audioRef.current = audio;
 
     return () => {
@@ -342,22 +436,33 @@ const AppContent: React.FC = () => {
 
   const togglePlayback = () => {
     if (!audioRef.current) return;
+
     if (isPlaying) {
       audioRef.current.pause();
       return;
     }
-    audioRef.current.play().catch(() => setIsPlaying(false));
+
+    audioRef.current.play().catch(() => {
+      setIsPlaying(false);
+    });
   };
 
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
+
     navigator.mediaSession.metadata = new MediaMetadata({
       title: liveMetadata?.title || 'Praise FM USA',
       artist: liveMetadata?.artist || 'Live Radio',
       artwork: [{ src: DEFAULT_COVER, sizes: '512x512', type: 'image/png' }]
     });
-    navigator.mediaSession.setActionHandler('play', () => audioRef.current?.play().catch(() => {}));
-    navigator.mediaSession.setActionHandler('pause', () => audioRef.current?.pause());
+
+    navigator.mediaSession.setActionHandler('play', () => {
+      audioRef.current?.play().catch(() => {});
+    });
+
+    navigator.mediaSession.setActionHandler('pause', () => {
+      audioRef.current?.pause();
+    });
   }, [liveMetadata]);
 
   useEffect(() => {
@@ -368,30 +473,46 @@ const AppContent: React.FC = () => {
       try {
         const data = JSON.parse(e.data);
         const streamTitle = data.streamTitle || '';
+
         if (!streamTitle.includes(' - ')) return;
+
         const [artistRaw, ...rest] = streamTitle.split(' - ');
         const artist = artistRaw.trim();
         const title = rest.join(' - ').trim();
+
         if (!artist || !title) return;
+
         const fullText = `${artist} ${title}`.toLowerCase();
+
         if (BLOCKED_METADATA_KEYWORDS.some(k => fullText.includes(k))) return;
 
         setLiveMetadata(prev => {
           if (prev && prev.title === title && prev.artist === artist) return prev;
-          const meta: LiveMetadata = { artist, title, playedAt: new Date(), isMusic: true };
+
+          const meta: LiveMetadata = {
+            artist,
+            title,
+            playedAt: new Date(),
+            isMusic: true
+          };
+
           setTrackHistory(history => [meta, ...history].slice(0, 10));
+
           return meta;
         });
       } catch {}
     };
 
-    return () => { es.close(); eventSourceRef.current = null; };
+    return () => {
+      es.close();
+      eventSourceRef.current = null;
+    };
   }, []);
 
   const isAppRoute = location.pathname === '/app';
 
   return (
-    <div className="min-h-screen flex flex-col pb-[100px] bg-black transition-colors">
+    <div className="min-h-screen flex flex-col pb-[120px] bg-white dark:bg-[#121212] transition-colors">
       <h1 className="sr-only">Praise FM USA - 24/7 Gospel Radio Station</h1>
 
       {!isAppRoute && (
@@ -413,13 +534,34 @@ const AppContent: React.FC = () => {
           />
         ) : (
           <Routes>
-            <Route path="/" element={
-              <HomeBBC isPlaying={isPlaying} liveMetadata={liveMetadata} currentProgram={currentProgram}
-                queue={queue} onListenClick={togglePlayback} onNavigateToProgram={setSelectedProgram} trackHistory={trackHistory} />
-            } />
+            <Route
+              path="/"
+              element={
+                <HomeBBC
+                  isPlaying={isPlaying}
+                  liveMetadata={liveMetadata}
+                  currentProgram={currentProgram}
+                  queue={queue}
+                  onListenClick={togglePlayback}
+                  onNavigateToProgram={setSelectedProgram}
+                  trackHistory={trackHistory}
+                />
+              }
+            />
+
             <Route path="/app" element={<AppHomePage />} />
             <Route path="/music" element={<Playlist />} />
-            <Route path="/schedule" element={<ScheduleList onNavigateToProgram={setSelectedProgram} onBack={() => navigate('/')} />} />
+
+            <Route
+              path="/schedule"
+              element={
+                <ScheduleList
+                  onNavigateToProgram={setSelectedProgram}
+                  onBack={() => navigate('/')}
+                />
+              }
+            />
+
             <Route path="/devotional" element={<DevotionalPage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/new-releases" element={<NewReleasesPage />} />
@@ -428,13 +570,17 @@ const AppContent: React.FC = () => {
             <Route path="/live-recordings" element={<LiveRecordingsPage />} />
             <Route path="/help" element={<HelpCenterPage />} />
             <Route path="/feedback" element={<FeedbackPage />} />
+
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
+
             <Route path="/my-sounds" element={<ProtectedRoute><MySoundsPage /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfUsePage />} />
             <Route path="/cookies" element={<CookiesPolicyPage />} />
+
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         )}
@@ -443,8 +589,14 @@ const AppContent: React.FC = () => {
       {!isAppRoute && <Footer />}
 
       {!isAppRoute && currentProgram && (
-        <LivePlayerBar isPlaying={isPlaying} onTogglePlayback={togglePlayback} program={currentProgram}
-          liveMetadata={liveMetadata} queue={queue} audioRef={audioRef} />
+        <LivePlayerBar
+          isPlaying={isPlaying}
+          onTogglePlayback={togglePlayback}
+          program={currentProgram}
+          liveMetadata={liveMetadata}
+          queue={queue}
+          audioRef={audioRef}
+        />
       )}
     </div>
   );
