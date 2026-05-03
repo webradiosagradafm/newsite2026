@@ -47,6 +47,34 @@ interface LiveMetadata {
   isMusic?: boolean;
 }
 
+const formatToAmPm = (time?: string) => {
+  if (!time) return '';
+
+  const [hourRaw, minuteRaw] = time.split(':').map(Number);
+  const hour = hourRaw === 0 ? 12 : hourRaw > 12 ? hourRaw - 12 : hourRaw;
+  const minute = String(minuteRaw || 0).padStart(2, '0');
+  const period = hourRaw >= 12 ? 'PM' : 'AM';
+
+  return `${hour}:${minute} ${period}`;
+};
+
+const formatRangeToAmPm = (start?: string, end?: string) => {
+  if (!start || !end) return '24/7';
+  return `${formatToAmPm(start)} - ${formatToAmPm(end)}`;
+};
+
+const getProgramImage = (program?: Program) => {
+  const p = program as any;
+
+  return (
+    p?.image ||
+    p?.cover ||
+    p?.presenterImage ||
+    p?.presenter?.image ||
+    DEFAULT_COVER
+  );
+};
+
 const getChicagoDayAndTotalMinutes = () => {
   const now = new Date();
   const chicagoDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
@@ -94,6 +122,7 @@ const HomeBBC = ({
 }) => {
   const nextOne = queue?.[0];
   const nextTwo = queue?.[1];
+  const presenterImage = getProgramImage(currentProgram);
 
   return (
     <>
@@ -107,9 +136,12 @@ const HomeBBC = ({
 
               <div className="absolute inset-[10px] rounded-full overflow-hidden bg-gray-200">
                 <img
-                  src={DEFAULT_COVER}
-                  alt="Praise FM"
+                  src={presenterImage}
+                  alt={currentProgram?.title || 'Praise FM'}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = DEFAULT_COVER;
+                  }}
                 />
               </div>
 
@@ -123,7 +155,9 @@ const HomeBBC = ({
                 <span className="font-black">LIVE</span>
                 <span className="text-gray-500">·</span>
                 <span className="text-gray-500">
-                  {currentProgram ? `${currentProgram.startTime} - ${currentProgram.endTime}` : '24/7'}
+                  {currentProgram
+                    ? formatRangeToAmPm(currentProgram.startTime, currentProgram.endTime)
+                    : '24/7'}
                 </span>
               </div>
 
@@ -158,49 +192,53 @@ const HomeBBC = ({
           <div className="grid md:grid-cols-2 gap-10 border-b border-gray-300 dark:border-white/10 py-4">
 
             {nextOne && (
-              <button
-                onClick={() => onNavigateToProgram(nextOne)}
-                className="flex gap-4 text-left"
-              >
-                <img src={DEFAULT_COVER} alt="Next" className="w-24 h-24 object-cover" />
+              <button onClick={() => onNavigateToProgram(nextOne)} className="flex gap-4 text-left">
+                <img
+                  src={getProgramImage(nextOne)}
+                  alt={nextOne.title}
+                  className="w-24 h-24 object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = DEFAULT_COVER;
+                  }}
+                />
 
                 <div>
                   <div className="flex items-center gap-2 text-xs mb-1">
                     <span className="font-black text-orange-500 uppercase">Up Next</span>
                     <span className="text-gray-400">
-                      {nextOne.startTime} - {nextOne.endTime}
+                      {formatRangeToAmPm(nextOne.startTime, nextOne.endTime)}
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-bold">
-                    {nextOne.title}
-                  </h3>
+                  <h3 className="text-lg font-bold">{nextOne.title}</h3>
 
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {nextOne.description || 'Christian music and inspiration.'}
+                    {(nextOne as any).description || 'Christian music and inspiration.'}
                   </p>
                 </div>
               </button>
             )}
 
             {nextTwo && (
-              <button
-                onClick={() => onNavigateToProgram(nextTwo)}
-                className="hidden md:flex gap-4 text-left"
-              >
-                <img src={DEFAULT_COVER} alt="Coming later" className="w-24 h-24 object-cover" />
+              <button onClick={() => onNavigateToProgram(nextTwo)} className="hidden md:flex gap-4 text-left">
+                <img
+                  src={getProgramImage(nextTwo)}
+                  alt={nextTwo.title}
+                  className="w-24 h-24 object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = DEFAULT_COVER;
+                  }}
+                />
 
                 <div>
                   <p className="text-xs text-gray-400 mb-1">
-                    {nextTwo.startTime} - {nextTwo.endTime}
+                    {formatRangeToAmPm(nextTwo.startTime, nextTwo.endTime)}
                   </p>
 
-                  <h3 className="text-lg font-bold">
-                    {nextTwo.title}
-                  </h3>
+                  <h3 className="text-lg font-bold">{nextTwo.title}</h3>
 
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {nextTwo.description || 'More from Praise FM.'}
+                    {(nextTwo as any).description || 'More from Praise FM.'}
                   </p>
                 </div>
               </button>
@@ -354,9 +392,7 @@ const AppContent: React.FC = () => {
 
           return meta;
         });
-      } catch {
-        // ignora metadata inválida
-      }
+      } catch {}
     };
 
     return () => {
@@ -430,23 +466,8 @@ const AppContent: React.FC = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
 
-            <Route
-              path="/my-sounds"
-              element={
-                <ProtectedRoute>
-                  <MySoundsPage />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/my-sounds" element={<ProtectedRoute><MySoundsPage /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
 
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfUsePage />} />
