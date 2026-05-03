@@ -249,14 +249,14 @@ const HomeBBC = ({
           </div>
 
           {/* UP NEXT & LATER - Estilo BBC Sounds */}
-          <div className="grid md:grid-cols-2 gap-6 py-6">
+          <div className="grid md:grid-cols-2 gap-6 py-6 border-b border-gray-300 dark:border-white/10">
             {/* UP NEXT */}
-            {nextOne && (
+            {nextOne ? (
               <button 
                 onClick={() => onNavigateToProgram(nextOne)} 
-                className="flex gap-4 text-left group items-center"
+                className="flex gap-4 text-left group items-center w-full"
               >
-                <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden">
+                <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg">
                   <img
                     src={getProgramImage(nextOne)}
                     alt={nextOne.title}
@@ -278,15 +278,29 @@ const HomeBBC = ({
                   </p>
                 </div>
               </button>
+            ) : (
+              <div className="flex gap-4 items-center">
+                <div className="w-20 h-20 bg-gray-200 dark:bg-gray-800 rounded-lg flex-shrink-0 flex items-center justify-center">
+                  <span className="text-2xl text-gray-400">♪</span>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-orange-500 uppercase tracking-wide mb-0.5">
+                    Up next
+                  </p>
+                  <p className="text-base font-bold text-gray-400 dark:text-gray-500">
+                    More music coming up
+                  </p>
+                </div>
+              </div>
             )}
 
             {/* LATER */}
-            {nextTwo && (
+            {nextTwo ? (
               <button 
                 onClick={() => onNavigateToProgram(nextTwo)} 
-                className="hidden md:flex gap-4 text-left group items-center"
+                className="hidden md:flex gap-4 text-left group items-center w-full"
               >
-                <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden">
+                <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg">
                   <img
                     src={getProgramImage(nextTwo)}
                     alt={nextTwo.title}
@@ -308,15 +322,29 @@ const HomeBBC = ({
                   </p>
                 </div>
               </button>
+            ) : (
+              <div className="hidden md:flex gap-4 items-center">
+                <div className="w-20 h-20 bg-gray-200 dark:bg-gray-800 rounded-lg flex-shrink-0 flex items-center justify-center">
+                  <span className="text-2xl text-gray-400">♪</span>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
+                    Later
+                  </p>
+                  <p className="text-base font-bold text-gray-400 dark:text-gray-500">
+                    Stay tuned
+                  </p>
+                </div>
+              </div>
             )}
           </div>
 
           {/* Description */}
-          <div className="border-t border-gray-300 dark:border-white/10 pt-6">
+          <div className="pt-6">
             <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
               {liveMetadata?.title 
                 ? `${liveMetadata.artist} - ${liveMetadata.title}` 
-                : 'Listen live to Praise FM — Christian music, worship and devotionals.'}
+                : currentProgram?.description || 'Listen live to Praise FM — Christian music, worship and devotionals.'}
             </p>
           </div>
         </div>
@@ -358,9 +386,19 @@ const AppContent: React.FC = () => {
       return total >= start && total < end;
     });
 
+    const currentIdx = index !== -1 ? index : 0;
+    const currentProgram = schedule[currentIdx];
+
+    // Pega os próximos 4 programas, dando a volta no array se necessário
+    const nextPrograms: Program[] = [];
+    for (let i = 1; i <= 4; i++) {
+      const nextIdx = (currentIdx + i) % schedule.length;
+      nextPrograms.push(schedule[nextIdx]);
+    }
+
     return {
-      currentProgram: schedule[index !== -1 ? index : 0],
-      queue: index !== -1 ? schedule.slice(index + 1, index + 5) : schedule.slice(1, 5)
+      currentProgram,
+      queue: nextPrograms
     };
   }, [day, total]);
 
