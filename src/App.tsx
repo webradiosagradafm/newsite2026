@@ -63,6 +63,33 @@ const formatRangeToAmPm = (start?: string, end?: string) => {
   return `${formatToAmPm(start)} - ${formatToAmPm(end)}`;
 };
 
+const getChicagoDayAndTotalMinutes = () => {
+  const now = new Date();
+  const chicagoDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+
+  return {
+    day: chicagoDate.getDay(),
+    total: chicagoDate.getHours() * 60 + chicagoDate.getMinutes()
+  };
+};
+
+const getProgramProgress = (program?: Program) => {
+  if (!program) return 0;
+
+  const { total } = getChicagoDayAndTotalMinutes();
+
+  const [sH, sM] = program.startTime.split(':').map(Number);
+  const [eH, eM] = program.endTime.split(':').map(Number);
+
+  const start = sH * 60 + sM;
+  const end = (eH === 0 ? 24 : eH) * 60 + eM;
+
+  if (total <= start) return 0;
+  if (total >= end) return 100;
+
+  return Math.round(((total - start) / (end - start)) * 100);
+};
+
 const getProgramImage = (program?: Program) => {
   const p = program as any;
 
@@ -73,16 +100,6 @@ const getProgramImage = (program?: Program) => {
     p?.presenter?.image ||
     DEFAULT_COVER
   );
-};
-
-const getChicagoDayAndTotalMinutes = () => {
-  const now = new Date();
-  const chicagoDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-
-  return {
-    day: chicagoDate.getDay(),
-    total: chicagoDate.getHours() * 60 + chicagoDate.getMinutes()
-  };
 };
 
 const ScrollToTop = () => {
@@ -122,7 +139,12 @@ const HomeBBC = ({
 }) => {
   const nextOne = queue?.[0];
   const nextTwo = queue?.[1];
+
   const presenterImage = getProgramImage(currentProgram);
+  const progress = getProgramProgress(currentProgram);
+
+  const radius = 88;
+  const circumference = 2 * Math.PI * radius;
 
   return (
     <>
@@ -132,9 +154,31 @@ const HomeBBC = ({
           <div className="grid md:grid-cols-[220px_1fr] gap-10 items-center border-b border-gray-300 dark:border-white/10 pb-10">
 
             <div className="relative w-[190px] h-[190px]">
-              <div className="absolute inset-0 rounded-full border-[5px] border-orange-500" />
+              <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 190 190">
+                <circle
+                  cx="95"
+                  cy="95"
+                  r={radius}
+                  stroke="rgba(249,115,22,0.22)"
+                  strokeWidth="8"
+                  fill="none"
+                />
 
-              <div className="absolute inset-[10px] rounded-full overflow-hidden bg-gray-200">
+                <circle
+                  cx="95"
+                  cy="95"
+                  r={radius}
+                  stroke="#f97316"
+                  strokeWidth="8"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={circumference * (1 - progress / 100)}
+                  className="transition-all duration-700 ease-out"
+                />
+              </svg>
+
+              <div className="absolute inset-[14px] rounded-full overflow-hidden bg-gray-200">
                 <img
                   src={presenterImage}
                   alt={currentProgram?.title || 'Praise FM'}
