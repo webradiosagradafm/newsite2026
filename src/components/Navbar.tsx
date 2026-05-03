@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Home,
   Music,
@@ -8,14 +8,10 @@ import {
   Sun,
   Moon,
   X,
-  User as UserIcon,
-  Library,
-  Settings,
-  Ticket
+  Ticket,
+  Megaphone
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
 
 interface NavbarProps {
   activeTab: string;
@@ -25,24 +21,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { user } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      const fetchAvatar = async () => {
-        const { data } = await supabase
-          .from('profiles')
-          .select('avatar_url')
-          .eq('id', user.id)
-          .single();
-
-        if (data?.avatar_url) setAvatarUrl(data.avatar_url);
-      };
-      fetchAvatar();
-    }
-  }, [user]);
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home, path: '/' },
@@ -50,6 +29,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
     { id: 'schedule', label: 'Schedule', icon: Calendar, path: '/schedule' },
     { id: 'events', label: 'Events', icon: Ticket, path: '/events' },
     { id: 'devotional', label: 'Devotional', icon: Radio, path: '/devotional' },
+    { id: 'advertise', label: 'Advertise', icon: Megaphone, path: '/advertise' },
   ];
 
   return (
@@ -96,18 +76,6 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
                 </button>
               );
             })}
-
-            <button
-              onClick={() => navigate('/my-sounds')}
-              className={`flex items-center space-x-2 text-[15px] font-medium transition-all h-full border-b-2 px-1 uppercase tracking-tighter ${
-                activeTab === 'my-sounds'
-                  ? 'text-black dark:text-white border-[#ff6600]'
-                  : 'text-gray-500 border-transparent hover:text-black dark:hover:text-white'
-              }`}
-            >
-              <Library className="w-4 h-4" strokeWidth={1.5} />
-              <span>My Sounds</span>
-            </button>
           </nav>
         </div>
 
@@ -123,49 +91,16 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
             )}
           </button>
 
-          <div className="flex items-center space-x-4">
-            {user ? (
-              <div className="hidden md:flex items-center space-x-4">
-                <button
-                  onClick={() => navigate('/profile')}
-                  className="flex items-center space-x-3 group"
-                >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 dark:bg-white/10 flex items-center justify-center border border-transparent group-hover:border-[#ff6600] transition-all">
-                    {avatarUrl ? (
-                      <img
-                        src={avatarUrl}
-                        alt="User"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <UserIcon className="w-4 h-4 text-gray-500" />
-                    )}
-                  </div>
-                  <span className="text-[10px] font-medium uppercase tracking-widest text-gray-500 group-hover:text-black dark:group-hover:text-white">
-                    Profile
-                  </span>
-                </button>
-              </div>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 md:hidden text-gray-800 dark:text-white"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-5 h-5" />
             ) : (
-              <button
-                onClick={() => navigate('/login')}
-                className="hidden md:block text-[10px] font-medium uppercase tracking-widest text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
-              >
-                Sign In
-              </button>
+              <Menu className="w-5 h-5" />
             )}
-
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 md:hidden text-gray-800 dark:text-white"
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
-            </button>
-          </div>
+          </button>
         </div>
       </div>
 
@@ -185,30 +120,6 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, theme, onToggleTheme }) => {
                 <span>{item.label}</span>
               </button>
             ))}
-
-            <button
-              onClick={() => {
-                navigate('/my-sounds');
-                setIsMobileMenuOpen(false);
-              }}
-              className="flex items-center space-x-4 p-4 rounded-xl text-lg font-medium text-gray-600 dark:text-gray-400 uppercase tracking-tighter"
-            >
-              <Library className="w-5 h-5" />
-              <span>My Sounds</span>
-            </button>
-
-            {user && (
-              <button
-                onClick={() => {
-                  navigate('/profile');
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex items-center space-x-4 p-4 rounded-xl text-lg font-medium text-[#ff6600] uppercase tracking-tighter border-t border-gray-100 dark:border-white/5 mt-4 pt-8"
-              >
-                <Settings className="w-5 h-5" />
-                <span>Account Settings</span>
-              </button>
-            )}
           </nav>
         </div>
       )}
