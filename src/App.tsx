@@ -87,7 +87,13 @@ const ScrollToTop = () => {
 };
 
 const HomeBBC = ({
-  isPlaying, liveMetadata, currentProgram, queue, onListenClick, onNavigateToProgram, trackHistory
+  isPlaying,
+  liveMetadata,
+  currentProgram,
+  queue,
+  onListenClick,
+  onNavigateToProgram,
+  trackHistory
 }: {
   isPlaying: boolean;
   liveMetadata: LiveMetadata | null;
@@ -114,10 +120,11 @@ const HomeBBC = ({
   return (
     <>
       <section className="bg-white dark:bg-[#121212] text-gray-950 dark:text-white">
-        <div className="max-w-7xl mx-auto px-6 py-10">
-          {/* Player principal */}
-          <div className="grid md:grid-cols-[220px_1fr] gap-10 items-center border-b border-gray-300 dark:border-white/10 pb-10">
-            <div className="relative w-[190px] h-[190px]">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-10">
+          {/* ========== MAIN PLAYER ========== */}
+          <div className="flex flex-col md:grid md:grid-cols-[220px_1fr] gap-8 md:gap-10 items-center border-b border-gray-300 dark:border-white/10 pb-8 md:pb-10">
+            {/* Capa + anel de progresso */}
+            <div className="relative w-[190px] h-[190px] mx-auto md:mx-0 flex-shrink-0">
               <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox={`0 0 ${size} ${size}`}>
                 <circle cx={center} cy={center} r={radius} stroke="currentColor" strokeWidth={strokeWidth} fill="none" className="text-gray-300 dark:text-gray-700" opacity={0.3} />
                 <circle cx={center} cy={center} r={radius} stroke="#f97316" strokeWidth={strokeWidth} fill="none" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={circumference * (1 - progress / 100)} className="transition-all duration-1000 ease-out" />
@@ -128,25 +135,30 @@ const HomeBBC = ({
               <div className="absolute -right-3 bottom-1 w-16 h-16 rounded-full bg-black text-white flex items-center justify-center text-4xl font-black border-4 border-white dark:border-[#121212] shadow-lg">1</div>
             </div>
 
-            <div>
-              <div className="flex items-center gap-2 text-sm mb-2">
+            {/* Informações do programa */}
+            <div className="text-center md:text-left w-full">
+              <div className="flex items-center justify-center md:justify-start gap-2 text-sm mb-2">
                 <span className="font-black text-orange-500">LIVE</span>
                 <span className="text-gray-500">·</span>
                 <span className="text-gray-500">{currentProgram ? formatRangeToAmPm(currentProgram.startTime, currentProgram.endTime) : '24/7'}</span>
               </div>
-              <button onClick={() => currentProgram && onNavigateToProgram(currentProgram)} className="group text-left">
+
+              <button onClick={() => currentProgram && onNavigateToProgram(currentProgram)} className="group text-left w-full md:w-auto">
                 <h1 className="text-3xl md:text-4xl font-black leading-tight">{currentProgram?.title || 'Praise FM Live'}<span className="text-orange-500 ml-2 group-hover:ml-3 transition-all">›</span></h1>
               </button>
-              <p className="mt-2 text-lg text-gray-700 dark:text-gray-300">{currentProgram?.description || 'Global Christian Radio'}</p>
+
+              <p className="mt-2 text-base md:text-lg text-gray-700 dark:text-gray-300">{currentProgram?.description || 'Global Christian Radio'}</p>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{liveMetadata?.artist || 'Streaming 24/7'}</p>
-              <button onClick={onListenClick} className="mt-7 bg-orange-500 hover:bg-orange-600 text-white px-12 py-4 font-black text-lg transition active:scale-95 inline-flex items-center gap-3">
-                {isPlaying ? <Pause size={22} /> : <Play size={22} fill="currentColor" />}{isPlaying ? 'Pause' : 'Play'}
+
+              <button onClick={onListenClick} className="mt-6 bg-orange-500 hover:bg-orange-600 text-white px-10 md:px-12 py-3 md:py-4 font-black text-lg transition active:scale-95 inline-flex items-center justify-center gap-3 mx-auto md:mx-0">
+                {isPlaying ? <Pause size={22} /> : <Play size={22} fill="currentColor" />}
+                {isPlaying ? 'Pause' : 'Play'}
               </button>
             </div>
           </div>
 
-          {/* Up Next */}
-          <div className="grid md:grid-cols-3 gap-4 py-8 border-b border-gray-300 dark:border-white/10">
+          {/* ========== UP NEXT ========== */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-8 border-b border-gray-300 dark:border-white/10">
             {nextOne && (
               <button onClick={() => onNavigateToProgram(nextOne)} className="flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full">
                 <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden">
@@ -159,8 +171,9 @@ const HomeBBC = ({
                 </div>
               </button>
             )}
+
             {nextTwo && (
-              <button onClick={() => onNavigateToProgram(nextTwo)} className="hidden md:flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full">
+              <button onClick={() => onNavigateToProgram(nextTwo)} className="flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full">
                 <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden">
                   <img src={getProgramImage(nextTwo)} alt={nextTwo.title} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = DEFAULT_COVER; }} />
                 </div>
@@ -171,8 +184,9 @@ const HomeBBC = ({
                 </div>
               </button>
             )}
+
             {nextThree && (
-              <button onClick={() => onNavigateToProgram(nextThree)} className="hidden md:flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full">
+              <button onClick={() => onNavigateToProgram(nextThree)} className="flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full">
                 <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden">
                   <img src={getProgramImage(nextThree)} alt={nextThree.title} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = DEFAULT_COVER; }} />
                 </div>
@@ -185,8 +199,8 @@ const HomeBBC = ({
             )}
           </div>
 
-          {/* Botão Advertise discreto */}
-          <div className="flex justify-end mt-2 mb-4">
+          {/* ========== BOTÃO ADVERTISE ========== */}
+          <div className="flex justify-center md:justify-end mt-3 mb-5">
             <button
               onClick={() => navigate('/advertise')}
               className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-orange-500 transition-colors group"
@@ -196,14 +210,15 @@ const HomeBBC = ({
             </button>
           </div>
 
-          {/* Descrição - SOMENTE descrição do programa, SEM liveMetadata.title */}
-          <div className="py-6">
-            <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+          {/* ========== DESCRIÇÃO ========== */}
+          <div className="py-4">
+            <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed text-center md:text-left">
               {currentProgram?.description || 'Listen live to Praise FM — Christian music, worship and devotionals.'}
             </p>
           </div>
         </div>
       </section>
+
       <RecentlyPlayed tracks={trackHistory} />
     </>
   );
@@ -360,7 +375,14 @@ const AppContent: React.FC = () => {
       {!isAppRoute && <Footer />}
 
       {!isAppRoute && currentProgram && (
-        <LivePlayerBar isPlaying={isPlaying} onTogglePlayback={togglePlayback} program={currentProgram} liveMetadata={liveMetadata} queue={queue} audioRef={audioRef} />
+        <LivePlayerBar
+          isPlaying={isPlaying}
+          onTogglePlayback={togglePlayback}
+          program={currentProgram}
+          liveMetadata={liveMetadata}
+          queue={queue}
+          audioRef={audioRef}
+        />
       )}
     </div>
   );
