@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Play, Pause, Volume2, VolumeX, Volume1, List, X, RotateCcw, RotateCw } from 'lucide-react';
 import { Program } from '../types';
 import { supabase } from '../lib/supabase';
@@ -116,6 +116,27 @@ const getListenerInfo = async () => {
   };
 };
 
+// Cálculo do progresso do programa (idêntico ao do App)
+const getChicagoDayAndTotalMinutes = () => {
+  const now = new Date();
+  const chicagoDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+  return {
+    day: chicagoDate.getDay(),
+    total: chicagoDate.getHours() * 60 + chicagoDate.getMinutes()
+  };
+};
+
+const getProgramProgress = (program: Program): number => {
+  const { total } = getChicagoDayAndTotalMinutes();
+  const [sH, sM] = program.startTime.split(':').map(Number);
+  const [eH, eM] = program.endTime.split(':').map(Number);
+  const start = sH * 60 + sM;
+  const end = (eH === 0 ? 24 : eH) * 60 + eM;
+  if (total <= start) return 0;
+  if (total >= end) return 100;
+  return Math.round(((total - start) / (end - start)) * 100);
+};
+
 const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayback, program, liveMetadata, queue = [], audioRef }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
@@ -133,6 +154,9 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
   const startTimeRef = useRef<number>(0);
   const durationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Progresso real do programa (atualiza a cada minuto)
+  const progress = useMemo(() => getProgramProgress(program), [program]);
+
   // Registrar quando começar a ouvir
   const trackListeningStart = async () => {
     const listenerId = getListenerId();
@@ -141,15 +165,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
     startTimeRef.current = Date.now();
 
     const listenerInfo = await getListenerInfo();
-
-    console.log('🔍 DEBUG - Program ', {
-      title: program.title,
-      id: program.id,
-      host: program.host,
-      fullProgram: program
-    });
-
-    console.log('🌍 DEBUG - Listener info:', listenerInfo);
 
     try {
       const dataToInsert = {
@@ -166,28 +181,22 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
         referrer: listenerInfo.referrer
       };
 
-      console.log('📤 Sending to Supabase:', dataToInsert);
-
       const { error } = await supabase
         .from('listeners')
         .insert(dataToInsert);
 
       if (error) {
-        console.error('❌ Error registering listener:', error);
-      } else {
-        console.log('✅ Listener registered successfully!', dataToInsert);
+        console.error('Error registering listener:', error);
       }
     } catch (err) {
-      console.error('❌ Error connecting to Supabase:', err);
+      console.error('Error connecting to Supabase:', err);
     }
   };
 
   // Atualizar duração periodicamente
   const updateDuration = async () => {
     if (!sessionIdRef.current) return;
-
     const durationSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000);
-
     try {
       await supabase
         .from('listeners')
@@ -201,10 +210,8 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
   // Marcar como completado
   const markAsCompleted = async () => {
     if (!sessionIdRef.current) return;
-
     try {
       const durationSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000);
-      
       await supabase
         .from('listeners')
         .update({ 
@@ -212,8 +219,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
           duration_seconds: durationSeconds
         })
         .eq('session_id', sessionIdRef.current);
-
-      console.log('✅ Session marked as complete');
     } catch (err) {
       console.error('Error marking as completed:', err);
     }
@@ -226,19 +231,15 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
       durationIntervalRef.current = setInterval(updateDuration, 10000);
     } else if (!isPlaying && sessionIdRef.current) {
       updateDuration();
-      
       if (durationIntervalRef.current) {
         clearInterval(durationIntervalRef.current);
       }
-
       const listenedMinutes = (Date.now() - startTimeRef.current) / 60000;
       if (listenedMinutes >= 5) {
         markAsCompleted();
       }
-
       sessionIdRef.current = null;
     }
-
     return () => {
       if (durationIntervalRef.current) {
         clearInterval(durationIntervalRef.current);
@@ -434,8 +435,9 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
           className={`fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 md:hidden transition-all duration-300 ${isExpanded ? 'h-auto' : 'h-[72px]'}`}
         >
           {!isExpanded ? (
+            /* Compact player */
             <div 
-              className="flex items-center justify-between px-4 py-3 h-[72px]"
+              className="flex items-center justify-between px-4 py-3 h-[72px] relative"
               onClick={() => {
                 setIsExpanded(true);
                 setShowSchedule(true);
@@ -475,8 +477,17 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                   <List className="w-5 h-5" />
                 </button>
               </div>
+
+              {/* Barra de progresso real (fina) no modo compacto */}
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200 dark:bg-white/10">
+                <div 
+                  className="h-full bg-orange-500 transition-all duration-1000 ease-out" 
+                  style={{ width: `${progress}%` }} 
+                />
+              </div>
             </div>
           ) : (
+            /* Expanded player */
             <div className="flex flex-col">
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
                 <span className="text-sm font-semibold text-black dark:text-white">Schedule</span>
@@ -508,16 +519,17 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                 </div>
               </div>
 
-              {/* REALISTIC LIVE INDICATOR - LARANJA */}
+              {/* BARRA DE PROGRESSO REAL (expandido) */}
               <div className="px-4 py-3">
-                <div className="w-full h-1 bg-gray-200 dark:bg-white/10 rounded-full relative overflow-hidden">
+                <div className="w-full h-2 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
                   <div 
-                    className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)] animate-live-pulse"
-                    style={{ 
-                      left: `${((Date.now() / 500) % 100)}%`,
-                      transition: 'left 0.5s linear'
-                    }}
+                    className="h-full bg-orange-500 rounded-full transition-all duration-1000 ease-out" 
+                    style={{ width: `${progress}%` }} 
                   />
+                </div>
+                <div className="flex justify-between mt-1">
+                  <span className="text-[10px] text-gray-400">{formatTimeToAmPm(program.startTime)}</span>
+                  <span className="text-[10px] text-gray-400">{formatTimeToAmPm(program.endTime)}</span>
                 </div>
               </div>
 
@@ -587,14 +599,11 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
       {/* DESKTOP PLAYER BAR */}
       {isPlaying && (
         <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 hidden md:flex flex-col transition-colors duration-300">
-          {/* REALISTIC LIVE INDICATOR - LARANJA */}
-          <div className="w-full h-1.5 bg-gray-100 dark:bg-white/5 relative overflow-hidden">
+          {/* BARRA DE PROGRESSO REAL (substitui o ponto pulsante) */}
+          <div className="w-full h-1.5 bg-gray-200 dark:bg-white/10">
             <div 
-              className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.9)] animate-live-pulse"
-              style={{ 
-                left: `${((Date.now() / 400) % 100)}%`,
-                transition: 'left 0.4s linear'
-              }}
+              className="h-full bg-orange-500 transition-all duration-1000 ease-out" 
+              style={{ width: `${progress}%` }} 
             />
           </div>
 
@@ -637,7 +646,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({ isPlaying, onTogglePlayba
                 <span className="absolute text-[9px] font-bold mt-[2px]">30</span>
               </button>
 
-              {/* Listeners Counter Desktop - ao lado do botão play */}
               <div className="ml-2">
               </div>
             </div>
