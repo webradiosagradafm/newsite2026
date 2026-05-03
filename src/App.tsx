@@ -248,11 +248,15 @@ const HomeBBC = ({
             </div>
           </div>
 
-          {/* UP NEXT & LATER */}
-          <div className="grid md:grid-cols-2 gap-10 border-b border-gray-300 dark:border-white/10 py-8">
+          {/* UP NEXT & LATER - Estilo BBC Sounds */}
+          <div className="grid md:grid-cols-2 gap-6 py-6">
+            {/* UP NEXT */}
             {nextOne && (
-              <button onClick={() => onNavigateToProgram(nextOne)} className="flex gap-4 text-left group">
-                <div className="relative w-24 h-24 flex-shrink-0">
+              <button 
+                onClick={() => onNavigateToProgram(nextOne)} 
+                className="flex gap-4 text-left group items-center"
+              >
+                <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden">
                   <img
                     src={getProgramImage(nextOne)}
                     alt={nextOne.title}
@@ -262,24 +266,27 @@ const HomeBBC = ({
                     }}
                   />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2 text-xs mb-1">
-                    <span className="font-black text-orange-500 uppercase">Up Next</span>
-                    <span className="text-gray-400">
-                      {formatRangeToAmPm(nextOne.startTime, nextOne.endTime)}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold group-hover:underline">{nextOne.title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {(nextOne as any).description || 'Christian music and inspiration.'}
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-orange-500 uppercase tracking-wide mb-0.5">
+                    Up next
+                  </p>
+                  <h3 className="text-base font-bold leading-tight group-hover:underline truncate">
+                    {nextOne.title}
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {formatRangeToAmPm(nextOne.startTime, nextOne.endTime)}
                   </p>
                 </div>
               </button>
             )}
 
+            {/* LATER */}
             {nextTwo && (
-              <button onClick={() => onNavigateToProgram(nextTwo)} className="hidden md:flex gap-4 text-left group">
-                <div className="relative w-24 h-24 flex-shrink-0">
+              <button 
+                onClick={() => onNavigateToProgram(nextTwo)} 
+                className="hidden md:flex gap-4 text-left group items-center"
+              >
+                <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden">
                   <img
                     src={getProgramImage(nextTwo)}
                     alt={nextTwo.title}
@@ -289,12 +296,14 @@ const HomeBBC = ({
                     }}
                   />
                 </div>
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
                     {formatRangeToAmPm(nextTwo.startTime, nextTwo.endTime)}
                   </p>
-                  <h3 className="text-lg font-bold group-hover:underline">{nextTwo.title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <h3 className="text-base font-bold leading-tight group-hover:underline truncate">
+                    {nextTwo.title}
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
                     {(nextTwo as any).description || 'More from Praise FM.'}
                   </p>
                 </div>
@@ -303,7 +312,7 @@ const HomeBBC = ({
           </div>
 
           {/* Description */}
-          <div className="py-6">
+          <div className="border-t border-gray-300 dark:border-white/10 pt-6">
             <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
               {liveMetadata?.title 
                 ? `${liveMetadata.artist} - ${liveMetadata.title}` 
