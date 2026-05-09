@@ -1,36 +1,44 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Play, Pause, Megaphone } from 'lucide-react';
+import React, { useState, useRef, useEffect, useMemo } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import RecentlyPlayed from './components/RecentlyPlayed';
-import LivePlayerBar from './components/LivePlayerBar';
-import ProgramDetail from './components/ProgramDetail';
-import Playlist from './components/Playlist';
-import ScheduleList from './components/ScheduleList';
-import SEO from './components/SEO';
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 
-import DevotionalPage from './pages/DevotionalPage';
-import FeaturedArtistsPage from './pages/FeaturedArtistsPage';
-import PresentersPage from './pages/PresentersPage';
-import NewReleasesPage from './pages/NewReleasesPage';
-import LiveRecordingsPage from './pages/LiveRecordingsPage';
-import HelpCenterPage from './pages/HelpCenterPage';
-import FeedbackPage from './pages/FeedbackPage';
-import EventsPage from './pages/EventsPage';
-import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
-import TermsOfUsePage from './pages/TermsOfUsePage';
-import CookiesPolicyPage from './pages/CookiesPolicyPage';
-import AppHomePage from './pages/AppHomePage';
-import AdvertisePage from './pages/AdvertisePage';
+import Navbar from './components/Navbar'
+import Hero from './components/Hero'
+import Footer from './components/Footer'
+import RecentlyPlayed from './components/RecentlyPlayed'
+import LivePlayerBar from './components/LivePlayerBar'
+import ProgramDetail from './components/ProgramDetail'
+import Playlist from './components/Playlist'
+import ScheduleList from './components/ScheduleList'
 
-import { SCHEDULES } from './constants';
-import { Program } from './types';
+import DevotionalPage from './pages/DevotionalPage'
+import LoginPage from './pages/LoginPage'
+import SignUpPage from './pages/SignUpPage'
+import MySoundsPage from './pages/MySoundsPage'
+import ProfilePage from './pages/ProfilePage'
+import FeaturedArtistsPage from './pages/FeaturedArtistsPage'
+import PresentersPage from './pages/PresentersPage'
+import NewReleasesPage from './pages/NewReleasesPage'
+import LiveRecordingsPage from './pages/LiveRecordingsPage'
+import HelpCenterPage from './pages/HelpCenterPage'
+import FeedbackPage from './pages/FeedbackPage'
+import EventsPage from './pages/EventsPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
+import TermsOfUsePage from './pages/TermsOfUsePage'
+import CookiesPolicyPage from './pages/CookiesPolicyPage'
 
-const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv';
-const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv';
-const DEFAULT_COVER = '/icon-512.png';
+import ProgramsPage from './pages/ProgramsPage'
+import ChristianRadioPage from './pages/ChristianRadioPage'
+import GospelRadioPage from './pages/GospelRadioPage'
+import WorshipRadioPage from './pages/WorshipRadioPage'
+
+import { SCHEDULES } from './constants'
+import { Program } from './types'
+
+const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv'
+const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv'
 
 const BLOCKED_METADATA_KEYWORDS = [
   'praise fm', 'praisefm', 'commercial', 'spot', 'promo', 'ident', 'sweeper',
@@ -427,9 +435,12 @@ const AppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <AppContent />
-    </BrowserRouter>
-  );
+    <AuthProvider>
+      <BrowserRouter>
+        <ScrollToTop />
+        <AppContent />
+        <SpeedInsights />
+      </BrowserRouter>
+    </AuthProvider>
+  )
 }
