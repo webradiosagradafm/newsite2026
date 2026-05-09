@@ -1,60 +1,55 @@
-import { useEffect } from "react";
+import { Helmet } from 'react-helmet'
 
 interface SEOProps {
-  title: string;
-  description: string;
-  image?: string;
-  url?: string;
+  title: string
+  description: string
+  url?: string
 }
 
-const DEFAULT_IMAGE =
-  "https://praisefmusa.com/discover-cover.jpg";
+export default function SEO({
+  title,
+  description,
+  url
+}: SEOProps) {
+  return (
+    <Helmet>
 
-const DEFAULT_URL = "https://praisefmradio.com";
+      <title>{title}</title>
 
-const SEO: React.FC<SEOProps> = ({ title, description, image, url }) => {
-  useEffect(() => {
-    document.title = title;
+      <meta
+        name="description"
+        content={description}
+      />
 
-    const setMeta = (key: string, content: string, isProperty = false) => {
-      let meta = document.querySelector(
-        isProperty
-          ? `meta[property="${key}"]`
-          : `meta[name="${key}"]`
-      );
+      <meta
+        property="og:title"
+        content={title}
+      />
 
-      if (!meta) {
-        meta = document.createElement("meta");
-        meta.setAttribute(isProperty ? "property" : "name", key);
-        document.head.appendChild(meta);
-      }
+      <meta
+        property="og:description"
+        content={description}
+      />
 
-      meta.setAttribute("content", content);
-    };
+      <meta
+        property="og:type"
+        content="website"
+      />
 
-    const finalImage = image || DEFAULT_IMAGE;
-    const finalUrl = url || DEFAULT_URL;
+      {url && (
+        <meta
+          property="og:url"
+          content={url}
+        />
+      )}
 
-    // ✅ Básico
-    setMeta("description", description);
+      {url && (
+        <link
+          rel="canonical"
+          href={url}
+        />
+      )}
 
-    // ✅ Open Graph (WhatsApp, Facebook)
-    setMeta("og:title", title, true);
-    setMeta("og:description", description, true);
-    setMeta("og:image", finalImage, true);
-    setMeta("og:url", finalUrl, true);
-    setMeta("og:type", "website", true);
-    setMeta("og:site_name", "Praise FM USA", true);
-
-    // ✅ Twitter
-    setMeta("twitter:card", "summary_large_image");
-    setMeta("twitter:title", title);
-    setMeta("twitter:description", description);
-    setMeta("twitter:image", finalImage);
-
-  }, [title, description, image, url]);
-
-  return null;
-};
-
-export default SEO;
+    </Helmet>
+  )
+}
