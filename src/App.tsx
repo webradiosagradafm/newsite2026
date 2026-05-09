@@ -7,70 +7,36 @@ import {
   useLocation,
   useNavigate
 } from 'react-router-dom'
-
-import {
-  Play,
-  Pause,
-  Megaphone
-} from 'lucide-react'
-
+import { Play, Pause, Megaphone } from 'lucide-react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 
-import { AuthProvider, useAuth } from './contexts/AuthContext'
-
 import Navbar from './components/Navbar'
-import Hero from './components/Hero'
 import Footer from './components/Footer'
 import RecentlyPlayed from './components/RecentlyPlayed'
 import LivePlayerBar from './components/LivePlayerBar'
 import ProgramDetail from './components/ProgramDetail'
 import Playlist from './components/Playlist'
 import ScheduleList from './components/ScheduleList'
-
 import SEO from './components/SEO'
 
 import DevotionalPage from './pages/DevotionalPage'
-
+import EventsPage from './pages/EventsPage'
+import NewReleasesPage from './pages/NewReleasesPage'
 import FeaturedArtistsPage from './pages/FeaturedArtistsPage'
 import PresentersPage from './pages/PresentersPage'
-import NewReleasesPage from './pages/NewReleasesPage'
 import LiveRecordingsPage from './pages/LiveRecordingsPage'
 import HelpCenterPage from './pages/HelpCenterPage'
 import FeedbackPage from './pages/FeedbackPage'
-import EventsPage from './pages/EventsPage'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 import TermsOfUsePage from './pages/TermsOfUsePage'
 import CookiesPolicyPage from './pages/CookiesPolicyPage'
-import ProgramsPage from './pages/ProgramsPage'
-import AdvertisePage from './pages/AdvertisePage'
-import AppHomePage from './pages/AppHomePage'
+
 import { SCHEDULES } from './constants'
 import { Program } from './types'
 
 const DEFAULT_COVER = '/logo.png'
-
-const STREAM_URL =
-  'https://stream.zeno.fm/hvwifp8ezc6tv'
-
-const METADATA_URL =
-  'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv'
-
-const BLOCKED_METADATA_KEYWORDS = [
-  'praise fm',
-  'praisefm',
-  'commercial',
-  'spot',
-  'promo',
-  'ident',
-  'sweeper',
-  'intro',
-  'program',
-  'announcement',
-  'station id',
-  'jingle',
-  'bumper',
-  'midday grace'
-]
+const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv'
+const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv'
 
 interface LiveMetadata {
   artist: string
@@ -82,94 +48,35 @@ interface LiveMetadata {
 const formatToAmPm = (time?: string) => {
   if (!time) return ''
 
-  const [hourRaw, minuteRaw] =
-    time.split(':').map(Number)
-
-  const hour =
-    hourRaw === 0
-      ? 12
-      : hourRaw > 12
-      ? hourRaw - 12
-      : hourRaw
-
-  const minute = String(minuteRaw || 0).padStart(
-    2,
-    '0'
-  )
-
+  const [hourRaw, minuteRaw] = time.split(':').map(Number)
+  const hour = hourRaw === 0 ? 12 : hourRaw > 12 ? hourRaw - 12 : hourRaw
+  const minute = String(minuteRaw || 0).padStart(2, '0')
   const period = hourRaw >= 12 ? 'PM' : 'AM'
 
   return `${hour}:${minute} ${period}`
 }
 
-const formatRangeToAmPm = (
-  start?: string,
-  end?: string
-) => {
+const formatRangeToAmPm = (start?: string, end?: string) => {
   if (!start || !end) return '24/7'
-
-  return `${formatToAmPm(
-    start
-  )} - ${formatToAmPm(end)}`
+  return `${formatToAmPm(start)} - ${formatToAmPm(end)}`
 }
 
 const getChicagoDayAndTotalMinutes = () => {
   const now = new Date()
-
   const chicagoDate = new Date(
-    now.toLocaleString('en-US', {
-      timeZone: 'America/Chicago'
-    })
+    now.toLocaleString('en-US', { timeZone: 'America/Chicago' })
   )
 
   return {
     day: chicagoDate.getDay(),
-    total:
-      chicagoDate.getHours() * 60 +
-      chicagoDate.getMinutes()
+    total: chicagoDate.getHours() * 60 + chicagoDate.getMinutes()
   }
 }
 
-const getProgramProgress = (
-  program?: Program
-) => {
-  if (!program) return 0
-
-  const { total } =
-    getChicagoDayAndTotalMinutes()
-
-  const [sH, sM] = program.startTime
-    .split(':')
-    .map(Number)
-
-  const [eH, eM] = program.endTime
-    .split(':')
-    .map(Number)
-
-  const start = sH * 60 + sM
-  const end =
-    (eH === 0 ? 24 : eH) * 60 + eM
-
-  if (total <= start) return 0
-  if (total >= end) return 100
-
-  return Math.round(
-    ((total - start) / (end - start)) * 100
-  )
-}
-
-const getProgramImage = (
-  program?: Program
-) => {
+const getProgramImage = (program?: Program) => {
   const p = program as any
 
-  return (
-    p?.image ||
-    p?.cover ||
-    p?.presenterImage ||
-    p?.presenter?.image ||
-    DEFAULT_COVER
-  )
+  return p?.image || p?.cover || p?.presenterImage || p?.presenter?.image || DEFAULT_COVER
 }
 
 const ScrollToTop = () => {
@@ -190,183 +97,98 @@ const HomeBBC = ({
   onListenClick,
   onNavigateToProgram,
   trackHistory
-}: any) => {
-  const nextOne = queue?.[0]
-  const nextTwo = queue?.[1]
-  const nextThree = queue?.[2]
-
-  const presenterImage =
-    getProgramImage(currentProgram)
-
-  const progress =
-    getProgramProgress(currentProgram)
-
+}: {
+  isPlaying: boolean
+  liveMetadata: LiveMetadata | null
+  currentProgram?: Program
+  queue: Program[]
+  onListenClick: () => void
+  onNavigateToProgram: (program: Program) => void
+  trackHistory: LiveMetadata[]
+}) => {
   const navigate = useNavigate()
 
   return (
     <>
       <section className="bg-white dark:bg-[#121212] text-gray-950 dark:text-white">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
+          <div className="grid md:grid-cols-[240px_1fr] gap-10 items-center">
+            <img
+              src={getProgramImage(currentProgram)}
+              alt="Praise FM"
+              className="w-[220px] h-[220px] object-cover rounded-full shadow-2xl"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_COVER
+              }}
+            />
 
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-10">
-
-          <div className="flex flex-col md:grid md:grid-cols-[220px_1fr] gap-8 md:gap-10 items-center border-b border-gray-300 dark:border-white/10 pb-8 md:pb-10">
-
-            <div className="relative w-[190px] h-[190px] mx-auto md:mx-0 flex-shrink-0">
-
-              <div className="absolute inset-[14px] rounded-full overflow-hidden bg-gray-200 shadow-lg">
-                <img
-                  src={presenterImage}
-                  alt={
-                    currentProgram?.title ||
-                    'Praise FM'
-                  }
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src =
-                      DEFAULT_COVER
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="text-center md:text-left w-full">
-
-              <div className="flex items-center justify-center md:justify-start gap-2 text-sm mb-2">
-
-                <span className="font-black text-orange-500">
-                  LIVE
-                </span>
-
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-orange-500 font-black">LIVE</span>
+                <span className="text-gray-500">•</span>
                 <span className="text-gray-500">
-                  ·
-                </span>
-
-                <span className="text-gray-500">
-                  {currentProgram
-                    ? formatRangeToAmPm(
-                        currentProgram.startTime,
-                        currentProgram.endTime
-                      )
-                    : '24/7'}
+                  {formatRangeToAmPm(currentProgram?.startTime, currentProgram?.endTime)}
                 </span>
               </div>
 
-              <button
-                onClick={() =>
-                  currentProgram &&
-                  onNavigateToProgram(
-                    currentProgram
-                  )
-                }
-                className="group text-center md:text-left w-full md:w-auto"
-              >
-                <h1 className="text-3xl md:text-4xl font-black leading-tight">
+              <h1 className="text-4xl md:text-5xl font-black leading-tight">
+                {currentProgram?.title || 'Praise FM USA'}
+              </h1>
 
-                  {currentProgram?.title ||
-                    'Praise FM Live'}
-
-                </h1>
-              </button>
-
-              <p className="mt-2 text-base md:text-lg text-gray-700 dark:text-gray-300">
-
-                {currentProgram?.description ||
-                  'Global Christian Radio'}
-
+              <p className="mt-3 text-lg text-gray-700 dark:text-gray-300">
+                {currentProgram?.description || 'Global Christian Radio'}
               </p>
 
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-
-                {liveMetadata?.artist ||
-                  'Streaming 24/7'}
-
+              <p className="mt-2 text-sm text-gray-500">
+                {liveMetadata?.artist || 'Streaming 24/7'}
               </p>
 
               <button
                 onClick={onListenClick}
-                className="mt-6 bg-orange-500 hover:bg-orange-600 text-white px-10 md:px-12 py-3 md:py-4 font-black text-lg transition active:scale-95 inline-flex items-center justify-center gap-3 mx-auto md:mx-0"
+                className="mt-8 bg-orange-500 hover:bg-orange-600 transition px-10 py-4 text-white font-black flex items-center gap-3 rounded-xl"
               >
-                {isPlaying ? (
-                  <Pause size={22} />
-                ) : (
-                  <Play
-                    size={22}
-                    fill="currentColor"
-                  />
-                )}
-
-                {isPlaying
-                  ? 'Pause'
-                  : 'Play'}
+                {isPlaying ? <Pause size={22} /> : <Play size={22} fill="currentColor" />}
+                {isPlaying ? 'Pause' : 'Play'}
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-8 border-b border-gray-300 dark:border-white/10">
+          <div className="grid md:grid-cols-3 gap-5 mt-12">
+            {queue?.slice(0, 3).map((program: Program) => (
+              <button
+                key={program.title}
+                onClick={() => onNavigateToProgram(program)}
+                className="bg-gray-100 dark:bg-[#1b1b1b] hover:bg-gray-200 dark:hover:bg-[#262626] transition rounded-2xl overflow-hidden text-left"
+              >
+                <img
+                  src={getProgramImage(program)}
+                  alt={program.title}
+                  className="w-full h-52 object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = DEFAULT_COVER
+                  }}
+                />
 
-            {[nextOne, nextTwo, nextThree]
-              .filter(Boolean)
-              .map((program: Program) => (
-                <button
-                  key={program.title}
-                  onClick={() =>
-                    onNavigateToProgram(program)
-                  }
-                  className="flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full"
-                >
+                <div className="p-5">
+                  <p className="text-xs uppercase tracking-wider text-orange-500 font-black">
+                    {formatRangeToAmPm(program.startTime, program.endTime)}
+                  </p>
 
-                  <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden">
+                  <h3 className="text-xl font-black mt-2">{program.title}</h3>
 
-                    <img
-                      src={getProgramImage(
-                        program
-                      )}
-                      alt={program.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  <div className="min-w-0">
-
-                    <p className="text-[11px] font-black text-orange-500 uppercase tracking-wide mb-0.5">
-
-                      {formatRangeToAmPm(
-                        program.startTime,
-                        program.endTime
-                      )}
-
-                    </p>
-
-                    <h3 className="text-sm font-bold leading-tight group-hover:text-orange-500 transition-colors truncate">
-
-                      {program.title}
-
-                    </h3>
-
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-
-                      {program.host}
-
-                    </p>
-                  </div>
-                </button>
-              ))}
+                  <p className="text-sm text-gray-500 mt-1">{program.host}</p>
+                </div>
+              </button>
+            ))}
           </div>
 
-          <div className="flex justify-center md:justify-end mt-3 mb-5">
-
+          <div className="flex justify-end mt-8">
             <button
-              onClick={() =>
-                navigate('/advertise')
-              }
-              className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-orange-500 transition-colors group"
+              onClick={() => navigate('/advertise')}
+              className="flex items-center gap-2 text-sm text-gray-500 hover:text-orange-500"
             >
-
-              <Megaphone className="w-3.5 h-3.5 group-hover:text-orange-500" />
-
-              <span className="font-medium uppercase tracking-wider">
-                Advertise with us
-              </span>
+              <Megaphone size={16} />
+              Advertise with us
             </button>
           </div>
         </div>
@@ -377,42 +199,213 @@ const HomeBBC = ({
   )
 }
 
-const AppContent: React.FC = () => {
-  return (
-    <div className="min-h-screen bg-white dark:bg-[#121212] text-black dark:text-white">
+const AppContent = () => {
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [liveMetadata, setLiveMetadata] = useState<LiveMetadata | null>(null)
+  const [trackHistory, setTrackHistory] = useState<LiveMetadata[]>([])
+  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
 
+  const [theme, setTheme] = useState<'light' | 'dark'>(
+    () => (localStorage.getItem('praise-theme') as 'light' | 'dark') || 'light'
+  )
+
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const { day, total } = getChicagoDayAndTotalMinutes()
+
+  const { currentProgram, queue } = useMemo(() => {
+    const schedule = SCHEDULES[day] || SCHEDULES[1]
+
+    const index = schedule.findIndex((p: Program) => {
+      const [sH, sM] = p.startTime.split(':').map(Number)
+      const [eH, eM] = p.endTime.split(':').map(Number)
+
+      const start = sH * 60 + sM
+      const end = (eH === 0 ? 24 : eH) * 60 + eM
+
+      return total >= start && total < end
+    })
+
+    const currentIndex = index !== -1 ? index : 0
+    const nextPrograms: Program[] = []
+
+    for (let i = 1; i <= 4; i++) {
+      nextPrograms.push(schedule[(currentIndex + i) % schedule.length])
+    }
+
+    return {
+      currentProgram: schedule[currentIndex],
+      queue: nextPrograms
+    }
+  }, [day, total])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+    localStorage.setItem('praise-theme', theme)
+  }, [theme])
+
+  useEffect(() => {
+    const audio = new Audio(STREAM_URL)
+    audio.preload = 'none'
+    audio.volume = Number(localStorage.getItem('praise-volume') || '0.8')
+
+    audioRef.current = audio
+
+    return () => {
+      audio.pause()
+      audio.src = ''
+      audioRef.current = null
+    }
+  }, [])
+
+  const togglePlayback = () => {
+    if (!audioRef.current) return
+
+    if (isPlaying) {
+      audioRef.current.pause()
+      setIsPlaying(false)
+      return
+    }
+
+    audioRef.current
+      .play()
+      .then(() => setIsPlaying(true))
+      .catch(() => setIsPlaying(false))
+  }
+
+  useEffect(() => {
+    const es = new EventSource(METADATA_URL)
+
+    es.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        const streamTitle = data.streamTitle || ''
+
+        if (!streamTitle.includes(' - ')) return
+
+        const [artistRaw, ...rest] = streamTitle.split(' - ')
+        const artist = artistRaw.trim()
+        const title = rest.join(' - ').trim()
+
+        if (!artist || !title) return
+
+        const meta: LiveMetadata = {
+          artist,
+          title,
+          playedAt: new Date(),
+          isMusic: true
+        }
+
+        setLiveMetadata(meta)
+        setTrackHistory((prev) => [meta, ...prev].slice(0, 10))
+      } catch {}
+    }
+
+    return () => {
+      es.close()
+    }
+  }, [])
+
+  return (
+    <div className="min-h-screen bg-white dark:bg-[#121212] text-black dark:text-white pb-[120px]">
       <SEO
         title="Praise FM USA"
         description="24/7 Worship & Gospel Radio"
         url={window.location.href}
       />
 
-      <Routes>
+      <Navbar
+        activeTab={location.pathname === '/' ? 'home' : location.pathname.replace('/', '')}
+        theme={theme}
+        onToggleTheme={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
+      />
 
-        <Route
-          path="/"
-          element={<div />}
+      <main>
+        {selectedProgram ? (
+          <ProgramDetail
+            program={selectedProgram}
+            onBack={() => setSelectedProgram(null)}
+            onViewSchedule={() => {
+              setSelectedProgram(null)
+              navigate('/schedule')
+            }}
+            onListenClick={togglePlayback}
+            isPlaying={isPlaying}
+          />
+        ) : (
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <HomeBBC
+                  isPlaying={isPlaying}
+                  liveMetadata={liveMetadata}
+                  currentProgram={currentProgram}
+                  queue={queue}
+                  onListenClick={togglePlayback}
+                  onNavigateToProgram={setSelectedProgram}
+                  trackHistory={trackHistory}
+                />
+              }
+            />
+
+            <Route path="/music" element={<Playlist />} />
+
+            <Route
+              path="/schedule"
+              element={
+                <ScheduleList
+                  onNavigateToProgram={setSelectedProgram}
+                  onBack={() => navigate('/')}
+                />
+              }
+            />
+
+            <Route path="/devotional" element={<DevotionalPage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/new-releases" element={<NewReleasesPage />} />
+            <Route path="/artists" element={<FeaturedArtistsPage />} />
+            <Route
+              path="/presenters"
+              element={<PresentersPage onNavigateToProgram={setSelectedProgram} />}
+            />
+            <Route path="/live-recordings" element={<LiveRecordingsPage />} />
+            <Route path="/help" element={<HelpCenterPage />} />
+            <Route path="/feedback" element={<FeedbackPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsOfUsePage />} />
+            <Route path="/cookies" element={<CookiesPolicyPage />} />
+            <Route path="/advertise" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        )}
+      </main>
+
+      <Footer />
+
+      {currentProgram && (
+        <LivePlayerBar
+          isPlaying={isPlaying}
+          onTogglePlayback={togglePlayback}
+          program={currentProgram}
+          liveMetadata={liveMetadata}
+          queue={queue}
+          audioRef={audioRef}
         />
-
-      </Routes>
+      )}
     </div>
   )
 }
 
 export default function App() {
   return (
-    <AuthProvider>
-
-      <BrowserRouter>
-
-        <ScrollToTop />
-
-        <AppContent />
-
-        <SpeedInsights />
-
-      </BrowserRouter>
-
-    </AuthProvider>
+    <BrowserRouter>
+      <ScrollToTop />
+      <AppContent />
+      <SpeedInsights />
+    </BrowserRouter>
   )
 }
