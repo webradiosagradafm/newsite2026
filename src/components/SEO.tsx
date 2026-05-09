@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet'
+import { useEffect } from 'react'
 
 interface SEOProps {
   title: string
@@ -11,45 +11,60 @@ export default function SEO({
   description,
   url
 }: SEOProps) {
-  return (
-    <Helmet>
+  useEffect(() => {
+    document.title = title
 
-      <title>{title}</title>
+    let descriptionTag = document.querySelector(
+      'meta[name="description"]'
+    )
 
-      <meta
-        name="description"
-        content={description}
-      />
+    if (!descriptionTag) {
+      descriptionTag = document.createElement('meta')
+      descriptionTag.setAttribute('name', 'description')
+      document.head.appendChild(descriptionTag)
+    }
 
-      <meta
-        property="og:title"
-        content={title}
-      />
+    descriptionTag.setAttribute('content', description)
 
-      <meta
-        property="og:description"
-        content={description}
-      />
+    let canonicalTag = document.querySelector(
+      'link[rel="canonical"]'
+    )
 
-      <meta
-        property="og:type"
-        content="website"
-      />
+    if (url) {
+      if (!canonicalTag) {
+        canonicalTag = document.createElement('link')
+        canonicalTag.setAttribute('rel', 'canonical')
+        document.head.appendChild(canonicalTag)
+      }
 
-      {url && (
-        <meta
-          property="og:url"
-          content={url}
-        />
-      )}
+      canonicalTag.setAttribute('href', url)
+    }
 
-      {url && (
-        <link
-          rel="canonical"
-          href={url}
-        />
-      )}
+    const setMeta = (
+      property: string,
+      content: string
+    ) => {
+      let tag = document.querySelector(
+        `meta[property="${property}"]`
+      )
 
-    </Helmet>
-  )
+      if (!tag) {
+        tag = document.createElement('meta')
+        tag.setAttribute('property', property)
+        document.head.appendChild(tag)
+      }
+
+      tag.setAttribute('content', content)
+    }
+
+    setMeta('og:title', title)
+    setMeta('og:description', description)
+    setMeta('og:type', 'website')
+
+    if (url) {
+      setMeta('og:url', url)
+    }
+  }, [title, description, url])
+
+  return null
 }
