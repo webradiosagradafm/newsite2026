@@ -1,11 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/shows/:path*",
-      "destination": "/shows/:path*"
-    },
-    {
-      "source": "/(.*)",
+      "source": "/((?!shows/.*|assets/.*|.*\\..*).*)",
       "destination": "/index.html"
     }
   ]
