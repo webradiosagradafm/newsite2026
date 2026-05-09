@@ -34,7 +34,7 @@ const DEFAULT_COVER = '/icon-512.png';
 
 const BLOCKED_METADATA_KEYWORDS = [
   'praise fm', 'praisefm', 'commercial', 'spot', 'promo', 'ident', 'sweeper',
-  'intro', 'program', 'announcement', 'station id', 'jingle', 'bumper'
+  'intro', 'program', 'announcement', 'station id', 'jingle', 'bumper', 'midday grace',
 ];
 
 interface LiveMetadata {
