@@ -7,18 +7,18 @@ export const COLORS = {
 };
 
 const IMAGES = {
-  DANIEL_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776767866/DANIEL_BROOKS_phqo8w.webp',
-  RACHEL_HARRIS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/RACHEL_HARRIS_rd59sb.webp',
-  MICHAEL_RAY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/MICHAEL_RAY_yv1ehj.webp',
-  STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/STANCY_CAMPBELL_xjkigb.webp',
-  MAT_RILEY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/MATT_RILEY_hvzcam.webp',
-  LIVING_THE_MESSAGE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776755226/LIVING_THE_MESSAGE_vb6hkk.webp',
-  JAKE_HUNTER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/JAKE_HUNTER_pyb2ji.webp',
-  AVA_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/AVA_BROOKS_yysmgc.webp',
-  SCOTT_TURNER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/SCOTT_TURNER_wy3hrd.webp',
-  DJ_ZION: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/DJ_ZION_hyjxbd.webp',
-  SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/SARAH_JORDAN_oehx8m.webp',
-  WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776755226/WORSHIP_z2fam3.webp',
+  DANIEL_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/daniel-brooks_yur5dq.webp',
+  RACHEL_HARRIS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/rachael-harris_aj4rsh.webp',
+  MICHAEL_RAY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/michael-ray_bs3c8x.webp',
+  STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/stancy-campbell_vddy5r.webp',
+  MAT_RILEY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/matt-riley_ucbrjg.webp',
+  LIVING_THE_MESSAGE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/living-the-message_aelv9d.webp',
+  JAKE_HUNTER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/jake-hunter_q6ligi.webp',
+  AVA_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/ava-brooks_tcobxo.webp',
+  SCOTT_TURNER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/scott-turner_wumkut.webp',
+  DJ_ZION: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/dj-zion_rm7tdy.webp',
+  SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/sarah-jordan_jnuzrb.webp',
+  WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/worship_be7p5y.webp',
 };
 
 const weekday: Program[] = [
