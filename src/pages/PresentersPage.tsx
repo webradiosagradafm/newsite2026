@@ -10,63 +10,72 @@ interface PresentersPageProps {
 const PRESENTERS_DATA = [
   {
     name: 'Stancy Campbell',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/STANCY_CAMPBELL_xjkigb.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/stancy-campbell_vddy5r.webp',
     bio: 'The energetic voice behind the Morning Show. Stancy brings bright conversation, uplifting music, and a strong start to the day for listeners across the United States and beyond.',
     programTitle: 'Morning Show'
   },
+
   {
     name: 'Michael Ray',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/MICHAEL_RAY_yv1ehj.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/michael-ray_bs3c8x.webp',
     bio: 'Michael Ray is your afternoon companion on Midday Grace, bringing worship, peace, and encouragement during the busiest part of the day.',
     programTitle: 'Midday Grace'
   },
+
   {
     name: 'DJ Zion',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/DJ_ZION_hyjxbd.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/dj-zion_rm7tdy.webp',
     bio: 'DJ Zion brings energy, rhythm, and fresh urban gospel to Praise FM Flow, creating a bold and modern space for listeners who love faith with movement.',
     programTitle: 'Praise FM Flow'
   },
+
   {
     name: 'Sarah Jordan',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/SARAH_JORDAN_oehx8m.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/sarah-jordan_jnuzrb.webp',
     bio: 'A champion for the new generation, Sarah hosts Future Artists, where she discovers and promotes independent faith-filled talent from around the world.',
     programTitle: 'Future Artists'
   },
+
   {
     name: 'Rachel Harris',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/RACHEL_HARRIS_rd59sb.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/rachael-harris_aj4rsh.webp',
     bio: 'Rachel makes your commute feel lighter. On Carpool, she mixes big songs, familiar favorites, and a smooth drive-home atmosphere.',
     programTitle: 'Carpool'
   },
+
   {
     name: 'Jake Hunter',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/JAKE_HUNTER_pyb2ji.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/jake-hunter_q6ligi.webp',
     bio: 'Jake Hunter brings edge, attitude, and faith-driven energy to the evening lineup with Praise FM Rock.',
     programTitle: 'Praise FM Rock'
   },
+
   {
     name: 'Scott Turner',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/SCOTT_TURNER_wy3hrd.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/scott-turner_wumkut.webp',
     bio: 'A historian of worship music, Scott hosts Praise FM Classics, taking listeners back to timeless songs that shaped generations.',
-    programTitle: 'Praise FM Classics'
+    programTitle: 'Classics'
   },
+
   {
     name: 'Ava Brooks',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/AVA_BROOKS_yysmgc.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/ava-brooks_tcobxo.webp',
     bio: 'Ava closes the day with calm, reflective sounds on Praise FM Chill, creating the perfect late-night atmosphere.',
     programTitle: 'Praise FM Chill'
   },
+
   {
     name: 'Daniel Brooks',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/MICHAEL_BROOKS_mdg7aa.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/daniel-brooks_yur5dq.webp',
     bio: 'The voice of the night. Daniel leads Midnight Grace with peaceful music and a calm overnight presence.',
     programTitle: 'Midnight Grace'
   },
+
   {
     name: 'Matt Riley',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/MATT_RILEY_hvzcam.webp',
-    bio: 'On Sundays, Matt Riley hosts Sunday With Christ, guiding listeners through a more reflective and worship-centered morning.',
-    programTitle: 'Sunday With Christ'
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/matt-riley_ucbrjg.webp',
+    bio: 'On Sundays, Matt Riley hosts Sunday Morning, guiding listeners through a reflective and worship-centered experience.',
+    programTitle: 'Sunday Morning'
   }
 ];
 
