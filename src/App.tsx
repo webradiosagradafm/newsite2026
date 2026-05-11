@@ -84,13 +84,41 @@ const formatRangeToAmPm = (start?: string, end?: string) => {
 
 const getChicagoDayAndTotalMinutes = () => {
   const now = new Date()
-  const chicagoDate = new Date(
-    now.toLocaleString('en-US', { timeZone: 'America/Chicago' })
+
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Chicago',
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  })
+
+  const parts = formatter.formatToParts(now)
+
+  const weekday =
+    parts.find((p) => p.type === 'weekday')?.value || 'Mon'
+
+  const hour = Number(
+    parts.find((p) => p.type === 'hour')?.value || 0
   )
 
+  const minute = Number(
+    parts.find((p) => p.type === 'minute')?.value || 0
+  )
+
+  const dayMap: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6
+  }
+
   return {
-    day: chicagoDate.getDay(),
-    total: chicagoDate.getHours() * 60 + chicagoDate.getMinutes()
+    day: dayMap[weekday],
+    total: hour * 60 + minute
   }
 }
 

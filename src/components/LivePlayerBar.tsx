@@ -104,15 +104,44 @@ const getListenerInfo = async () => {
 };
 
 const getChicagoDayAndTotalMinutes = () => {
-  const now = new Date();
-  const chicago = new Date(
-    now.toLocaleString('en-US', { timeZone: 'America/Chicago' })
-  );
+  const now = new Date()
+
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Chicago',
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  })
+
+  const parts = formatter.formatToParts(now)
+
+  const weekday =
+    parts.find((p) => p.type === 'weekday')?.value || 'Mon'
+
+  const hour = Number(
+    parts.find((p) => p.type === 'hour')?.value || 0
+  )
+
+  const minute = Number(
+    parts.find((p) => p.type === 'minute')?.value || 0
+  )
+
+  const dayMap: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6
+  }
+
   return {
-    day: chicago.getDay(),
-    total: chicago.getHours() * 60 + chicago.getMinutes(),
-  };
-};
+    day: dayMap[weekday],
+    total: hour * 60 + minute
+  }
+}
 
 const getProgramProgress = (program?: Program): number => {
   if (!program) return 0;
