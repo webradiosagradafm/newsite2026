@@ -95,16 +95,9 @@ const getChicagoDayAndTotalMinutes = () => {
 
   const parts = formatter.formatToParts(now)
 
-  const weekday =
-    parts.find((p) => p.type === 'weekday')?.value || 'Mon'
-
-  const hour = Number(
-    parts.find((p) => p.type === 'hour')?.value || 0
-  )
-
-  const minute = Number(
-    parts.find((p) => p.type === 'minute')?.value || 0
-  )
+  const weekday = parts.find((p) => p.type === 'weekday')?.value || 'Mon'
+  const hour = Number(parts.find((p) => p.type === 'hour')?.value || 0)
+  const minute = Number(parts.find((p) => p.type === 'minute')?.value || 0)
 
   const dayMap: Record<string, number> = {
     Sun: 0,
@@ -117,7 +110,7 @@ const getChicagoDayAndTotalMinutes = () => {
   }
 
   return {
-    day: dayMap[weekday],
+    day: dayMap[weekday] ?? 1,
     total: hour * 60 + minute
   }
 }
@@ -250,7 +243,10 @@ const HomeBBC = ({
                 <span className="text-gray-500">·</span>
                 <span className="text-gray-500">
                   {currentProgram
-                    ? formatRangeToAmPm(currentProgram.startTime, currentProgram.endTime)
+                    ? formatRangeToAmPm(
+                        currentProgram.startTime,
+                        currentProgram.endTime
+                      )
                     : '24/7'}
                 </span>
               </div>
@@ -288,7 +284,7 @@ const HomeBBC = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-8 border-b border-gray-300 dark:border-white/10">
             {[nextOne, nextTwo, nextThree].filter(Boolean).map((program) => (
               <button
-                key={(program as Program).title}
+                key={(program as Program).id || (program as Program).title}
                 onClick={() => onNavigateToProgram(program as Program)}
                 className="flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full rounded-2xl"
               >
@@ -381,15 +377,27 @@ const AppContent: React.FC = () => {
     })
 
     const currentIdx = index !== -1 ? index : 0
+    const currentProgram = schedule[currentIdx]
+
     const nextPrograms: Program[] = []
 
-    for (let i = 1; i <= 4; i++) {
-      const nextIdx = (currentIdx + i) % schedule.length
-      nextPrograms.push(schedule[nextIdx])
+    const nextSchedule =
+      day === 0 && total >= 22 * 60
+        ? SCHEDULES[1]
+        : schedule
+
+    const nextStartIdx =
+      nextSchedule === schedule
+        ? currentIdx + 1
+        : 0
+
+    for (let i = 0; i < 4; i++) {
+      const nextIdx = (nextStartIdx + i) % nextSchedule.length
+      nextPrograms.push(nextSchedule[nextIdx])
     }
 
     return {
-      currentProgram: schedule[currentIdx],
+      currentProgram,
       queue: nextPrograms
     }
   }, [day, total])
