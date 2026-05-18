@@ -40,7 +40,8 @@ import { Program } from './types'
 const DEFAULT_COVER = '/logo.png'
 
 const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv'
-const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv'
+const METADATA_URL =
+  'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv'
 
 const BLOCKED_METADATA_KEYWORDS = [
   'praise fm',
@@ -55,7 +56,7 @@ const BLOCKED_METADATA_KEYWORDS = [
   'announcement',
   'station id',
   'jingle',
-  'bumper',
+  'bumper'
 ]
 
 interface LiveMetadata {
@@ -123,7 +124,11 @@ const getProgramProgress = (program?: Program) => {
   const [eH, eM] = program.endTime.split(':').map(Number)
 
   const start = sH * 60 + sM
-  const end = (eH === 0 ? 24 : eH) * 60 + eM
+  let end = eH * 60 + eM
+
+  if (end === 0 || end <= start) {
+    end = 24 * 60
+  }
 
   if (total <= start) return 0
   if (total >= end) return 100
@@ -251,7 +256,9 @@ const HomeBBC = ({
               </div>
 
               <button
-                onClick={() => currentProgram && onNavigateToProgram(currentProgram)}
+                onClick={() =>
+                  currentProgram && onNavigateToProgram(currentProgram)
+                }
                 className="group text-center md:text-left w-full md:w-auto"
               >
                 <h1 className="text-3xl md:text-4xl font-black leading-tight">
@@ -274,7 +281,11 @@ const HomeBBC = ({
                 onClick={onListenClick}
                 className="mt-6 bg-orange-500 hover:bg-orange-600 text-white px-10 md:px-12 py-3 md:py-4 font-black text-lg transition active:scale-95 inline-flex items-center justify-center gap-3 mx-auto md:mx-0 rounded-xl"
               >
-                {isPlaying ? <Pause size={22} /> : <Play size={22} fill="currentColor" />}
+                {isPlaying ? (
+                  <Pause size={22} />
+                ) : (
+                  <Play size={22} fill="currentColor" />
+                )}
                 {isPlaying ? 'Pause' : 'Play'}
               </button>
             </div>
@@ -365,34 +376,28 @@ const AppContent: React.FC = () => {
   const { currentProgram, queue } = useMemo(() => {
     const schedule = SCHEDULES[day] || SCHEDULES[1]
 
-    const index = schedule.findIndex((p: Program) => {
+    const currentIndex = schedule.findIndex((p: Program) => {
       const [sH, sM] = p.startTime.split(':').map(Number)
       const [eH, eM] = p.endTime.split(':').map(Number)
 
       const start = sH * 60 + sM
-      const end = (eH === 0 ? 24 : eH) * 60 + eM
+      let end = eH * 60 + eM
+
+      if (end === 0 || end <= start) {
+        end = 24 * 60
+      }
 
       return total >= start && total < end
     })
 
-    const currentIdx = index !== -1 ? index : 0
-    const currentProgram = schedule[currentIdx]
+    const safeIndex = currentIndex === -1 ? 0 : currentIndex
+    const currentProgram = schedule[safeIndex]
 
     const nextPrograms: Program[] = []
 
-    const nextSchedule =
-      day === 0 && total >= 22 * 60
-        ? SCHEDULES[1]
-        : schedule
-
-    const nextStartIdx =
-      nextSchedule === schedule
-        ? currentIdx + 1
-        : 0
-
-    for (let i = 0; i < 4; i++) {
-      const nextIdx = (nextStartIdx + i) % nextSchedule.length
-      nextPrograms.push(nextSchedule[nextIdx])
+    for (let i = 1; i <= 4; i++) {
+      const nextIndex = (safeIndex + i) % schedule.length
+      nextPrograms.push(schedule[nextIndex])
     }
 
     return {
@@ -461,10 +466,14 @@ const AppContent: React.FC = () => {
 
         const fullText = `${artist} ${title}`.toLowerCase()
 
-        if (BLOCKED_METADATA_KEYWORDS.some((k) => fullText.includes(k))) return
+        if (BLOCKED_METADATA_KEYWORDS.some((k) => fullText.includes(k))) {
+          return
+        }
 
         setLiveMetadata((prev) => {
-          if (prev && prev.title === title && prev.artist === artist) return prev
+          if (prev && prev.title === title && prev.artist === artist) {
+            return prev
+          }
 
           const meta: LiveMetadata = {
             artist,
