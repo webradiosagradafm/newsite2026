@@ -56,7 +56,6 @@ const BLOCKED_METADATA_KEYWORDS = [
   'station id',
   'jingle',
   'bumper',
-  'MIDDAY GRACE'
 ]
 
 interface LiveMetadata {
