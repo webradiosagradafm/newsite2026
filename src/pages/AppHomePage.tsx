@@ -2,192 +2,11 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Play, Pause, ChevronRight, Volume2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-// Programação Segunda a Sábado
-const WEEKDAY_SCHEDULE = [
-  {
-    id: 1,
-    title: "Midnight Grace",
-    host: "Daniel Brooks",
-    startTime: "00:00",
-    endTime: "06:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Daniel_Brooks_iukwmr.webp"
-  },
-  {
-    id: 2,
-    title: "Worship",
-    host: "Praise FM",
-    startTime: "06:00",
-    endTime: "07:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1776755226/WORSHIP_z2fam3.webp"
-  },
-  {
-    id: 3,
-    title: "Morning Show",
-    host: "Stancy Campbell",
-    startTime: "07:00",
-    endTime: "12:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Stancy_Campbell_xkwprb.webp"
-  },
-  {
-    id: 4,
-    title: "Worship",
-    host: "Praise FM",
-    startTime: "12:00",
-    endTime: "13:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1776755226/WORSHIP_z2fam3.webp"
-  },
-  {
-    id: 5,
-    title: "Midday Grace",
-    host: "Michael Ray",
-    startTime: "13:00",
-    endTime: "16:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Michael_Ray_kz8rea.webp"
-  },
-  {
-    id: 6,
-   title: "Praise FM Flow",
-   host: "DJ Zion",
-   startTime: "16:00",
-   endTime: "17:00",
-   image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/DJ_ZION_hyjxbd.webp"
-  },
-  {
-    id: 7,
-    title: "Future Artists",
-    host: "Sarah Jordan",
-    startTime: "17:00",
-    endTime: "18:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Sarah_Jordan_zgvxuu.webp"
-  },
-  {
-    id: 8,
-    title: "Carpool",
-    host: "Rachael Harris",
-    startTime: "18:00",
-    endTime: "20:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Rachael_Harris_gywdjb.webp"
-  },
-  {
-     id: 6,
-     title: "Praise FM Rock",
-     host: "Jake Hunter",
-     startTime: "16:00",
-     endTime: "17:00",
-     image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/JAKE_HUNTER_pyb2ji.webp"
-  },
-  {
-    id: 10,
-    title: "Classics",
-    host: "Scott Turner",
-    startTime: "21:00",
-    endTime: "22:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Scott_Turner_qxn3o8.webp"
-  },
-  {
-    id: 11,
-    title: "Praise FM Chill",
-    host: "Ava Brooks",
-    startTime: "22:00",
-    endTime: "00:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/AVA_BROOKS_yysmgc.webp"
-  }
-];
-
-// Programação Domingo
-const SUNDAY_SCHEDULE = [
-  {
-    id: 1,
-    title: "Midnight Grace",
-    host: "Daniel Brooks",
-    startTime: "00:00",
-    endTime: "06:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Daniel_Brooks_iukwmr.webp"
-  },
-  {
-    id: 2,
-    title: "Worship",
-    host: "Praise FM",
-    startTime: "06:00",
-    endTime: "07:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1776755226/WORSHIP_z2fam3.webp"
-  },
-  {
-    id: 3,
-    title: "Sunday Morning",
-    host: "Matt Riley",
-    startTime: "07:00",
-    endTime: "12:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Matt_Riley_Sunday_Morning_jdvkyz.webp"
-  },
-  {
-    id: 4,
-    title: "Worship",
-    host: "Praise FM",
-    startTime: "12:00",
-    endTime: "13:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1776755226/WORSHIP_z2fam3.webp"
-  },
-  {
-    id: 5,
-    title: "Midday Grace",
-    host: "Michael Ray",
-    startTime: "13:00",
-    endTime: "16:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Michael_Ray_kz8rea.webp"
-  },
-  {
-    id: 6,
-    title: "Praise FM Rock",
-    host: "Jake Hunter",
-    startTime: "16:00",
-    endTime: "17:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1776232682/JAKE_HUNTER_pyb2ji.webp"
-  },
-  {
-    id: 7,
-    title: "Future Artists",
-    host: "Sarah Jordan",
-    startTime: "17:00",
-    endTime: "18:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Sarah_Jordan_zgvxuu.webp"
-  },
-  {
-    id: 8,
-    title: "Worship",
-    host: "Praise FM",
-    startTime: "18:00",
-    endTime: "20:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1776755226/WORSHIP_z2fam3.webp"
-  },
-  {
-    id: 9,
-    title: "Living The Message",
-    host: "Guest",
-    startTime: "20:00",
-    endTime: "21:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1776755226/LIVING_THE_MESSAGE_vb6hkk.webp"
-  },
-  {
-    id: 10,
-    title: "Classics",
-    host: "Scott Turner",
-    startTime: "21:00",
-    endTime: "22:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1737232837/Scott_Turner_qxn3o8.webp"
-  },
-  {
-    id: 11,
-    title: "Praise FM Chill",
-    host: "Ava Brooks",
-    startTime: "22:00",
-    endTime: "00:00",
-    image: "https://res.cloudinary.com/dtecypmsh/image/upload/v1776232683/AVA_BROOKS_yysmgc.webp"
-  }
-];
+import { SCHEDULES } from '../constants';
 
 const getChicagoTime = () => {
   const now = new Date();
+
   const chicagoDate = new Date(
     now.toLocaleString('en-US', { timeZone: 'America/Chicago' })
   );
@@ -209,6 +28,7 @@ const format12h = (time24: string) => {
 
 const AppHomePage: React.FC = () => {
   const navigate = useNavigate();
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(getChicagoTime());
 
@@ -221,13 +41,13 @@ const AppHomePage: React.FC = () => {
   }, []);
 
   const todaySchedule = useMemo(() => {
-    return currentTime.day === 0 ? SUNDAY_SCHEDULE : WEEKDAY_SCHEDULE;
+    return SCHEDULES[currentTime.day] || SCHEDULES[1];
   }, [currentTime.day]);
 
   const currentProgram = useMemo(() => {
-    return todaySchedule.find((prog) => {
-      const [sH, sM] = prog.startTime.split(':').map(Number);
-      const [eH, eM] = prog.endTime.split(':').map(Number);
+    return todaySchedule.find((program) => {
+      const [sH, sM] = program.startTime.split(':').map(Number);
+      const [eH, eM] = program.endTime.split(':').map(Number);
 
       const start = sH * 60 + sM;
       let end = eH * 60 + eM;
@@ -236,11 +56,10 @@ const AppHomePage: React.FC = () => {
 
       return currentTime.totalMinutes >= start && currentTime.totalMinutes < end;
     });
-  }, [todaySchedule, currentTime]);
+  }, [todaySchedule, currentTime.totalMinutes]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white pb-24">
-      {/* Header */}
       <header className="border-b border-gray-200 dark:border-white/10 py-4 px-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -264,7 +83,6 @@ const AppHomePage: React.FC = () => {
         </div>
       </header>
 
-      {/* Live Program Carousel */}
       <section className="py-6">
         <div className="flex space-x-4 overflow-x-auto no-scrollbar px-4 pb-4">
           {todaySchedule.map((program) => {
@@ -282,12 +100,14 @@ const AppHomePage: React.FC = () => {
                     alt={program.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.src =
-                        "https://res.cloudinary.com/dtecypmsh/image/upload/v1776755226/WORSHIP_z2fam3.webp";
+                      e.currentTarget.src = '/logo.png';
                     }}
                   />
+
                   <div className="absolute bottom-2 right-2 w-10 h-10 bg-black dark:bg-white rounded-full flex items-center justify-center border-2 border-white dark:border-black">
-                    <span className="text-white dark:text-black text-lg font-bold">1</span>
+                    <span className="text-white dark:text-black text-lg font-bold">
+                      1
+                    </span>
                   </div>
                 </div>
 
@@ -298,7 +118,10 @@ const AppHomePage: React.FC = () => {
                 )}
 
                 <div className="text-center mt-3 max-w-[160px]">
-                  <p className="text-xs font-semibold truncate">{program.title}</p>
+                  <p className="text-xs font-semibold truncate">
+                    {program.title}
+                  </p>
+
                   <p className="text-[10px] text-gray-500 dark:text-gray-400">
                     {format12h(program.startTime)} - {format12h(program.endTime)}
                   </p>
@@ -309,15 +132,17 @@ const AppHomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Current Program Info */}
       <section className="px-6 py-4">
         <div className="text-center">
-          <h1 className="text-3xl font-bold mb-1">Praise FM United States</h1>
+          <h1 className="text-3xl font-bold mb-1">
+            Praise FM United States
+          </h1>
 
           {currentProgram && (
             <p className="text-gray-500 dark:text-gray-400 mb-4">
-              {currentProgram.title}{" "}
-              {currentProgram.host !== "Praise FM" && `with ${currentProgram.host}`}
+              {currentProgram.title}{' '}
+              {currentProgram.host !== 'Praise FM' &&
+                `with ${currentProgram.host}`}
             </p>
           )}
 
@@ -331,11 +156,12 @@ const AppHomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Recently Played */}
       <section className="px-6 py-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold">Recently Played</h2>
-          <button className="text-sm text-gray-600 dark:text-gray-400">View all</button>
+          <button className="text-sm text-gray-600 dark:text-gray-400">
+            View all
+          </button>
         </div>
 
         <div className="space-y-4">
@@ -347,15 +173,22 @@ const AppHomePage: React.FC = () => {
             </div>
 
             <div className="flex-grow min-w-0">
-              <h3 className="font-bold text-base truncate">Morning Worship Mix</h3>
+              <h3 className="font-bold text-base truncate">
+                Morning Worship Mix
+              </h3>
+
               <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                 Contemporary Christian Music
               </p>
 
               <div className="mt-2 flex items-center space-x-2">
                 <div className="flex-grow h-1 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#ff6600]" style={{ width: '45%' }}></div>
+                  <div
+                    className="h-full bg-[#ff6600]"
+                    style={{ width: '45%' }}
+                  />
                 </div>
+
                 <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                   2h ago
                 </span>
@@ -372,17 +205,19 @@ const AppHomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Bottom Mini Player */}
       {isPlaying && (
         <div className="fixed bottom-16 left-0 right-0 bg-black dark:bg-white text-white dark:text-black px-4 py-3 flex items-center justify-between shadow-lg">
           <div className="flex items-center space-x-3 flex-grow min-w-0">
-            <div className="w-2 h-2 bg-[#ff6600] rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-[#ff6600] rounded-full animate-pulse" />
+
             <div className="min-w-0">
               <p className="font-semibold text-sm truncate">
                 {currentProgram?.title || 'Praise FM USA'}
               </p>
+
               <p className="text-xs opacity-70 truncate">
-                {currentProgram?.host && currentProgram.host !== "Praise FM USA"
+                {currentProgram?.host &&
+                currentProgram.host !== 'Praise FM'
                   ? `with ${currentProgram.host}`
                   : 'Live Streaming'}
               </p>
@@ -398,7 +233,6 @@ const AppHomePage: React.FC = () => {
         </div>
       )}
 
-      {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-black border-t border-gray-200 dark:border-white/10 px-4 py-2 shadow-lg">
         <div className="flex items-center justify-around">
           <button
