@@ -1,236 +1,236 @@
-import { Program, Podcast } from './types';
+import { Program } from './types'
 
 export const COLORS = {
   ACCENT: '#ff6600',
   DARK: '#1a1a1a',
   GRAY: '#f3f4f6'
-};
+}
 
 const IMAGES = {
-  DANIEL_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/daniel-brooks_yur5dq.webp',
-  RACHEL_HARRIS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/rachael-harris_aj4rsh.webp',
-  MICHAEL_RAY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/michael-ray_bs3c8x.webp',
-  STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/stancy-campbell_vddy5r.webp',
-  MAT_RILEY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/matt-riley_ucbrjg.webp',
-  LIVING_THE_MESSAGE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/living-the-message_aelv9d.webp',
-  JAKE_HUNTER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/jake-hunter_q6ligi.webp',
-  AVA_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/ava-brooks_tcobxo.webp',
-  SCOTT_TURNER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/scott-turner_wumkut.webp',
-  DJ_ZION: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/dj-zion_rm7tdy.webp',
-  SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/sarah-jordan_jnuzrb.webp',
-  WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/worship_be7p5y.webp',
-};
+  DANIEL_BROOKS: '/shows/daniel-brooks.jpg',
+  RACHEL_HARRIS: '/shows/rachael-harris.jpg',
+  MICHAEL_RAY: '/shows/michael-ray.jpg',
+  STANCY_CAMPBELL: '/shows/stancy-campbell.jpg',
+  MATT_RILEY: '/shows/matt-riley.jpg',
+  LIVING_THE_MESSAGE: '/shows/living-the-message.jpg',
+  JAKE_HUNTER: '/shows/jake-hunter.jpg',
+  AVA_BROOKS: '/shows/ava-brooks.jpg',
+  SCOTT_TURNER: '/shows/scott-turner.jpg',
+  DJ_ZION: '/shows/dj-zion.jpg',
+  SARAH_JORDAN: '/shows/sarah-jordan.jpg',
+  WORSHIP: '/shows/worship.jpg'
+}
 
 const weekday: Program[] = [
   {
-    id: '1',
+    id: 'midnight-grace',
     title: 'Midnight Grace',
     host: 'Daniel Brooks',
     startTime: '00:00',
     endTime: '06:00',
-    description: 'Peaceful music for the night hours.',
+    description: 'Peaceful worship and reflective Christian music for the overnight hours.',
     image: IMAGES.DANIEL_BROOKS
   },
   {
-    id: '2',
+    id: 'worship-morning',
     title: 'Worship',
     host: 'Praise FM',
     startTime: '06:00',
     endTime: '07:00',
-    description: 'Morning adoration and praise.',
+    description: 'Morning worship to start your day with faith and peace.',
     image: IMAGES.WORSHIP
   },
   {
-    id: '3',
+    id: 'morning-show',
     title: 'Morning Show',
     host: 'Stancy Campbell',
     startTime: '07:00',
     endTime: '12:00',
-    description: 'Life, music, and the Morning Show crew.',
+    description: 'Uplifting music, encouragement and a bright start to your day.',
     image: IMAGES.STANCY_CAMPBELL
   },
   {
-    id: '4',
+    id: 'worship-midday',
     title: 'Worship',
     host: 'Praise FM',
     startTime: '12:00',
     endTime: '13:00',
-    description: 'Midday reflection and worship.',
+    description: 'A midday hour of worship and reflection.',
     image: IMAGES.WORSHIP
   },
   {
-    id: '5',
+    id: 'midday-grace',
     title: 'Midday Grace',
     host: 'Michael Ray',
     startTime: '13:00',
     endTime: '16:00',
-    description: 'Soulful sounds for your afternoon.',
+    description: 'A smooth afternoon blend of worship, hope and Christian favorites.',
     image: IMAGES.MICHAEL_RAY
   },
   {
-    id: '6',
+    id: 'praise-fm-flow',
     title: 'Praise FM Flow',
     host: 'DJ Zion',
     startTime: '16:00',
     endTime: '17:00',
-    description: 'Urban gospel, rap and rhythm.',
+    description: 'Modern Christian pop, rhythm, flow and fresh energy.',
     image: IMAGES.DJ_ZION
   },
   {
-    id: '7',
-    title: 'Future Artists',
+    id: 'future-artists',
+    title: 'Praise FM Future Artists',
     host: 'Sarah Jordan',
     startTime: '17:00',
     endTime: '18:00',
-    description: 'Discover the next generation.',
+    description: 'Discover new voices and the future sound of Christian music.',
     image: IMAGES.SARAH_JORDAN
   },
   {
-    id: '8',
+    id: 'carpool',
     title: 'Carpool',
     host: 'Rachael Harris',
     startTime: '18:00',
     endTime: '20:00',
-    description: 'Drive home companion.',
+    description: 'Your drive-time companion with uplifting Christian music.',
     image: IMAGES.RACHEL_HARRIS
   },
   {
-    id: '9',
+    id: 'praise-fm-rock',
     title: 'Praise FM Rock',
     host: 'Jake Hunter',
     startTime: '20:00',
     endTime: '21:00',
-    description: 'Energy, guitars and faith.',
+    description: 'Faith, guitars and powerful Christian rock energy.',
     image: IMAGES.JAKE_HUNTER
   },
   {
-    id: '10',
-    title: 'Classics',
+    id: 'praise-fm-classics',
+    title: 'Praise FM Classics',
     host: 'Scott Turner',
     startTime: '21:00',
     endTime: '22:00',
-    description: 'Timeless hits.',
+    description: 'Timeless Christian songs and modern classics.',
     image: IMAGES.SCOTT_TURNER
   },
   {
-    id: '11',
+    id: 'praise-fm-chill',
     title: 'Praise FM Chill',
     host: 'Ava Brooks',
     startTime: '22:00',
     endTime: '00:00',
-    description: 'Relax and unwind.',
+    description: 'Relax, unwind and end the day with peaceful Christian music.',
     image: IMAGES.AVA_BROOKS
-  },
-];
+  }
+]
 
 const sunday: Program[] = [
   {
-    id: 's1',
+    id: 'sunday-midnight-grace',
     title: 'Midnight Grace',
     host: 'Daniel Brooks',
     startTime: '00:00',
     endTime: '06:00',
-    description: 'Peaceful music for the night hours.',
+    description: 'Peaceful worship and reflective Christian music for the overnight hours.',
     image: IMAGES.DANIEL_BROOKS
   },
   {
-    id: 's2',
+    id: 'sunday-worship-morning',
     title: 'Worship',
     host: 'Praise FM',
     startTime: '06:00',
     endTime: '07:00',
-    description: 'Morning adoration and praise.',
+    description: 'Morning worship to start Sunday with faith and peace.',
     image: IMAGES.WORSHIP
   },
   {
-    id: 's3',
-    title: 'Sunday Morning',
+    id: 'sunday-morning',
+    title: 'Sunday Morning With Christ',
     host: 'Matt Riley',
     startTime: '07:00',
     endTime: '12:00',
-    description: 'A holy morning experience.',
-    image: IMAGES.MAT_RILEY
+    description: 'A peaceful Sunday morning experience with worship and encouragement.',
+    image: IMAGES.MATT_RILEY
   },
   {
-    id: 's4',
+    id: 'sunday-worship-midday',
     title: 'Worship',
     host: 'Praise FM',
     startTime: '12:00',
     endTime: '13:00',
-    description: 'Midday worship.',
+    description: 'A midday hour of worship and reflection.',
     image: IMAGES.WORSHIP
   },
   {
-    id: 's5',
+    id: 'sunday-midday-grace',
     title: 'Midday Grace',
     host: 'Michael Ray',
     startTime: '13:00',
     endTime: '16:00',
-    description: 'Soulful sounds.',
+    description: 'A smooth afternoon blend of worship, hope and Christian favorites.',
     image: IMAGES.MICHAEL_RAY
   },
   {
-    id: 's6',
+    id: 'sunday-praise-fm-flow',
     title: 'Praise FM Flow',
     host: 'DJ Zion',
     startTime: '16:00',
     endTime: '17:00',
-    description: 'Urban gospel, rap and rhythm.',
+    description: 'Modern Christian pop, rhythm, flow and fresh energy.',
     image: IMAGES.DJ_ZION
   },
   {
-    id: 's7',
-    title: 'Future Artists',
+    id: 'sunday-future-artists',
+    title: 'Praise FM Future Artists',
     host: 'Sarah Jordan',
     startTime: '17:00',
     endTime: '18:00',
-    description: 'New talents.',
+    description: 'Discover new voices and the future sound of Christian music.',
     image: IMAGES.SARAH_JORDAN
   },
   {
-    id: 's8',
+    id: 'sunday-worship-evening',
     title: 'Worship',
     host: 'Praise FM',
     startTime: '18:00',
     endTime: '20:00',
-    description: 'Evening worship.',
+    description: 'Evening worship and peaceful Christian music.',
     image: IMAGES.WORSHIP
   },
   {
-    id: 's9',
+    id: 'living-the-message',
     title: 'Living The Message',
-    host: 'Guest',
+    host: 'Praise FM',
     startTime: '20:00',
     endTime: '21:00',
-    description: 'A powerful message.',
+    description: 'A focused message of faith, hope and encouragement.',
     image: IMAGES.LIVING_THE_MESSAGE
   },
   {
-    id: 's10',
-    title: 'Classics',
+    id: 'sunday-praise-fm-classics',
+    title: 'Praise FM Classics',
     host: 'Scott Turner',
     startTime: '21:00',
     endTime: '22:00',
-    description: 'Timeless hits.',
+    description: 'Timeless Christian songs and modern classics.',
     image: IMAGES.SCOTT_TURNER
   },
   {
-    id: 's11',
+    id: 'sunday-praise-fm-chill',
     title: 'Praise FM Chill',
     host: 'Ava Brooks',
     startTime: '22:00',
     endTime: '00:00',
-    description: 'Relax and unwind.',
+    description: 'Relax, unwind and end Sunday with peaceful Christian music.',
     image: IMAGES.AVA_BROOKS
-  },
-];
+  }
+]
 
 export const SCHEDULES: Record<number, Program[]> = {
+  0: sunday,
   1: weekday,
   2: weekday,
   3: weekday,
   4: weekday,
   5: weekday,
-  6: weekday,
-  0: sunday
-};
+  6: weekday
+}
