@@ -17,6 +17,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import RecentlyPlayed from './components/RecentlyPlayed'
 import LivePlayerBar from './components/LivePlayerBar'
+import ProgramMiniPage from './components/ProgramMiniPage'
 import Playlist from './components/Playlist'
 import ScheduleList from './components/ScheduleList'
 import SEO from './components/SEO'
@@ -398,6 +399,9 @@ const AppContent: React.FC = () => {
     LiveMetadata[]
   >([])
 
+  const [selectedProgram, setSelectedProgram] =
+    useState<Program | null>(null)
+
   const [theme, setTheme] = useState<'light' | 'dark'>(
     () =>
       (localStorage.getItem('praise-theme') as
@@ -504,6 +508,11 @@ const AppContent: React.FC = () => {
     audioRef.current.play().catch(() => setIsPlaying(false))
   }
 
+  const openProgramPage = (program: Program) => {
+    setSelectedProgram(program)
+    navigate('/program')
+  }
+
   useEffect(() => {
     const es = new EventSource(METADATA_URL, {
       withCredentials: false
@@ -608,11 +617,29 @@ const AppContent: React.FC = () => {
                 currentProgram={currentProgram}
                 queue={queue}
                 onListenClick={togglePlayback}
-                onNavigateToProgram={() =>
-                  navigate('/schedule')
-                }
+                onNavigateToProgram={openProgramPage}
                 trackHistory={trackHistory}
               />
+            }
+          />
+
+          <Route
+            path="/program"
+            element={
+              selectedProgram ? (
+                <ProgramMiniPage
+                  program={selectedProgram}
+                  queue={queue}
+                  liveMetadata={liveMetadata}
+                  trackHistory={trackHistory}
+                  isPlaying={isPlaying}
+                  onListenClick={togglePlayback}
+                  onBack={() => navigate(-1)}
+                  onViewSchedule={() => navigate('/schedule')}
+                />
+              ) : (
+                <Navigate to="/schedule" replace />
+              )
             }
           />
 
@@ -622,7 +649,7 @@ const AppContent: React.FC = () => {
             path="/schedule"
             element={
               <ScheduleList
-                onNavigateToProgram={() => {}}
+                onNavigateToProgram={openProgramPage}
                 onBack={() => navigate('/')}
               />
             }
@@ -649,7 +676,7 @@ const AppContent: React.FC = () => {
             path="/presenters"
             element={
               <PresentersPage
-                onNavigateToProgram={() => {}}
+                onNavigateToProgram={openProgramPage}
               />
             }
           />
