@@ -66,8 +66,9 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
     return true
   }
 
+  // ✅ AGORA LIMITA EM 4
   const displayedTracks = Array.isArray(tracks)
-    ? tracks.filter(isValidMusic).slice(0, 6)
+    ? tracks.filter(isValidMusic).slice(0, 4)
     : []
 
   useEffect(() => {
@@ -75,39 +76,56 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
       const newArtworks = { ...artworks }
       let changed = false
 
-      for (const track of displayedTracks) {
-        const key = `${track.artist}-${track.title}`
+      // ✅ busca paralela mais rápida
+      await Promise.all(
+        displayedTracks.map(async (track) => {
+          const key = `${track.artist}-${track.title}`
 
-        if (!newArtworks[key] && !track.artwork) {
+          // já existe
+          if (newArtworks[key] || track.artwork) return
+
           try {
             const url = `https://itunes.apple.com/search?term=${encodeURIComponent(
               `${track.artist} ${track.title}`
             )}&media=music&limit=1`
 
             const res = await fetch(url)
+
             let image = ''
 
             if (res.ok) {
               const data = await res.json()
+
               if (data.results?.length) {
-                image = data.results[0].artworkUrl100
+                image =
+                  data.results[0].artworkUrl100?.replace(
+                    '100x100bb',
+                    '300x300bb'
+                  ) || ''
               }
             }
 
+            // fallback
             if (!image) {
-              image = `https://picsum.photos/seed/${encodeURIComponent(key)}/100/100`
+              image = `https://picsum.photos/seed/${encodeURIComponent(
+                key
+              )}/300/300`
             }
 
             newArtworks[key] = image
             changed = true
           } catch {
-            newArtworks[key] = `https://picsum.photos/seed/${encodeURIComponent(key)}/100/100`
+            newArtworks[key] = `https://picsum.photos/seed/${encodeURIComponent(
+              key
+            )}/300/300`
             changed = true
           }
-        }
-      }
+        })
+      )
 
-      if (changed) setArtworks(newArtworks)
+      if (changed) {
+        setArtworks(newArtworks)
+      }
     }
 
     if (displayedTracks.length > 0) {
@@ -144,7 +162,9 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
               const artwork =
                 artworks[key] ||
                 track.artwork ||
-                `https://picsum.photos/seed/${encodeURIComponent(key)}/100/100`
+                `https://picsum.photos/seed/${encodeURIComponent(
+                  key
+                )}/300/300`
 
               return (
                 <div
@@ -159,14 +179,17 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
 
                     <img
                       src={artwork}
+                      alt={track.title}
+                      loading="lazy"
                       className="w-11 h-11 object-cover rounded"
                     />
 
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-black dark:text-white">
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm font-medium text-black dark:text-white truncate">
                         {track.title}
                       </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+
+                      <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
                         {track.artist}
                       </span>
                     </div>
