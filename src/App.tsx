@@ -7,6 +7,7 @@ import {
   useLocation,
   useNavigate
 } from 'react-router-dom'
+
 import { Play, Pause, Megaphone } from 'lucide-react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 
@@ -34,12 +35,16 @@ import TermsOfUsePage from './pages/TermsOfUsePage'
 import CookiesPolicyPage from './pages/CookiesPolicyPage'
 import AdvertisePage from './pages/AdvertisePage'
 
+/* NOVO APP */
+import PraiseAppPage from './pages/PraiseAppPage'
+
 import { SCHEDULES } from './constants'
 import { Program } from './types'
 
 const DEFAULT_COVER = '/logo.png'
 
 const STREAM_URL = 'https://stream.zeno.fm/hvwifp8ezc6tv'
+
 const METADATA_URL =
   'https://api.zeno.fm/mounts/metadata/subscribe/hvwifp8ezc6tv'
 
@@ -70,8 +75,16 @@ const formatToAmPm = (time?: string) => {
   if (!time) return ''
 
   const [hourRaw, minuteRaw] = time.split(':').map(Number)
-  const hour = hourRaw === 0 ? 12 : hourRaw > 12 ? hourRaw - 12 : hourRaw
+
+  const hour =
+    hourRaw === 0
+      ? 12
+      : hourRaw > 12
+      ? hourRaw - 12
+      : hourRaw
+
   const minute = String(minuteRaw || 0).padStart(2, '0')
+
   const period = hourRaw >= 12 ? 'PM' : 'AM'
 
   return `${hour}:${minute} ${period}`
@@ -95,9 +108,16 @@ const getChicagoDayAndTotalMinutes = () => {
 
   const parts = formatter.formatToParts(now)
 
-  const weekday = parts.find((p) => p.type === 'weekday')?.value || 'Mon'
-  const hour = Number(parts.find((p) => p.type === 'hour')?.value || 0)
-  const minute = Number(parts.find((p) => p.type === 'minute')?.value || 0)
+  const weekday =
+    parts.find((p) => p.type === 'weekday')?.value || 'Mon'
+
+  const hour = Number(
+    parts.find((p) => p.type === 'hour')?.value || 0
+  )
+
+  const minute = Number(
+    parts.find((p) => p.type === 'minute')?.value || 0
+  )
 
   const dayMap: Record<string, number> = {
     Sun: 0,
@@ -124,6 +144,7 @@ const getProgramProgress = (program?: Program) => {
   const [eH, eM] = program.endTime.split(':').map(Number)
 
   const start = sH * 60 + sM
+
   let end = eH * 60 + eM
 
   if (end === 0 || end <= start) {
@@ -182,6 +203,7 @@ const HomeBBC = ({
   const nextThree = queue?.[2]
 
   const presenterImage = getProgramImage(currentProgram)
+
   const progress = getProgramProgress(currentProgram)
 
   const size = 190
@@ -194,8 +216,11 @@ const HomeBBC = ({
     <>
       <section className="bg-white dark:bg-[#121212] text-gray-950 dark:text-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-10">
+
           <div className="flex flex-col md:grid md:grid-cols-[220px_1fr] gap-8 md:gap-10 items-center border-b border-gray-300 dark:border-white/10 pb-8 md:pb-10">
+
             <div className="relative w-[190px] h-[190px] mx-auto md:mx-0 flex-shrink-0">
+
               <svg
                 className="absolute inset-0 w-full h-full -rotate-90"
                 viewBox={`0 0 ${size} ${size}`}
@@ -220,7 +245,9 @@ const HomeBBC = ({
                   fill="none"
                   strokeLinecap="round"
                   strokeDasharray={circumference}
-                  strokeDashoffset={circumference * (1 - progress / 100)}
+                  strokeDashoffset={
+                    circumference * (1 - progress / 100)
+                  }
                   className="transition-all duration-1000 ease-out"
                 />
               </svg>
@@ -242,9 +269,14 @@ const HomeBBC = ({
             </div>
 
             <div className="text-center md:text-left w-full">
+
               <div className="flex items-center justify-center md:justify-start gap-2 text-sm mb-2">
-                <span className="font-black text-orange-500">LIVE</span>
+                <span className="font-black text-orange-500">
+                  LIVE
+                </span>
+
                 <span className="text-gray-500">·</span>
+
                 <span className="text-gray-500">
                   {currentProgram
                     ? formatRangeToAmPm(
@@ -257,12 +289,14 @@ const HomeBBC = ({
 
               <button
                 onClick={() =>
-                  currentProgram && onNavigateToProgram(currentProgram)
+                  currentProgram &&
+                  onNavigateToProgram(currentProgram)
                 }
                 className="group text-center md:text-left w-full md:w-auto"
               >
                 <h1 className="text-3xl md:text-4xl font-black leading-tight">
                   {currentProgram?.title || 'Praise FM Live'}
+
                   <span className="text-orange-500 ml-2 group-hover:ml-3 transition-all">
                     ›
                   </span>
@@ -270,7 +304,8 @@ const HomeBBC = ({
               </button>
 
               <p className="mt-2 text-base md:text-lg text-gray-700 dark:text-gray-300">
-                {currentProgram?.description || 'Global Christian Radio'}
+                {currentProgram?.description ||
+                  'Global Christian Radio'}
               </p>
 
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -286,47 +321,53 @@ const HomeBBC = ({
                 ) : (
                   <Play size={22} fill="currentColor" />
                 )}
+
                 {isPlaying ? 'Pause' : 'Play'}
               </button>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-8 border-b border-gray-300 dark:border-white/10">
-            {[nextOne, nextTwo, nextThree].filter(Boolean).map((program) => (
-              <button
-                key={(program as Program).id || (program as Program).title}
-                onClick={() => onNavigateToProgram(program as Program)}
-                className="flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full rounded-2xl"
-              >
-                <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-xl">
-                  <img
-                    src={getProgramImage(program as Program)}
-                    alt={(program as Program).title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = DEFAULT_COVER
-                    }}
-                  />
-                </div>
 
-                <div className="min-w-0">
-                  <p className="text-[11px] font-black text-orange-500 uppercase tracking-wide mb-0.5">
-                    {formatRangeToAmPm(
-                      (program as Program).startTime,
-                      (program as Program).endTime
-                    )}
-                  </p>
+            {[nextOne, nextTwo, nextThree]
+              .filter(Boolean)
+              .map((program) => (
+                <button
+                  key={
+                    (program as Program).id ||
+                    (program as Program).title
+                  }
+                  onClick={() =>
+                    onNavigateToProgram(program as Program)
+                  }
+                  className="flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full rounded-2xl"
+                >
+                  <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-xl">
+                    <img
+                      src={getProgramImage(program as Program)}
+                      alt={(program as Program).title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
 
-                  <h3 className="text-sm font-bold leading-tight group-hover:text-orange-500 transition-colors truncate">
-                    {(program as Program).title}
-                  </h3>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-black text-orange-500 uppercase tracking-wide mb-0.5">
+                      {formatRangeToAmPm(
+                        (program as Program).startTime,
+                        (program as Program).endTime
+                      )}
+                    </p>
 
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                    {(program as Program).host}
-                  </p>
-                </div>
-              </button>
-            ))}
+                    <h3 className="text-sm font-bold leading-tight group-hover:text-orange-500 transition-colors truncate">
+                      {(program as Program).title}
+                    </h3>
+
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                      {(program as Program).host}
+                    </p>
+                  </div>
+                </button>
+              ))}
           </div>
 
           <div className="flex justify-center md:justify-end mt-3 mb-5">
@@ -335,6 +376,7 @@ const HomeBBC = ({
               className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-orange-500 transition-colors group"
             >
               <Megaphone className="w-3.5 h-3.5 group-hover:text-orange-500" />
+
               <span className="font-medium uppercase tracking-wider">
                 Advertise with us
               </span>
@@ -357,18 +399,30 @@ const HomeBBC = ({
 
 const AppContent: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false)
-  const [liveMetadata, setLiveMetadata] = useState<LiveMetadata | null>(null)
-  const [trackHistory, setTrackHistory] = useState<LiveMetadata[]>([])
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
+
+  const [liveMetadata, setLiveMetadata] =
+    useState<LiveMetadata | null>(null)
+
+  const [trackHistory, setTrackHistory] = useState<
+    LiveMetadata[]
+  >([])
+
+  const [selectedProgram, setSelectedProgram] =
+    useState<Program | null>(null)
 
   const [theme, setTheme] = useState<'light' | 'dark'>(
-    () => (localStorage.getItem('praise-theme') as 'light' | 'dark') || 'light'
+    () =>
+      (localStorage.getItem('praise-theme') as
+        | 'light'
+        | 'dark') || 'light'
   )
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
+
   const eventSourceRef = useRef<EventSource | null>(null)
 
   const location = useLocation()
+
   const navigate = useNavigate()
 
   const { day, total } = getChicagoDayAndTotalMinutes()
@@ -376,21 +430,30 @@ const AppContent: React.FC = () => {
   const { currentProgram, queue } = useMemo(() => {
     const schedule = SCHEDULES[day] || SCHEDULES[1]
 
-    const currentIndex = schedule.findIndex((p: Program) => {
-      const [sH, sM] = p.startTime.split(':').map(Number)
-      const [eH, eM] = p.endTime.split(':').map(Number)
+    const currentIndex = schedule.findIndex(
+      (p: Program) => {
+        const [sH, sM] = p.startTime
+          .split(':')
+          .map(Number)
 
-      const start = sH * 60 + sM
-      let end = eH * 60 + eM
+        const [eH, eM] = p.endTime
+          .split(':')
+          .map(Number)
 
-      if (end === 0 || end <= start) {
-        end = 24 * 60
+        const start = sH * 60 + sM
+
+        let end = eH * 60 + eM
+
+        if (end === 0 || end <= start) {
+          end = 24 * 60
+        }
+
+        return total >= start && total < end
       }
-
-      return total >= start && total < end
-    })
+    )
 
     const safeIndex = currentIndex === -1 ? 0 : currentIndex
+
     const currentProgram = schedule[safeIndex]
 
     const nextPrograms: Program[] = []
@@ -407,7 +470,11 @@ const AppContent: React.FC = () => {
   }, [day, total])
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark')
+    document.documentElement.classList.toggle(
+      'dark',
+      theme === 'dark'
+    )
+
     localStorage.setItem('praise-theme', theme)
   }, [theme])
 
@@ -415,22 +482,32 @@ const AppContent: React.FC = () => {
     const audio = new Audio(STREAM_URL)
 
     audio.crossOrigin = 'anonymous'
+
     audio.preload = 'none'
-    audio.volume = parseFloat(localStorage.getItem('praise-volume') || '0.8')
+
+    audio.volume = parseFloat(
+      localStorage.getItem('praise-volume') || '0.8'
+    )
 
     const handlePlay = () => setIsPlaying(true)
+
     const handlePause = () => setIsPlaying(false)
 
     audio.addEventListener('play', handlePlay)
+
     audio.addEventListener('pause', handlePause)
 
     audioRef.current = audio
 
     return () => {
       audio.removeEventListener('play', handlePlay)
+
       audio.removeEventListener('pause', handlePause)
+
       audio.pause()
+
       audio.src = ''
+
       audioRef.current = null
     }
   }, [])
@@ -447,31 +524,46 @@ const AppContent: React.FC = () => {
   }
 
   useEffect(() => {
-    const es = new EventSource(METADATA_URL, { withCredentials: false })
+    const es = new EventSource(METADATA_URL, {
+      withCredentials: false
+    })
 
     eventSourceRef.current = es
 
     es.onmessage = (e) => {
       try {
         const data = JSON.parse(e.data)
+
         const streamTitle = data.streamTitle || ''
 
         if (!streamTitle.includes(' - ')) return
 
-        const [artistRaw, ...rest] = streamTitle.split(' - ')
+        const [artistRaw, ...rest] =
+          streamTitle.split(' - ')
+
         const artist = artistRaw.trim()
+
         const title = rest.join(' - ').trim()
 
         if (!artist || !title) return
 
-        const fullText = `${artist} ${title}`.toLowerCase()
+        const fullText =
+          `${artist} ${title}`.toLowerCase()
 
-        if (BLOCKED_METADATA_KEYWORDS.some((k) => fullText.includes(k))) {
+        if (
+          BLOCKED_METADATA_KEYWORDS.some((k) =>
+            fullText.includes(k)
+          )
+        ) {
           return
         }
 
         setLiveMetadata((prev) => {
-          if (prev && prev.title === title && prev.artist === artist) {
+          if (
+            prev &&
+            prev.title === title &&
+            prev.artist === artist
+          ) {
             return prev
           }
 
@@ -482,7 +574,9 @@ const AppContent: React.FC = () => {
             isMusic: true
           }
 
-          setTrackHistory((history) => [meta, ...history].slice(0, 10))
+          setTrackHistory((history) =>
+            [meta, ...history].slice(0, 10)
+          )
 
           return meta
         })
@@ -495,52 +589,38 @@ const AppContent: React.FC = () => {
     }
   }, [])
 
-  const getSEO = () => {
-    const path = location.pathname
-
-    if (path === '/') {
-      return {
-        title: 'Praise FM USA - 24/7 Worship & Gospel Radio',
-        description:
-          'Listen live to Praise FM USA — 24/7 Christian radio streaming worship music, gospel hits, devotionals, and uplifting shows.'
-      }
-    }
-
-    if (path === '/schedule') {
-      return {
-        title: 'Full Schedule - Praise FM USA',
-        description: 'See the complete programming schedule for Praise FM USA.'
-      }
-    }
-
-    if (path === '/advertise') {
-      return {
-        title: 'Advertise with Praise FM USA',
-        description:
-          'Reach engaged Christian listeners with advertising on Praise FM USA.'
-      }
-    }
-
-    return {
-      title: 'Praise FM USA - Worship & Gospel Radio',
-      description:
-        'Listen live to Praise FM USA — 24/7 Christian radio streaming worship music, gospel hits, devotionals, and uplifting shows.'
-    }
+  const seo = {
+    title:
+      'Praise FM USA - 24/7 Worship & Gospel Radio',
+    description:
+      'Listen live to Praise FM USA — 24/7 Christian radio streaming worship music, gospel hits, devotionals, and uplifting shows.'
   }
-
-  const seo = getSEO()
 
   return (
     <div className="min-h-screen flex flex-col pb-[120px] bg-white dark:bg-[#121212] transition-colors">
-      <SEO title={seo.title} description={seo.description} url={window.location.href} />
+
+      <SEO
+        title={seo.title}
+        description={seo.description}
+        url={window.location.href}
+      />
 
       <Navbar
-        activeTab={location.pathname === '/' ? 'home' : location.pathname.split('/')[1]}
+        activeTab={
+          location.pathname === '/'
+            ? 'home'
+            : location.pathname.split('/')[1]
+        }
         theme={theme}
-        onToggleTheme={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
+        onToggleTheme={() =>
+          setTheme((t) =>
+            t === 'light' ? 'dark' : 'light'
+          )
+        }
       />
 
       <main className="flex-grow">
+
         {selectedProgram ? (
           <ProgramDetail
             program={selectedProgram}
@@ -554,6 +634,7 @@ const AppContent: React.FC = () => {
           />
         ) : (
           <Routes>
+
             <Route
               path="/"
               element={
@@ -563,43 +644,107 @@ const AppContent: React.FC = () => {
                   currentProgram={currentProgram}
                   queue={queue}
                   onListenClick={togglePlayback}
-                  onNavigateToProgram={setSelectedProgram}
+                  onNavigateToProgram={
+                    setSelectedProgram
+                  }
                   trackHistory={trackHistory}
                 />
               }
             />
 
-            <Route path="/music" element={<Playlist />} />
+            {/* NOVO APP */}
+            <Route
+              path="/app"
+              element={<PraiseAppPage />}
+            />
+
+            <Route
+              path="/music"
+              element={<Playlist />}
+            />
 
             <Route
               path="/schedule"
               element={
                 <ScheduleList
-                  onNavigateToProgram={setSelectedProgram}
+                  onNavigateToProgram={
+                    setSelectedProgram
+                  }
                   onBack={() => navigate('/')}
                 />
               }
             />
 
-            <Route path="/devotional" element={<DevotionalPage />} />
-            <Route path="/events" element={<EventsPage />} />
-            <Route path="/new-releases" element={<NewReleasesPage />} />
-            <Route path="/artists" element={<FeaturedArtistsPage />} />
+            <Route
+              path="/devotional"
+              element={<DevotionalPage />}
+            />
+
+            <Route
+              path="/events"
+              element={<EventsPage />}
+            />
+
+            <Route
+              path="/new-releases"
+              element={<NewReleasesPage />}
+            />
+
+            <Route
+              path="/artists"
+              element={<FeaturedArtistsPage />}
+            />
 
             <Route
               path="/presenters"
-              element={<PresentersPage onNavigateToProgram={setSelectedProgram} />}
+              element={
+                <PresentersPage
+                  onNavigateToProgram={
+                    setSelectedProgram
+                  }
+                />
+              }
             />
 
-            <Route path="/live-recordings" element={<LiveRecordingsPage />} />
-            <Route path="/help" element={<HelpCenterPage />} />
-            <Route path="/feedback" element={<FeedbackPage />} />
-            <Route path="/advertise" element={<AdvertisePage />} />
-            <Route path="/privacy" element={<PrivacyPolicyPage />} />
-            <Route path="/terms" element={<TermsOfUsePage />} />
-            <Route path="/cookies" element={<CookiesPolicyPage />} />
+            <Route
+              path="/live-recordings"
+              element={<LiveRecordingsPage />}
+            />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route
+              path="/help"
+              element={<HelpCenterPage />}
+            />
+
+            <Route
+              path="/feedback"
+              element={<FeedbackPage />}
+            />
+
+            <Route
+              path="/advertise"
+              element={<AdvertisePage />}
+            />
+
+            <Route
+              path="/privacy"
+              element={<PrivacyPolicyPage />}
+            />
+
+            <Route
+              path="/terms"
+              element={<TermsOfUsePage />}
+            />
+
+            <Route
+              path="/cookies"
+              element={<CookiesPolicyPage />}
+            />
+
+            <Route
+              path="*"
+              element={<Navigate to="/" replace />}
+            />
           </Routes>
         )}
       </main>
