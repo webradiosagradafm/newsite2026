@@ -33,10 +33,7 @@ import FeedbackPage from './pages/FeedbackPage'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 import TermsOfUsePage from './pages/TermsOfUsePage'
 import CookiesPolicyPage from './pages/CookiesPolicyPage'
-import AdvertisePage from './pages/AdvertisePage'
-
-/* NOVO APP */
-import PraiseAppPage from './pages/PraiseAppPage'
+import AdvertisePage from './pages/AdvertisePage
 
 import { SCHEDULES } from './constants'
 import { Program } from './types'
@@ -650,12 +647,6 @@ const AppContent: React.FC = () => {
                   trackHistory={trackHistory}
                 />
               }
-            />
-
-            {/* NOVO APP */}
-            <Route
-              path="/app"
-              element={<PraiseAppPage />}
             />
 
             <Route
