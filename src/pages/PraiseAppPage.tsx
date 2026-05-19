@@ -1,16 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
-  Home,
-  Search,
-  CalendarDays,
-  Music2,
-  User,
-  Play,
+  Calendar,
   ChevronRight,
-  Radio
+  Heart,
+  Home,
+  Music,
+  Pause,
+  Play,
+  Search,
+  User
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-
 import { SCHEDULES } from '../constants'
 import { Program } from '../types'
 
@@ -18,52 +18,24 @@ const DEFAULT_COVER = '/logo.png'
 
 const getChicagoTime = () => {
   const now = new Date()
-
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Chicago',
-    weekday: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  })
-
-  const parts = formatter.formatToParts(now)
-
-  const weekday = parts.find((p) => p.type === 'weekday')?.value || 'Mon'
-  const hour = Number(parts.find((p) => p.type === 'hour')?.value || 0)
-  const minute = Number(parts.find((p) => p.type === 'minute')?.value || 0)
-
-  const dayMap: Record<string, number> = {
-    Sun: 0,
-    Mon: 1,
-    Tue: 2,
-    Wed: 3,
-    Thu: 4,
-    Fri: 5,
-    Sat: 6
-  }
+  const chicagoDate = new Date(
+    now.toLocaleString('en-US', { timeZone: 'America/Chicago' })
+  )
 
   return {
-    day: dayMap[weekday] ?? 1,
-    total: hour * 60 + minute
+    day: chicagoDate.getDay(),
+    totalMinutes: chicagoDate.getHours() * 60 + chicagoDate.getMinutes()
   }
 }
 
-const format12h = (time?: string) => {
-  if (!time) return ''
-
-  const [h, m] = time.split(':').map(Number)
+const format12h = (time24: string) => {
+  const [h, m] = time24.split(':').map(Number)
   const period = h >= 12 ? 'PM' : 'AM'
-  const hour = h % 12 || 12
-
-  return `${hour}:${String(m || 0).padStart(2, '0')} ${period}`
+  const displayH = h % 12 || 12
+  return `${displayH}:${String(m).padStart(2, '0')} ${period}`
 }
 
-const getProgramProgress = (program?: Program) => {
-  if (!program) return 0
-
-  const { total } = getChicagoTime()
-
+const isProgramLive = (program: Program, totalMinutes: number) => {
   const [sH, sM] = program.startTime.split(':').map(Number)
   const [eH, eM] = program.endTime.split(':').map(Number)
 
@@ -72,144 +44,139 @@ const getProgramProgress = (program?: Program) => {
 
   if (end === 0 || end <= start) end = 24 * 60
 
-  if (total <= start) return 0
-  if (total >= end) return 100
-
-  return Math.round(((total - start) / (end - start)) * 100)
+  return totalMinutes >= start && totalMinutes < end
 }
 
 export default function PraiseAppPage() {
   const navigate = useNavigate()
-  const [clock, setClock] = useState(getChicagoTime())
+  const [time, setTime] = useState(getChicagoTime())
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setClock(getChicagoTime())
-    }, 30000)
-
+    const timer = setInterval(() => setTime(getChicagoTime()), 30000)
     return () => clearInterval(timer)
   }, [])
 
-  const todaySchedule = useMemo(() => {
-    return SCHEDULES[clock.day] || SCHEDULES[1]
-  }, [clock.day])
+  const schedule = useMemo(() => {
+    return SCHEDULES[time.day] || SCHEDULES[1]
+  }, [time.day])
 
   const currentProgram = useMemo(() => {
-    return todaySchedule.find((program) => {
-      const [sH, sM] = program.startTime.split(':').map(Number)
-      const [eH, eM] = program.endTime.split(':').map(Number)
+    return schedule.find((program) =>
+      isProgramLive(program, time.totalMinutes)
+    )
+  }, [schedule, time.totalMinutes])
 
-      const start = sH * 60 + sM
-      let end = eH * 60 + eM
+  const liveProgram = currentProgram || schedule[0]
 
-      if (end === 0 || end <= start) end = 24 * 60
-
-      return clock.total >= start && clock.total < end
-    })
-  }, [todaySchedule, clock.total])
-
-  const currentIndex = todaySchedule.findIndex(
-    (program) => program.id === currentProgram?.id
-  )
-
-  const queue = useMemo(() => {
-    if (currentIndex === -1) return todaySchedule.slice(0, 4)
-
-    return Array.from({ length: 4 }, (_, index) => {
-      const nextIndex = (currentIndex + index + 1) % todaySchedule.length
-      return todaySchedule[nextIndex]
-    })
-  }, [currentIndex, todaySchedule])
-
-  const progress = getProgramProgress(currentProgram)
+  const continueListening = schedule.slice(0, 4)
 
   return (
-    <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white pb-28">
-      <header className="px-5 pt-6 pb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <img
-            src="/logo.png"
-            alt="Praise FM"
-            className="w-11 h-11 rounded-xl object-contain"
-          />
-          <div>
-            <p className="text-xs uppercase tracking-[0.25em] text-orange-500 font-bold">
-              Praise FM
-            </p>
-            <h1 className="text-xl font-black leading-none">
-              United States
-            </h1>
+    <div className="min-h-screen bg-white text-black pb-32 overflow-x-hidden">
+      <header className="px-6 pt-8 pb-4">
+        <div className="flex items-center justify-between">
+          <div className="text-3xl font-black tracking-tight">
+            <span className="bg-orange-500 text-white px-2 py-1 mr-1">P</span>
+            <span className="bg-orange-500 text-white px-2 py-1 mr-1">F</span>
+            <span className="bg-orange-500 text-white px-2 py-1">M</span>
           </div>
+
+          <button className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+            R
+          </button>
         </div>
+      </header>
+
+      <section className="pt-4">
+        <div className="flex gap-5 overflow-x-auto px-6 pb-6 no-scrollbar">
+          {schedule.map((program) => {
+            const live = currentProgram?.id === program.id
+
+            return (
+              <button
+                key={program.id}
+                onClick={() => setSelectedProgram(program)}
+                className="shrink-0 w-32 text-center"
+              >
+                <div
+                  className={`relative w-28 h-28 mx-auto rounded-full overflow-hidden border-4 shadow-lg ${
+                    live ? 'border-orange-500' : 'border-gray-100'
+                  }`}
+                >
+                  <img
+                    src={program.image || DEFAULT_COVER}
+                    alt={program.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = DEFAULT_COVER
+                    }}
+                  />
+
+                  {live && (
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center text-3xl font-black">
+                        1
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <p className="mt-3 text-xs font-bold truncate">
+                  {program.title}
+                </p>
+
+                <p className="text-[10px] text-gray-500">
+                  {format12h(program.startTime)}
+                </p>
+              </button>
+            )
+          })}
+        </div>
+      </section>
+
+      <section className="px-6 text-center mt-2">
+        <div className="inline-block bg-black text-white text-xs font-black px-4 py-1 mb-3">
+          LIVE
+        </div>
+
+        <h1 className="text-3xl font-black tracking-tight">
+          Praise FM United States
+        </h1>
+
+        <p className="text-lg text-gray-600 mt-2">
+          {liveProgram.title}
+          {liveProgram.host !== 'Praise FM'
+            ? ` with ${liveProgram.host}`
+            : ''}
+        </p>
 
         <button
           onClick={() => navigate('/schedule')}
-          className="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center"
+          className="mt-7 border-2 border-black px-8 py-4 text-lg font-bold inline-flex items-center gap-2 hover:bg-black hover:text-white transition"
         >
-          <Radio className="w-5 h-5" />
+          Stations & schedules
+          <ChevronRight className="w-5 h-5" />
         </button>
-      </header>
+      </section>
 
-      <main>
-        <section className="px-5 pt-2">
-          <h2 className="text-3xl font-black tracking-tight mb-5">
-            Listen Live
-          </h2>
+      <section className="px-6 mt-12">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-3xl font-black">Continue Listening</h2>
+          <button className="text-sm font-bold">Manage list</button>
+        </div>
 
-          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-6">
-            {todaySchedule.map((program) => {
-              const isLive = program.id === currentProgram?.id
-
-              return (
-                <button
-                  key={program.id}
-                  onClick={() => navigate('/schedule')}
-                  className="flex-shrink-0 w-32 text-center"
-                >
-                  <div
-                    className={`relative w-28 h-28 mx-auto rounded-full overflow-hidden border-4 shadow-lg ${
-                      isLive
-                        ? 'border-orange-500'
-                        : 'border-gray-200 dark:border-white/10'
-                    }`}
-                  >
-                    <img
-                      src={program.image || DEFAULT_COVER}
-                      alt={program.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = DEFAULT_COVER
-                      }}
-                    />
-
-                    {isLive && (
-                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                        <div className="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center">
-                          <Play className="w-5 h-5 fill-current ml-0.5" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <p className="mt-3 text-xs font-bold truncate">
-                    {program.title}
-                  </p>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400">
-                    {format12h(program.startTime)}
-                  </p>
-                </button>
-              )
-            })}
-          </div>
-        </section>
-
-        <section className="px-5">
-          <div className="rounded-[2rem] bg-gray-100 dark:bg-[#151515] p-5 shadow-sm">
-            <div className="flex gap-5 items-center">
-              <div className="relative w-28 h-28 rounded-3xl overflow-hidden flex-shrink-0 shadow-lg">
+        <div className="space-y-5">
+          {continueListening.map((program) => (
+            <button
+              key={`continue-${program.id}`}
+              onClick={() => setSelectedProgram(program)}
+              className="w-full flex items-center gap-4 text-left"
+            >
+              <div className="w-24 h-24 shrink-0 overflow-hidden bg-gray-100">
                 <img
-                  src={currentProgram?.image || DEFAULT_COVER}
-                  alt={currentProgram?.title || 'Praise FM'}
+                  src={program.image || DEFAULT_COVER}
+                  alt={program.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.currentTarget.src = DEFAULT_COVER
@@ -218,151 +185,155 @@ export default function PraiseAppPage() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-orange-500 font-black uppercase tracking-widest mb-1">
-                  On Air Now
-                </p>
-
-                <h3 className="text-2xl font-black leading-tight truncate">
-                  {currentProgram?.title || 'Praise FM Live'}
+                <h3 className="font-black text-xl leading-tight truncate">
+                  {program.title}
                 </h3>
 
-                <p className="text-sm text-gray-600 dark:text-gray-400 truncate mt-1">
-                  {currentProgram?.host
-                    ? `with ${currentProgram.host}`
-                    : 'Streaming 24/7'}
+                <p className="text-gray-600 truncate">
+                  {program.host}
                 </p>
 
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                  {format12h(currentProgram?.startTime)} -{' '}
-                  {format12h(currentProgram?.endTime)}
+                <div className="mt-3 flex items-center gap-3">
+                  <div className="h-1 bg-gray-300 flex-1">
+                    <div className="h-full bg-orange-500 w-1/2" />
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {format12h(program.startTime)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="w-11 h-11 rounded-full bg-black text-white flex items-center justify-center shrink-0">
+                <Play className="w-5 h-5 fill-white ml-0.5" />
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {selectedProgram && (
+        <div className="fixed inset-0 z-[90] bg-black/60 flex items-end md:items-center justify-center">
+          <div className="bg-white w-full md:max-w-md rounded-t-3xl md:rounded-3xl p-6">
+            <div className="flex gap-4 items-center">
+              <img
+                src={selectedProgram.image || DEFAULT_COVER}
+                alt={selectedProgram.title}
+                className="w-24 h-24 rounded-2xl object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = DEFAULT_COVER
+                }}
+              />
+
+              <div>
+                <h3 className="text-2xl font-black">
+                  {selectedProgram.title}
+                </h3>
+                <p className="text-gray-600">
+                  with {selectedProgram.host}
+                </p>
+                <p className="text-sm text-orange-500 font-bold mt-1">
+                  {format12h(selectedProgram.startTime)} -{' '}
+                  {format12h(selectedProgram.endTime)}
                 </p>
               </div>
             </div>
 
-            <div className="mt-5">
-              <div className="h-2 bg-gray-300 dark:bg-white/10 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-orange-500 rounded-full transition-all duration-1000"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
+            <p className="mt-5 text-gray-700">
+              {selectedProgram.description}
+            </p>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setIsPlaying(true)
+                  setSelectedProgram(null)
+                }}
+                className="flex-1 bg-orange-500 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2"
+              >
+                <Play className="w-5 h-5 fill-white" />
+                Listen
+              </button>
+
+              <button
+                onClick={() => navigate('/schedule')}
+                className="flex-1 border border-black py-3 rounded-xl font-bold"
+              >
+                Schedule
+              </button>
             </div>
 
             <button
-              onClick={() => navigate('/schedule')}
-              className="mt-5 w-full bg-black text-white dark:bg-white dark:text-black rounded-2xl py-3 font-black flex items-center justify-center gap-2"
+              onClick={() => setSelectedProgram(null)}
+              className="mt-4 w-full text-gray-500 font-bold py-2"
             >
-              Stations & schedules
-              <ChevronRight className="w-5 h-5" />
+              Close
             </button>
           </div>
-        </section>
+        </div>
+      )}
 
-        <section className="px-5 mt-8">
-          <h2 className="text-2xl font-black mb-4">
-            Coming Up
-          </h2>
+      <div className="fixed bottom-16 left-0 right-0 bg-black text-white px-5 py-3 flex items-center justify-between z-50">
+        <div className="min-w-0">
+          <p className="text-sm font-bold truncate">
+            On Air: {liveProgram.title}
+          </p>
+          <p className="text-xs text-white/60 truncate">
+            {liveProgram.host}
+          </p>
+        </div>
 
-          <div className="space-y-3">
-            {queue.map((program) => (
-              <button
-                key={program.id}
-                onClick={() => navigate('/schedule')}
-                className="w-full flex items-center gap-4 bg-gray-50 dark:bg-[#111] hover:bg-gray-100 dark:hover:bg-[#1b1b1b] rounded-2xl p-3 text-left transition"
-              >
-                <img
-                  src={program.image || DEFAULT_COVER}
-                  alt={program.title}
-                  className="w-14 h-14 rounded-xl object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = DEFAULT_COVER
-                  }}
-                />
+        <button
+          onClick={() => setIsPlaying((v) => !v)}
+          className="w-12 h-12 rounded-full border-4 border-orange-500 flex items-center justify-center"
+        >
+          {isPlaying ? (
+            <Pause className="w-5 h-5 fill-white" />
+          ) : (
+            <Play className="w-5 h-5 fill-white ml-0.5" />
+          )}
+        </button>
+      </div>
 
-                <div className="min-w-0 flex-1">
-                  <p className="font-bold truncate">{program.title}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    {program.host}
-                  </p>
-                </div>
-
-                <span className="text-xs font-black text-orange-500">
-                  {format12h(program.startTime)}
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="px-5 mt-8">
-          <h2 className="text-2xl font-black mb-4">
-            Continue Listening
-          </h2>
-
-          <div className="grid grid-cols-2 gap-4">
-            {todaySchedule.slice(0, 4).map((program) => (
-              <button
-                key={`continue-${program.id}`}
-                onClick={() => navigate('/schedule')}
-                className="text-left rounded-3xl overflow-hidden bg-gray-100 dark:bg-[#151515]"
-              >
-                <img
-                  src={program.image || DEFAULT_COVER}
-                  alt={program.title}
-                  className="w-full aspect-square object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = DEFAULT_COVER
-                  }}
-                />
-
-                <div className="p-3">
-                  <p className="text-sm font-black truncate">
-                    {program.title}
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">
-                    {program.host}
-                  </p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
-      </main>
-
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-black/95 backdrop-blur-xl border-t border-gray-200 dark:border-white/10 z-50">
-        <div className="grid grid-cols-5 py-2">
-          <button className="flex flex-col items-center gap-1 text-orange-500">
-            <Home className="w-5 h-5" />
-            <span className="text-[10px] font-bold">Home</span>
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-50">
+        <div className="flex items-center justify-around">
+          <button
+            onClick={() => navigate('/app')}
+            className="flex flex-col items-center text-orange-500"
+          >
+            <Home className="w-6 h-6" />
+            <span className="text-xs font-bold">Home</span>
           </button>
 
           <button
             onClick={() => navigate('/music')}
-            className="flex flex-col items-center gap-1 text-gray-500"
+            className="flex flex-col items-center text-gray-500"
           >
-            <Music2 className="w-5 h-5" />
-            <span className="text-[10px] font-bold">Music</span>
+            <Music className="w-6 h-6" />
+            <span className="text-xs font-bold">Music</span>
           </button>
 
           <button
             onClick={() => navigate('/schedule')}
-            className="flex flex-col items-center gap-1 text-gray-500"
+            className="flex flex-col items-center text-gray-500"
           >
-            <CalendarDays className="w-5 h-5" />
-            <span className="text-[10px] font-bold">Schedule</span>
-          </button>
-
-          <button className="flex flex-col items-center gap-1 text-gray-500">
-            <Search className="w-5 h-5" />
-            <span className="text-[10px] font-bold">Search</span>
+            <Calendar className="w-6 h-6" />
+            <span className="text-xs font-bold">Schedule</span>
           </button>
 
           <button
-            onClick={() => navigate('/presenters')}
-            className="flex flex-col items-center gap-1 text-gray-500"
+            onClick={() => alert('My Sounds coming soon')}
+            className="flex flex-col items-center text-gray-500"
           >
-            <User className="w-5 h-5" />
-            <span className="text-[10px] font-bold">My Sounds</span>
+            <User className="w-6 h-6" />
+            <span className="text-xs font-bold">My Sounds</span>
+          </button>
+
+          <button
+            onClick={() => alert('Search coming soon')}
+            className="flex flex-col items-center text-gray-500"
+          >
+            <Search className="w-6 h-6" />
+            <span className="text-xs font-bold">Search</span>
           </button>
         </div>
       </nav>
