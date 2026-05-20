@@ -23,5 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 serviceAccountKey.json
+serviceAccountKey.json.json
 auto-upload.cjs
 .env
