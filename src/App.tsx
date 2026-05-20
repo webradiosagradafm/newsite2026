@@ -10,7 +10,9 @@ import {
 
 import { Play, Pause, Megaphone } from 'lucide-react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
+
 import { AuthProvider } from './contexts/AuthContext'
+
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import RecentlyPlayed from './components/RecentlyPlayed'
@@ -19,6 +21,8 @@ import ProgramMiniPage from './components/ProgramMiniPage'
 import Playlist from './components/Playlist'
 import ScheduleList from './components/ScheduleList'
 import SEO from './components/SEO'
+
+import ProgramsPage from './pages/ProgramsPage'
 import ProgramEpisodesPage from './pages/ProgramEpisodesPage'
 import DevotionalPage from './pages/DevotionalPage'
 import EventsPage from './pages/EventsPage'
@@ -33,6 +37,7 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 import TermsOfUsePage from './pages/TermsOfUsePage'
 import CookiesPolicyPage from './pages/CookiesPolicyPage'
 import AdvertisePage from './pages/AdvertisePage'
+
 import { SCHEDULES } from './constants'
 import { Program } from './types'
 
@@ -72,14 +77,9 @@ const formatToAmPm = (time?: string) => {
   const [hourRaw, minuteRaw] = time.split(':').map(Number)
 
   const hour =
-    hourRaw === 0
-      ? 12
-      : hourRaw > 12
-      ? hourRaw - 12
-      : hourRaw
+    hourRaw === 0 ? 12 : hourRaw > 12 ? hourRaw - 12 : hourRaw
 
   const minute = String(minuteRaw || 0).padStart(2, '0')
-
   const period = hourRaw >= 12 ? 'PM' : 'AM'
 
   return `${hour}:${minute} ${period}`
@@ -139,7 +139,6 @@ const getProgramProgress = (program?: Program) => {
   const [eH, eM] = program.endTime.split(':').map(Number)
 
   const start = sH * 60 + sM
-
   let end = eH * 60 + eM
 
   if (end === 0 || end <= start) {
@@ -198,7 +197,6 @@ const HomeBBC = ({
   const nextThree = queue?.[2]
 
   const presenterImage = getProgramImage(currentProgram)
-
   const progress = getProgramProgress(currentProgram)
 
   const size = 190
@@ -625,11 +623,27 @@ const AppContent: React.FC = () => {
             path="/program"
             element={
               selectedProgram ? (
-                <ProgramMiniPage />
+                <ProgramMiniPage
+                  program={selectedProgram}
+                  queue={queue}
+                  liveMetadata={liveMetadata}
+                  trackHistory={trackHistory}
+                  isPlaying={isPlaying}
+                  onListenClick={togglePlayback}
+                  onBack={() => navigate(-1)}
+                  onViewSchedule={() => navigate('/schedule')}
+                />
               ) : (
                 <Navigate to="/schedule" replace />
               )
             }
+          />
+
+          <Route path="/programs" element={<ProgramsPage />} />
+
+          <Route
+            path="/program/:slug"
+            element={<ProgramEpisodesPage />}
           />
 
           <Route path="/music" element={<Playlist />} />
@@ -671,8 +685,8 @@ const AppContent: React.FC = () => {
           />
 
           <Route
-            path="/program/:slug"
-            element={<ProgramEpisodesPage />}
+            path="/live-recordings"
+            element={<LiveRecordingsPage />}
           />
 
           <Route
