@@ -21,30 +21,6 @@ const programs = [
     description: 'Fresh Christian artists and the future of worship music.'
   },
   {
-    slug: 'morning-show',
-    title: 'Morning Show',
-    presenter: 'Stancy Campbell',
-    time: '7:00 AM - 12:00 PM',
-    image: '/logo.png',
-    description: 'Faith, music and inspiration to start your day.'
-  },
-  {
-    slug: 'midday-grace',
-    title: 'Midday Grace',
-    presenter: 'Michael Ray',
-    time: '1:00 PM - 4:00 PM',
-    image: '/logo.png',
-    description: 'Grace in the middle of your day.'
-  },
-  {
-    slug: 'midnight-grace',
-    title: 'Midnight Grace',
-    presenter: 'Daniel Brooks',
-    time: '12:00 AM - 6:00 AM',
-    image: '/logo.png',
-    description: 'Worship through the night.'
-  },
-  {
     slug: 'praise-fm-rock',
     title: 'Praise FM Rock',
     presenter: 'Jake Hunter',
@@ -53,6 +29,7 @@ const programs = [
     description: 'Faith louder than ever.'
   }
 ]
+
 
 export default function ProgramsPage() {
   return (
