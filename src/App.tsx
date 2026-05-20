@@ -10,6 +10,7 @@ import {
 
 import { Play, Pause, Megaphone } from 'lucide-react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
+import { Analytics } from '@vercel/analytics/react'
 
 import { AuthProvider } from './contexts/AuthContext'
 
@@ -745,6 +746,7 @@ export default function App() {
         <ScrollToTop />
         <AppContent />
         <SpeedInsights />
+        <Analytics />
       </BrowserRouter>
     </AuthProvider>
   )
