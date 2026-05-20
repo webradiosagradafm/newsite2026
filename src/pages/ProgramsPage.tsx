@@ -25,7 +25,8 @@ const programs = [
     title: 'Praise FM Rock',
     presenter: 'Jake Hunter',
     time: '8:00 PM - 9:00 PM',
-    image: '/logo.png',
+    image:
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/jake-hunter_q6ligi.webp',
     description: 'Faith louder than ever.'
   }
 ]
