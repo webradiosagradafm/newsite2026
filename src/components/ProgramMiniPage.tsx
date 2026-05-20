@@ -5,7 +5,8 @@ import {
   Clock,
   Music2,
   Pause,
-  Play
+  Play,
+  Radio
 } from 'lucide-react'
 
 import { Program } from '../types'
@@ -89,6 +90,7 @@ const ProgramMiniPage: React.FC<ProgramMiniPageProps> = ({
   onListenClick
 }) => {
   const image = getProgramImage(program)
+
   const host = getHostName(program)
 
   return (
@@ -122,6 +124,7 @@ const ProgramMiniPage: React.FC<ProgramMiniPageProps> = ({
 
               <span className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
                 <Clock size={15} />
+
                 {formatRangeToAmPm(
                   program.startTime,
                   program.endTime
@@ -169,6 +172,7 @@ const ProgramMiniPage: React.FC<ProgramMiniPageProps> = ({
               <div className="rounded-3xl bg-gray-100 dark:bg-[#1A1A1A] p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <Music2 className="text-orange-500" size={20} />
+
                   <h2 className="font-black text-lg">
                     Now Playing
                   </h2>
@@ -228,6 +232,84 @@ const ProgramMiniPage: React.FC<ProgramMiniPageProps> = ({
                 </div>
               </div>
             </div>
+
+            {/* LATEST EPISODES */}
+
+            <div className="mt-5 rounded-3xl bg-gray-100 dark:bg-[#1A1A1A] p-5">
+              <div className="flex items-center gap-2 mb-5">
+                <Radio className="text-orange-500" size={20} />
+
+                <h2 className="font-black text-lg">
+                  Latest Episodes
+                </h2>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-white dark:bg-[#242424] rounded-2xl p-4">
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <img
+                      src={image}
+                      alt="Episode"
+                      className="w-full md:w-28 h-28 object-cover rounded-2xl"
+                    />
+
+                    <div className="flex-1">
+                      <p className="text-xs uppercase tracking-wide text-orange-500 font-black mb-2">
+                        20 May 2026 • 60 mins
+                      </p>
+
+                      <h3 className="text-xl font-black mb-2">
+                        Praise FM Classics
+                      </h3>
+
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        The best Christian classics from 2015 to 2022.
+                      </p>
+
+                      <audio controls className="w-full">
+                        <source
+                          src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+                          type="audio/mpeg"
+                        />
+                      </audio>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-[#242424] rounded-2xl p-4">
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <img
+                      src={image}
+                      alt="Episode"
+                      className="w-full md:w-28 h-28 object-cover rounded-2xl"
+                    />
+
+                    <div className="flex-1">
+                      <p className="text-xs uppercase tracking-wide text-orange-500 font-black mb-2">
+                        19 May 2026 • 60 mins
+                      </p>
+
+                      <h3 className="text-xl font-black mb-2">
+                        Praise FM Classics
+                      </h3>
+
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        Timeless worship classics and unforgettable songs.
+                      </p>
+
+                      <audio controls className="w-full">
+                        <source
+                          src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+                          type="audio/mpeg"
+                        />
+                      </audio>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* RECENTLY PLAYED */}
 
             <div className="mt-5 rounded-3xl bg-gray-100 dark:bg-[#1A1A1A] p-5">
               <h2 className="font-black text-lg mb-4">
