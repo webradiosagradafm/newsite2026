@@ -1,32 +1,125 @@
-import SEO from "../components/SEO";
+import { Link } from 'react-router-dom'
+import SEO from '../components/SEO'
+
+const programs = [
+  {
+    slug: 'classic',
+    title: 'Praise FM Classics',
+    presenter: 'Scott Turner',
+    time: '9:00 PM - 10:00 PM',
+    image:
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/scott-turner_wumkut.webp',
+    description: 'Christian classics from 2015 to 2022.'
+  },
+  {
+    slug: 'future-artists',
+    title: 'Future Artists',
+    presenter: 'Sarah Jordan',
+    time: '5:00 PM - 6:00 PM',
+    image:
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/sarah-jordan_jnuzrb.webp',
+    description: 'Fresh Christian artists and the future of worship music.'
+  },
+  {
+    slug: 'morning-show',
+    title: 'Morning Show',
+    presenter: 'Stancy Campbell',
+    time: '7:00 AM - 12:00 PM',
+    image: '/logo.png',
+    description: 'Faith, music and inspiration to start your day.'
+  },
+  {
+    slug: 'midday-grace',
+    title: 'Midday Grace',
+    presenter: 'Michael Ray',
+    time: '1:00 PM - 4:00 PM',
+    image: '/logo.png',
+    description: 'Grace in the middle of your day.'
+  },
+  {
+    slug: 'midnight-grace',
+    title: 'Midnight Grace',
+    presenter: 'Daniel Brooks',
+    time: '12:00 AM - 6:00 AM',
+    image: '/logo.png',
+    description: 'Worship through the night.'
+  },
+  {
+    slug: 'praise-fm-rock',
+    title: 'Praise FM Rock',
+    presenter: 'Jake Hunter',
+    time: '8:00 PM - 9:00 PM',
+    image: '/logo.png',
+    description: 'Faith louder than ever.'
+  }
+]
 
 export default function ProgramsPage() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10 text-black dark:text-white">
+    <main className="min-h-screen bg-white dark:bg-[#121212] text-black dark:text-white">
       <SEO
         title="Praise FM Programs | Global Christian Radio Shows"
         description="Explore all programs on Praise FM. Christian radio shows, worship music, and gospel programming streaming worldwide."
       />
 
-      <h1 className="text-2xl font-bold mb-4">
-        Praise FM Programs
-      </h1>
+      <section className="max-w-7xl mx-auto px-4 md:px-6 py-10">
+        <div className="mb-10">
+          <p className="text-orange-500 font-black uppercase tracking-wide text-sm mb-2">
+            Praise FM USA
+          </p>
 
-      <p className="mb-4">
-        Discover the full lineup of Praise FM. Our programs are designed to inspire,
-        encourage, and bring faith-filled music to listeners around the world.
-      </p>
+          <h1 className="text-4xl md:text-6xl font-black mb-4">
+            Programs
+          </h1>
 
-      <p className="mb-4">
-        From worship sessions to gospel hits and special shows, Praise FM delivers
-        a global Christian radio experience 24/7.
-      </p>
+          <p className="max-w-3xl text-gray-600 dark:text-gray-400 text-lg">
+            Discover shows, hosts, music blocks and listen-again episodes from Praise FM.
+          </p>
+        </div>
 
-      <p>
-        <a href="/#/christian-radio">Christian Radio</a> |{" "}
-        <a href="/#/gospel-radio">Gospel Radio</a> |{" "}
-        <a href="/#/worship-radio">Worship Radio</a>
-      </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+          {programs.map((program) => (
+            <Link
+              key={program.slug}
+              to={`/program/${program.slug}`}
+              className="group rounded-3xl overflow-hidden bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#242424] transition shadow-sm hover:shadow-xl"
+            >
+              <div className="aspect-square overflow-hidden bg-black">
+                <img
+                  src={program.image}
+                  alt={program.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                  onError={(e) => {
+                    e.currentTarget.src = '/logo.png'
+                  }}
+                />
+              </div>
+
+              <div className="p-5">
+                <p className="text-xs font-black text-orange-500 uppercase tracking-wide mb-2">
+                  {program.time}
+                </p>
+
+                <h2 className="text-2xl font-black mb-1 group-hover:text-orange-500 transition">
+                  {program.title}
+                </h2>
+
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  with {program.presenter}
+                </p>
+
+                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                  {program.description}
+                </p>
+
+                <div className="mt-5 inline-flex items-center text-sm font-black text-orange-500">
+                  View episodes →
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
     </main>
-  );
+  )
 }
