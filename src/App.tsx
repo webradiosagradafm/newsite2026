@@ -10,9 +10,7 @@ import {
 
 import { Play, Pause, Megaphone } from 'lucide-react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
-
 import { AuthProvider } from './contexts/AuthContext'
-
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import RecentlyPlayed from './components/RecentlyPlayed'
@@ -21,7 +19,7 @@ import ProgramMiniPage from './components/ProgramMiniPage'
 import Playlist from './components/Playlist'
 import ScheduleList from './components/ScheduleList'
 import SEO from './components/SEO'
-
+import ProgramEpisodesPage from './pages/ProgramEpisodesPage'
 import DevotionalPage from './pages/DevotionalPage'
 import EventsPage from './pages/EventsPage'
 import NewReleasesPage from './pages/NewReleasesPage'
@@ -35,7 +33,6 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 import TermsOfUsePage from './pages/TermsOfUsePage'
 import CookiesPolicyPage from './pages/CookiesPolicyPage'
 import AdvertisePage from './pages/AdvertisePage'
-
 import { SCHEDULES } from './constants'
 import { Program } from './types'
 
@@ -628,16 +625,7 @@ const AppContent: React.FC = () => {
             path="/program"
             element={
               selectedProgram ? (
-                <ProgramMiniPage
-                  program={selectedProgram}
-                  queue={queue}
-                  liveMetadata={liveMetadata}
-                  trackHistory={trackHistory}
-                  isPlaying={isPlaying}
-                  onListenClick={togglePlayback}
-                  onBack={() => navigate(-1)}
-                  onViewSchedule={() => navigate('/schedule')}
-                />
+                <ProgramMiniPage />
               ) : (
                 <Navigate to="/schedule" replace />
               )
@@ -680,6 +668,11 @@ const AppContent: React.FC = () => {
                 onNavigateToProgram={openProgramPage}
               />
             }
+          />
+
+          <Route
+            path="/program/:slug"
+            element={<ProgramEpisodesPage />}
           />
 
           <Route
