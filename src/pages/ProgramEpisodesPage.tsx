@@ -207,9 +207,36 @@ export default function ProgramEpisodesPage() {
                         {episode.description}
                       </p>
 
-                      <audio controls className="w-full">
-                        <source src={episode.audioUrl} type="audio/mpeg" />
-                      </audio>
+                      <div className="bg-black/40 border border-white/10 rounded-2xl p-4 backdrop-blur-xl">
+                        <div className="flex items-center gap-4 mb-4">
+                          <button className="w-14 h-14 rounded-full bg-orange-500 hover:bg-orange-600 transition flex items-center justify-center text-white shadow-lg">
+                            <Play size={24} fill="currentColor" />
+                          </button>
+
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between text-xs uppercase tracking-wide text-gray-400 mb-2">
+                              <span>Now Playing</span>
+                              <span>{episode.duration}</span>
+                            </div>
+
+                            <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                              <div className="h-full w-1/3 bg-orange-500 rounded-full"></div>
+                            </div>
+
+                            <div className="flex justify-between text-xs text-gray-500 mt-2">
+                              <span>00:00</span>
+                              <span>{episode.duration}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <audio
+                          controls
+                          className="w-full opacity-80 hover:opacity-100 transition"
+                        >
+                          <source src={episode.audioUrl} type="audio/mpeg" />
+                        </audio>
+                      </div>
                     </div>
                   </div>
                 </article>
