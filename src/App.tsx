@@ -28,6 +28,7 @@ import NewReleasesPage from './pages/NewReleasesPage'
 import FeaturedArtistsPage from './pages/FeaturedArtistsPage'
 import PresentersPage from './pages/PresentersPage'
 import LiveRecordingsPage from './pages/LiveRecordingsPage'
+import ListenAgainPage from './pages/ListenAgainPage'
 import HelpCenterPage from './pages/HelpCenterPage'
 import FeedbackPage from './pages/FeedbackPage'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
@@ -682,8 +683,8 @@ const AppContent: React.FC = () => {
           />
 
           <Route
-            path="/live-recordings"
-            element={<LiveRecordingsPage />}
+            path="/listen-again"
+            element={<ListenAgainPage />}
           />
 
           <Route path="/help" element={<HelpCenterPage />} />
