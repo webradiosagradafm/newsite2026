@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   collection,
@@ -8,7 +8,15 @@ import {
   doc,
   getDoc
 } from 'firebase/firestore'
-import { ArrowLeft, Clock, Play } from 'lucide-react'
+import {
+  ArrowLeft,
+  Clock,
+  Pause,
+  Play,
+  SkipBack,
+  SkipForward,
+  Volume2
+} from 'lucide-react'
 
 import { db } from '../firebase'
 
@@ -32,7 +40,208 @@ interface ProgramData {
   end: string
 }
 
+interface EpisodePlayerProps {
+  episode: Episode
+  image: string
+}
+
 const DEFAULT_COVER = '/logo.png'
+
+const formatTime = (seconds: number) => {
+  if (!Number.isFinite(seconds)) return '0:00'
+
+  const mins = Math.floor(seconds / 60)
+  const secs = Math.floor(seconds % 60)
+
+  return `${mins}:${String(secs).padStart(2, '0')}`
+}
+
+const EpisodePlayer = ({ episode, image }: EpisodePlayerProps) => {
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+
+  const progress =
+    duration > 0 ? Math.min((currentTime / duration) * 100, 100) : 0
+
+  const togglePlay = async () => {
+    if (!audioRef.current) return
+
+    if (isPlaying) {
+      audioRef.current.pause()
+      setIsPlaying(false)
+      return
+    }
+
+    try {
+      await audioRef.current.play()
+      setIsPlaying(true)
+    } catch (error) {
+      console.error('Error playing episode:', error)
+    }
+  }
+
+  const seekTo = (value: number) => {
+    if (!audioRef.current || !duration) return
+
+    const nextTime = (value / 100) * duration
+
+    audioRef.current.currentTime = nextTime
+    setCurrentTime(nextTime)
+  }
+
+  const skip = (seconds: number) => {
+    if (!audioRef.current) return
+
+    const nextTime = Math.max(
+      0,
+      Math.min(audioRef.current.currentTime + seconds, duration || 0)
+    )
+
+    audioRef.current.currentTime = nextTime
+    setCurrentTime(nextTime)
+  }
+
+  return (
+    <div className="rounded-[2rem] bg-[#111111] border border-white/10 overflow-hidden shadow-2xl">
+      <audio
+        ref={audioRef}
+        preload="metadata"
+        src={episode.audioUrl}
+        onLoadedMetadata={(e) => {
+          setDuration(e.currentTarget.duration || 0)
+        }}
+        onTimeUpdate={(e) => {
+          setCurrentTime(e.currentTarget.currentTime || 0)
+        }}
+        onEnded={() => {
+          setIsPlaying(false)
+          setCurrentTime(0)
+        }}
+        onPause={() => setIsPlaying(false)}
+        onPlay={() => setIsPlaying(true)}
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr]">
+        <div className="relative min-h-[280px] bg-black">
+          <img
+            src={image}
+            alt={episode.title}
+            className="absolute inset-0 h-full w-full object-cover opacity-90"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_COVER
+            }}
+          />
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+
+          <button
+            onClick={togglePlay}
+            className="absolute left-6 bottom-6 w-20 h-20 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center shadow-2xl transition active:scale-95"
+            aria-label={isPlaying ? 'Pause episode' : 'Play episode'}
+          >
+            {isPlaying ? (
+              <Pause size={34} fill="currentColor" />
+            ) : (
+              <Play size={34} fill="currentColor" className="ml-1" />
+            )}
+          </button>
+        </div>
+
+        <div className="p-6 md:p-8 flex flex-col justify-center">
+          <div className="flex flex-wrap items-center gap-2 text-xs font-black uppercase tracking-wide text-orange-500 mb-3">
+            <span>{episode.date}</span>
+            <span>•</span>
+            <span>{episode.duration}</span>
+          </div>
+
+          <h3 className="text-3xl md:text-5xl font-black leading-tight mb-3">
+            {episode.title}
+          </h3>
+
+          <p className="text-gray-400 mb-8 max-w-3xl">
+            {episode.description}
+          </p>
+
+          <div className="rounded-3xl bg-black/50 border border-white/10 p-5">
+            <div className="flex items-center gap-4 mb-5">
+              <button
+                onClick={() => skip(-15)}
+                className="hidden sm:flex w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white items-center justify-center transition"
+                aria-label="Skip back 15 seconds"
+              >
+                <SkipBack size={20} />
+              </button>
+
+              <button
+                onClick={togglePlay}
+                className="w-16 h-16 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center shadow-xl transition active:scale-95"
+                aria-label={isPlaying ? 'Pause episode' : 'Play episode'}
+              >
+                {isPlaying ? (
+                  <Pause size={28} fill="currentColor" />
+                ) : (
+                  <Play size={28} fill="currentColor" className="ml-1" />
+                )}
+              </button>
+
+              <button
+                onClick={() => skip(30)}
+                className="hidden sm:flex w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white items-center justify-center transition"
+                aria-label="Skip forward 30 seconds"
+              >
+                <SkipForward size={20} />
+              </button>
+
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wide text-gray-400 mb-2">
+                  <span>{isPlaying ? 'Now Playing' : 'Ready to Play'}</span>
+                  <span>{formatTime(duration)}</span>
+                </div>
+
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={progress}
+                  onChange={(e) => seekTo(Number(e.target.value))}
+                  className="w-full accent-orange-500 cursor-pointer"
+                  aria-label="Episode progress"
+                />
+
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(duration)}</span>
+                </div>
+              </div>
+
+              <Volume2 className="hidden md:block text-gray-500" size={22} />
+            </div>
+
+            <div className="h-12 flex items-end gap-1 overflow-hidden">
+              {Array.from({ length: 80 }).map((_, index) => {
+                const active = index < Math.round(progress * 0.8)
+                const height = 20 + ((index * 13) % 28)
+
+                return (
+                  <div
+                    key={index}
+                    className={`w-1 rounded-full transition-all ${
+                      active ? 'bg-orange-500' : 'bg-white/10'
+                    }`}
+                    style={{ height }}
+                  />
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function ProgramEpisodesPage() {
   const { slug } = useParams()
@@ -168,78 +377,13 @@ export default function ProgramEpisodesPage() {
               No episodes available yet.
             </div>
           ) : (
-            <div className="space-y-5">
+            <div className="space-y-8">
               {episodes.map((episode) => (
-                <article
+                <EpisodePlayer
                   key={episode.id}
-                  className="rounded-3xl bg-[#151515] p-4 md:p-5 transition hover:bg-[#1f1f1f]"
-                >
-                  <div className="flex flex-col md:flex-row gap-5">
-                    <div className="relative w-full md:w-40 h-40 flex-shrink-0 overflow-hidden rounded-2xl bg-black">
-                      <img
-                        src={episode.image || program.image || DEFAULT_COVER}
-                        alt={episode.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = DEFAULT_COVER
-                        }}
-                      />
-
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/25">
-                        <div className="w-12 h-12 rounded-full bg-orange-500 text-white flex items-center justify-center">
-                          <Play size={22} fill="currentColor" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 text-xs font-black uppercase tracking-wide text-orange-500 mb-2">
-                        <span>{episode.date}</span>
-                        <span>•</span>
-                        <span>{episode.duration}</span>
-                      </div>
-
-                      <h3 className="text-2xl md:text-3xl font-black mb-2">
-                        {episode.title}
-                      </h3>
-
-                      <p className="text-gray-400 mb-4">
-                        {episode.description}
-                      </p>
-
-                      <div className="bg-black/40 border border-white/10 rounded-2xl p-4 backdrop-blur-xl">
-                        <div className="flex items-center gap-4 mb-4">
-                          <button className="w-14 h-14 rounded-full bg-orange-500 hover:bg-orange-600 transition flex items-center justify-center text-white shadow-lg">
-                            <Play size={24} fill="currentColor" />
-                          </button>
-
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between text-xs uppercase tracking-wide text-gray-400 mb-2">
-                              <span>Now Playing</span>
-                              <span>{episode.duration}</span>
-                            </div>
-
-                            <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-                              <div className="h-full w-1/3 bg-orange-500 rounded-full"></div>
-                            </div>
-
-                            <div className="flex justify-between text-xs text-gray-500 mt-2">
-                              <span>00:00</span>
-                              <span>{episode.duration}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <audio
-                          controls
-                          className="w-full opacity-80 hover:opacity-100 transition"
-                        >
-                          <source src={episode.audioUrl} type="audio/mpeg" />
-                        </audio>
-                      </div>
-                    </div>
-                  </div>
-                </article>
+                  episode={episode}
+                  image={episode.image || program.image || DEFAULT_COVER}
+                />
               ))}
             </div>
           )}
