@@ -197,10 +197,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
     sessionIdRef.current = sessionId;
     startTimeRef.current = Date.now();
     const info = await getListenerInfo();
-    try {
-      const supabaseClient = (window as any).supabase;
-      if (!supabaseClient?.from) return;
-      await supabaseClient.from('listening_sessions').insert({
         user_id: listenerId,
         session_id: sessionId,
         audio_id: program.title || program.host || 'Unknown',
@@ -220,11 +216,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
 
   const updateDuration = async () => {
     if (!sessionIdRef.current) return;
-    try {
-      const supabaseClient = (window as any).supabase;
-      if (!supabaseClient?.from) return;
-      await supabaseClient
-        .from('listening_sessions')
+
         .update({
           duration_seconds: Math.floor(
             (Date.now() - startTimeRef.current) / 1000
@@ -238,11 +230,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
 
   const markAsCompleted = async () => {
     if (!sessionIdRef.current) return;
-    try {
-      const supabaseClient = (window as any).supabase;
-      if (!supabaseClient?.from) return;
-      await supabaseClient
-        .from('listening_sessions')
+
         .update({
           completed: true,
           duration_seconds: Math.floor(

@@ -37,7 +37,6 @@ const CookiesPolicyPage: React.FC = () => {
              <div className="bg-white dark:bg-[#111] p-10">
                <Shield className="w-6 h-6 text-[#ff6600] mb-6" />
                <h3 className="text-xl font-medium uppercase tracking-tight mb-4 dark:text-white">Essential Cookies</h3>
-               <p className="text-sm text-gray-500 uppercase tracking-tight leading-relaxed">Required for account login (Supabase) and keeping you authenticated as you browse different programs.</p>
              </div>
              <div className="bg-white dark:bg-[#111] p-10">
                <Settings className="w-6 h-6 text-[#ff6600] mb-6" />
