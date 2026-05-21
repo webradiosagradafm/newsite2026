@@ -99,7 +99,6 @@ const TermsOfUsePage: React.FC = () => {
 
             <section id="accounts" className="scroll-mt-32">
               <h2 className="text-3xl font-medium uppercase tracking-tighter mb-8 dark:text-white border-b-2 border-black dark:border-white pb-4 inline-block">4. Account Security</h2>
-              <p className="text-gray-600 dark:text-gray-400 font-normal uppercase tracking-tight text-sm leading-relaxed">You are responsible for maintaining the confidentiality of your account credentials. All activities occurring under your account are your responsibility. We use Supabase for authentication to ensure industry-standard security.</p>
             </section>
 
             <section id="ip" className="scroll-mt-32">
