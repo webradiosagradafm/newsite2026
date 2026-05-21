@@ -11,7 +11,6 @@ import {
   RotateCw,
 } from 'lucide-react';
 import { Program } from '../types';
-import { supabase } from '../lib/supabase';
 
 /* ------------------------------------------------------------------ */
 /*  Animação auxiliar                                                 */
@@ -199,7 +198,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
     startTimeRef.current = Date.now();
     const info = await getListenerInfo();
     try {
-      await supabase.from('listeners').insert({
         user_id: listenerId,
         session_id: sessionId,
         audio_id: program.title || program.host || 'Unknown',
@@ -220,8 +218,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
   const updateDuration = async () => {
     if (!sessionIdRef.current) return;
     try {
-      await supabase
-        .from('listeners')
         .update({
           duration_seconds: Math.floor(
             (Date.now() - startTimeRef.current) / 1000
@@ -236,8 +232,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
   const markAsCompleted = async () => {
     if (!sessionIdRef.current) return;
     try {
-      await supabase
-        .from('listeners')
         .update({
           completed: true,
           duration_seconds: Math.floor(
