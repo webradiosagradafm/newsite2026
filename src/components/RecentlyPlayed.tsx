@@ -134,7 +134,6 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
   const handleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation()
 
-  
   }
 
   return (
