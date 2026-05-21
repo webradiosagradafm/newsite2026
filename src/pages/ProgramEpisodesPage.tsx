@@ -23,7 +23,7 @@ import { db } from '../firebase'
 interface Episode {
   id: string
   title: string
-  presenter: string
+  presenter?: string
   description: string
   duration: string
   date: string
@@ -43,6 +43,7 @@ interface ProgramData {
 interface EpisodePlayerProps {
   episode: Episode
   image: string
+  fallbackPresenter: string
 }
 
 const DEFAULT_COVER = '/logo.png'
@@ -56,15 +57,22 @@ const formatTime = (seconds: number) => {
   return `${mins}:${String(secs).padStart(2, '0')}`
 }
 
-const EpisodePlayer = ({ episode, image }: EpisodePlayerProps) => {
+const EpisodePlayer = ({
+  episode,
+  image,
+  fallbackPresenter
+}: EpisodePlayerProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [volume, setVolume] = useState(0.85)
 
   const progress =
     duration > 0 ? Math.min((currentTime / duration) * 100, 100) : 0
+
+  const presenter = episode.presenter || fallbackPresenter
 
   const togglePlay = async () => {
     if (!audioRef.current) return
@@ -87,7 +95,6 @@ const EpisodePlayer = ({ episode, image }: EpisodePlayerProps) => {
     if (!audioRef.current || !duration) return
 
     const nextTime = (value / 100) * duration
-
     audioRef.current.currentTime = nextTime
     setCurrentTime(nextTime)
   }
@@ -104,6 +111,14 @@ const EpisodePlayer = ({ episode, image }: EpisodePlayerProps) => {
     setCurrentTime(nextTime)
   }
 
+  const changeVolume = (value: number) => {
+    setVolume(value)
+
+    if (audioRef.current) {
+      audioRef.current.volume = value
+    }
+  }
+
   return (
     <div className="rounded-[2rem] bg-[#111111] border border-white/10 overflow-hidden shadow-2xl">
       <audio
@@ -112,6 +127,7 @@ const EpisodePlayer = ({ episode, image }: EpisodePlayerProps) => {
         src={episode.audioUrl}
         onLoadedMetadata={(e) => {
           setDuration(e.currentTarget.duration || 0)
+          e.currentTarget.volume = volume
         }}
         onTimeUpdate={(e) => {
           setCurrentTime(e.currentTarget.currentTime || 0)
@@ -140,7 +156,6 @@ const EpisodePlayer = ({ episode, image }: EpisodePlayerProps) => {
           <button
             onClick={togglePlay}
             className="absolute left-6 bottom-6 w-20 h-20 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center shadow-2xl transition active:scale-95"
-            aria-label={isPlaying ? 'Pause episode' : 'Play episode'}
           >
             {isPlaying ? (
               <Pause size={34} fill="currentColor" />
@@ -157,9 +172,13 @@ const EpisodePlayer = ({ episode, image }: EpisodePlayerProps) => {
             <span>{episode.duration}</span>
           </div>
 
-          <h3 className="text-3xl md:text-5xl font-black leading-tight mb-3">
+          <h3 className="text-3xl md:text-5xl font-black leading-tight mb-2">
             {episode.title}
           </h3>
+
+          <p className="text-gray-300 mb-3">
+            with <strong>{presenter}</strong>
+          </p>
 
           <p className="text-gray-400 mb-8 max-w-3xl">
             {episode.description}
@@ -170,7 +189,6 @@ const EpisodePlayer = ({ episode, image }: EpisodePlayerProps) => {
               <button
                 onClick={() => skip(-15)}
                 className="hidden sm:flex w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white items-center justify-center transition"
-                aria-label="Skip back 15 seconds"
               >
                 <SkipBack size={20} />
               </button>
@@ -178,7 +196,6 @@ const EpisodePlayer = ({ episode, image }: EpisodePlayerProps) => {
               <button
                 onClick={togglePlay}
                 className="w-16 h-16 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center shadow-xl transition active:scale-95"
-                aria-label={isPlaying ? 'Pause episode' : 'Play episode'}
               >
                 {isPlaying ? (
                   <Pause size={28} fill="currentColor" />
@@ -190,7 +207,6 @@ const EpisodePlayer = ({ episode, image }: EpisodePlayerProps) => {
               <button
                 onClick={() => skip(30)}
                 className="hidden sm:flex w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white items-center justify-center transition"
-                aria-label="Skip forward 30 seconds"
               >
                 <SkipForward size={20} />
               </button>
@@ -208,7 +224,6 @@ const EpisodePlayer = ({ episode, image }: EpisodePlayerProps) => {
                   value={progress}
                   onChange={(e) => seekTo(Number(e.target.value))}
                   className="w-full accent-orange-500 cursor-pointer"
-                  aria-label="Episode progress"
                 />
 
                 <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -216,8 +231,24 @@ const EpisodePlayer = ({ episode, image }: EpisodePlayerProps) => {
                   <span>{formatTime(duration)}</span>
                 </div>
               </div>
+            </div>
 
-              <Volume2 className="hidden md:block text-gray-500" size={22} />
+            <div className="flex items-center gap-3 mb-5">
+              <Volume2 size={18} className="text-gray-400" />
+
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={(e) => changeVolume(Number(e.target.value))}
+                className="w-40 accent-orange-500 cursor-pointer"
+              />
+
+              <span className="text-xs text-gray-500">
+                {Math.round(volume * 100)}%
+              </span>
             </div>
 
             <div className="h-12 flex items-end gap-1 overflow-hidden">
@@ -383,6 +414,7 @@ export default function ProgramEpisodesPage() {
                   key={episode.id}
                   episode={episode}
                   image={episode.image || program.image || DEFAULT_COVER}
+                  fallbackPresenter={program.presenter}
                 />
               ))}
             </div>
