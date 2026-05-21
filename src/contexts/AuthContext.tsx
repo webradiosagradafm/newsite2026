@@ -1,93 +1,36 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
-import type { Session, User } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
+import React, { createContext, useContext } from 'react'
 
 type AuthContextType = {
-  user: User | null
-  session: Session | null
-  loading: boolean
+  user: null
+  session: null
+  loading: false
   signOut: () => Promise<void>
-  refreshAvatar: (userId?: string) => Promise<void>
+  refreshAvatar: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
-  loading: true,
+  loading: false,
   signOut: async () => {},
   refreshAvatar: async () => {},
 })
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
-  const [loading, setLoading] = useState(true)
+export const AuthProvider = ({
+  children,
+}: {
+  children: React.ReactNode
+}) => {
+  const signOut = async () => {}
 
-  useEffect(() => {
-    let isMounted = true
-
-    const loadSession = async () => {
-      try {
-        const { data, error } = await supabase.auth.getSession()
-
-        if (error) {
-          console.error('getSession error:', error)
-        }
-
-        if (!isMounted) return
-
-        setSession(data.session ?? null)
-        setUser(data.session?.user ?? null)
-      } catch (err) {
-        console.error('Auth init error:', err)
-      } finally {
-        if (isMounted) setLoading(false)
-      }
-    }
-
-    loadSession()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!isMounted) return
-      setSession(session ?? null)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-
-    return () => {
-      isMounted = false
-      subscription.unsubscribe()
-    }
-  }, [])
-
-  const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
-
-    setUser(null)
-    setSession(null)
-  }
-
-  const refreshAvatar = async (_userId?: string) => {
-    const { data, error } = await supabase.auth.getSession()
-
-    if (error) {
-      console.error('refreshAvatar error:', error)
-      return
-    }
-
-    setSession(data.session ?? null)
-    setUser(data.session?.user ?? null)
-  }
+  const refreshAvatar = async () => {}
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        session,
-        loading,
+        user: null,
+        session: null,
+        loading: false,
         signOut,
         refreshAvatar,
       }}
