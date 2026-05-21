@@ -92,7 +92,7 @@ const weekday: Program[] = [
     startTime: '18:00',
     endTime: '20:00',
     description: 'Your drive-time companion with uplifting Christian music.',
-    image: IMAGES.RACHEL_HARRIS
+    image: IMAGES.RACHAEL_HARRIS
   },
   {
     id: 'praise-fm-rock',
