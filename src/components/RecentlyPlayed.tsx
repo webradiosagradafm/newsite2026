@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { Heart } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
 interface Track {
@@ -17,7 +16,6 @@ interface RecentlyPlayedProps {
 
 const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
   const [artworks, setArtworks] = useState<Record<string, string>>({})
-  const { user } = useAuth()
   const navigate = useNavigate()
 
   // 🔥 BLOQUEIO PESADO (nível rádio)
@@ -136,9 +134,7 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
   const handleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation()
 
-    if (!user) {
-      navigate('/login')
-    }
+  
   }
 
   return (
