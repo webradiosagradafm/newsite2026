@@ -132,7 +132,6 @@ const PrivacyPolicyPage: React.FC = () => {
 
             <section id="storage" className="scroll-mt-32">
               <h2 className="text-3xl font-medium uppercase tracking-tighter mb-8 dark:text-white border-b-2 border-black dark:border-white pb-4 inline-block">5. Storage & Security</h2>
-              <p className="text-gray-600 dark:text-gray-400 font-normal uppercase tracking-tight text-sm leading-relaxed">Your account data is stored using enterprise-grade encryption provided by Supabase. We do not sell your personal information to third parties. Data is kept for as long as your account is active or as needed to provide you with services.</p>
             </section>
 
             <section id="rights" className="scroll-mt-32">
