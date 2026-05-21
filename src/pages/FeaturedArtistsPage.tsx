@@ -1,7 +1,6 @@
 import React from 'react'
 import { Star, Music, Users, Play, ArrowRight, Heart } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
 
 interface Artist {
   id: string
@@ -16,77 +15,88 @@ const FEATURED_ARTISTS: Artist[] = [
     id: 'art_1',
     name: 'Brandon Lake',
     genre: 'Contemporary Worship',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823362/BRANDON_LAKE_pirbp8.webp',
+    image:
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823362/BRANDON_LAKE_pirbp8.webp',
     hits: ['Gratitude', 'Trust In God', 'Praise'],
   },
   {
     id: 'art_2',
     name: 'Tauren Wells',
     genre: 'Christian Pop / R&B',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823979/TAUREN_WELLS_elfhyd.webp',
+    image:
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823979/TAUREN_WELLS_elfhyd.webp',
     hits: ['Known', 'Joy In The Morning', 'Take It All Back'],
   },
   {
     id: 'art_3',
     name: 'Forrest Frank',
     genre: 'Indie Pop',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769824459/FORREST_FRANK_jolxny.webp',
+    image:
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1769824459/FORREST_FRANK_jolxny.webp',
     hits: ['Good Day', 'No Longer Bound', 'UP!'],
   },
   {
     id: 'art_4',
     name: 'Ben Fuller',
     genre: 'Country / Soul',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769824684/BEN_FULLER_pulwau.webp',
+    image:
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1769824684/BEN_FULLER_pulwau.webp',
     hits: ['Who I Am', 'If I Got Jesus', 'But the Cross'],
   },
   {
     id: 'art_5',
     name: 'Lauren Daigle',
     genre: 'Christian Pop',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823362/LAUREN_DAIGLE_cjqazt.webp',
+    image:
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823362/LAUREN_DAIGLE_cjqazt.webp',
     hits: ['You Say', 'Rescue', 'Thank God I Do'],
   },
   {
     id: 'art_6',
     name: 'Elevation Worship',
     genre: 'Modern Worship',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823362/ELEVATION_WORSHIP_hyuqfg.webp',
+    image:
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1769823362/ELEVATION_WORSHIP_hyuqfg.webp',
     hits: ['LION', 'Trust In God', 'More Than Able'],
   },
 ]
 
 const FeaturedArtistsPage: React.FC = () => {
   const navigate = useNavigate()
-  const { user } = useAuth()
 
   const handleArtistClick = (artistName: string) => {
     navigate(`/music?search=${encodeURIComponent(artistName)}`)
   }
 
-  const handleSongClick = (e: React.MouseEvent, artistName: string, songName: string) => {
+  const handleSongClick = (
+    e: React.MouseEvent,
+    artistName: string,
+    songName: string
+  ) => {
     e.stopPropagation()
-    navigate(`/music?search=${encodeURIComponent(`${artistName} ${songName}`)}`)
+
+    navigate(
+      `/music?search=${encodeURIComponent(
+        `${artistName} ${songName}`
+      )}`
+    )
   }
 
   const handleFollowArtist = (e: React.MouseEvent) => {
     e.stopPropagation()
 
-    if (!user) {
-      navigate('/login')
-      return
-    }
-
-    // Favoritos ainda não implementados no AuthContext atual.
+    console.log('Favorites not implemented yet')
   }
 
   return (
     <div className="bg-white dark:bg-[#000] min-h-screen transition-colors duration-300 font-sans">
       <div className="bg-black text-white py-16 md:py-24 border-b border-white/10 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#ff6600]/10 to-transparent pointer-events-none" />
+
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="flex items-center space-x-3 text-[#ff6600] mb-6">
             <Star className="w-5 h-5 fill-current" />
+
             <span className="text-[10px] font-medium uppercase tracking-[0.4em]">
               The Pulse of Praise FM USA
             </span>
@@ -99,8 +109,9 @@ const FeaturedArtistsPage: React.FC = () => {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-400 max-w-2xl font-normal uppercase tracking-tight leading-tight">
-            The sounds defining a generation of faith. Exclusive sessions and deep dives into the
-            artists behind the world's biggest worship anthems.
+            The sounds defining a generation of faith. Exclusive sessions and
+            deep dives into the artists behind the world's biggest worship
+            anthems.
           </p>
         </div>
       </div>
@@ -125,9 +136,10 @@ const FeaturedArtistsPage: React.FC = () => {
                   alt={artist.name}
                   className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 scale-100 group-hover:scale-105"
                   onError={(e) => {
-                    ;(e.target as HTMLImageElement).src = `https://picsum.photos/seed/${encodeURIComponent(
-                      artist.name
-                    )}/800/800`
+                    ;(e.target as HTMLImageElement).src =
+                      `https://picsum.photos/seed/${encodeURIComponent(
+                        artist.name
+                      )}/800/800`
                   }}
                 />
 
@@ -144,14 +156,17 @@ const FeaturedArtistsPage: React.FC = () => {
 
                   <div className="mt-6 h-0 group-hover:h-auto overflow-hidden transition-all duration-700 opacity-0 group-hover:opacity-100">
                     <p className="text-gray-400 text-[9px] font-medium uppercase tracking-widest mb-4 flex items-center">
-                      <Music className="w-3 h-3 mr-2 text-[#ff6600]" /> Top Tracks
+                      <Music className="w-3 h-3 mr-2 text-[#ff6600]" />
+                      Top Tracks
                     </p>
 
                     <div className="flex flex-wrap gap-2">
                       {artist.hits.slice(0, 3).map((hit) => (
                         <button
                           key={hit}
-                          onClick={(e) => handleSongClick(e, artist.name, hit)}
+                          onClick={(e) =>
+                            handleSongClick(e, artist.name, hit)
+                          }
                           className="bg-white/10 text-white text-[9px] px-3 py-1.5 uppercase tracking-widest backdrop-blur-md border border-white/10 hover:bg-[#ff6600] hover:text-white transition-all active:scale-95"
                         >
                           {hit}
@@ -170,7 +185,11 @@ const FeaturedArtistsPage: React.FC = () => {
                         : 'bg-[#ff6600] text-white hover:bg-white hover:text-black'
                     }`}
                   >
-                    <Heart className={`w-6 h-6 ${followed ? 'fill-current' : ''}`} />
+                    <Heart
+                      className={`w-6 h-6 ${
+                        followed ? 'fill-current' : ''
+                      }`}
+                    />
                   </button>
 
                   <div className="bg-black/50 text-white p-4 rounded-full shadow-2xl backdrop-blur-md">
@@ -194,8 +213,9 @@ const FeaturedArtistsPage: React.FC = () => {
               </h4>
 
               <p className="text-gray-500 text-sm font-normal uppercase tracking-tight leading-relaxed">
-                We champion the next generation. If you're creating music that inspires, we want to
-                hear your story and your sound for potential airplay.
+                We champion the next generation. If you're creating music that
+                inspires, we want to hear your story and your sound for
+                potential airplay.
               </p>
             </div>
           </div>
@@ -205,6 +225,7 @@ const FeaturedArtistsPage: React.FC = () => {
             className="bg-[#ff6600] text-white px-10 py-6 text-[10px] font-medium uppercase tracking-[0.4em] hover:bg-black transition-all shadow-xl active:scale-95 whitespace-nowrap flex items-center space-x-3"
           >
             <span>Upload Your Track</span>
+
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
