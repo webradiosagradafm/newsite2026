@@ -11,8 +11,6 @@ import {
 import { Play, Pause, Megaphone } from 'lucide-react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 
-import { AuthProvider } from './contexts/AuthContext'
-
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import RecentlyPlayed from './components/RecentlyPlayed'
@@ -740,12 +738,10 @@ const AppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <AuthProvider>
       <BrowserRouter>
         <ScrollToTop />
         <AppContent />
         <SpeedInsights />
       </BrowserRouter>
-    </AuthProvider>
   )
 }
