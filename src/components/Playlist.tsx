@@ -11,7 +11,6 @@ import {
   Calendar,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
 
 const MASTER_ARTISTS = [
   'Brandon Lake',
@@ -71,14 +70,9 @@ const PlaylistCard: React.FC<{
   onTogglePlay: () => void
 }> = ({ track, isPlaying, onTogglePlay }) => {
   const navigate = useNavigate()
-  const { user } = useAuth()
 
   const handleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!user) {
-      navigate('/login')
-      return
-    }
     // Favoritos ainda não implementados no AuthContext atual.
   }
 
