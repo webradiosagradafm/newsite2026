@@ -48,10 +48,6 @@ export default defineConfig({
           ui: [
             'lucide-react',
             'swiper'
-          ],
-
-          supabase: [
-            '@supabase/supabase-js'
           ]
         }
       }
