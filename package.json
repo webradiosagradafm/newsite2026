@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.103.3",
     "@vercel/speed-insights": "^2.0.0",
     "chokidar": "^5.0.0",
     "cloudinary": "^2.10.0",
