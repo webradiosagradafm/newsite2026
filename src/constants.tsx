@@ -8,7 +8,7 @@ export const COLORS = {
 
 const IMAGES = {
   DANIEL_BROOKS: '/shows/daniel-brooks.jpg',
-  RACHEL_HARRIS: '/shows/rachael-harris.jpg',
+  RACHAEL_HARRIS: '/shows/rachael-harris.jpg',
   MICHAEL_RAY: '/shows/michael-ray.jpg',
   STANCY_CAMPBELL: '/shows/stancy-campbell.jpg',
   MATT_RILEY: '/shows/matt-riley.jpg',
