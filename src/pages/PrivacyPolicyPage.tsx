@@ -92,7 +92,6 @@ const PrivacyPolicyPage: React.FC = () => {
                 <div className="p-8 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5">
                   <Lock className="w-6 h-6 text-[#ff6600] mb-6" />
                   <h4 className="text-lg font-medium uppercase tracking-tight mb-4 dark:text-white">Account Information</h4>
-                  <p className="text-sm text-gray-500 uppercase tracking-tight leading-relaxed">When you create an account, we collect your email address, display name, and profile photo through our secure Supabase authentication system.</p>
                 </div>
                 <div className="p-8 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5">
                   <Eye className="w-6 h-6 text-[#ff6600] mb-6" />
