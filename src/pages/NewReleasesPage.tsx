@@ -3,7 +3,6 @@ import {
   Play, Pause, Zap, Flame, Heart,
   Loader2, RefreshCw, ExternalLink
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 interface Release {
@@ -182,7 +181,6 @@ const NewReleasesPage: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const load = async () => {
     setLoading(true);
@@ -227,10 +225,6 @@ const NewReleasesPage: React.FC = () => {
   const handleFavorite = (e: React.MouseEvent, _release: Release) => {
     e.stopPropagation();
 
-    if (!user) {
-      navigate('/login');
-      return;
-    }
 
     // Favoritos ainda não implementados no AuthContext atual.
   };
