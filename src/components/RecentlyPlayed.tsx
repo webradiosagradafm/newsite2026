@@ -194,6 +194,16 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
                     onClick={handleFavorite}
                     className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition"
                   >
+                    <Heart size={18} />
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </section>
+  )
 }
 
 export default RecentlyPlayed
