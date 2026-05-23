@@ -211,7 +211,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
       <LivePulseAnimation />
 
       <div
-        className={`fixed top-0 right-0 bottom-0 w-full md:w-96 z-[100] bg-white dark:bg-[#121212] transition-transform duration-300 flex flex-col shadow-2xl ${
+        className={`fixed top-0 right-0 bottom-[72px] md:bottom-0 w-full md:w-96 z-[100] bg-white dark:bg-[#121212] transition-transform duration-300 flex flex-col shadow-2xl ${
           showSchedule ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -228,7 +228,7 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
           </button>
         </div>
 
-        <div className="flex-grow overflow-y-auto pb-20 md:pb-0">
+        <div className="flex-grow overflow-y-auto pb-4 md:pb-0">
           <div className="p-3 border-b border-gray-100 dark:border-white/5">
             <div className="flex items-start space-x-3">
               <div className="w-16 h-16 flex-shrink-0 rounded overflow-hidden bg-gray-200 dark:bg-gray-700">
@@ -295,30 +295,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
               </div>
             </div>
           ))}
-
-          {queue.slice(0, 4).length < 4 &&
-            Array.from({ length: 4 - queue.slice(0, 4).length }).map(
-              (_, i) => (
-                <div
-                  key={`placeholder-${i}`}
-                  className="p-3 border-b border-gray-100 dark:border-white/5"
-                >
-                  <div className="flex items-start space-x-3">
-                    <div className="w-16 h-16 flex-shrink-0 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
-
-                    <div className="flex flex-col min-w-0 flex-grow">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-1 animate-pulse" />
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-1 animate-pulse" />
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse" />
-                    </div>
-
-                    <span className="text-xs font-medium text-orange-500 mt-1">
-                      {queue.length + i + 2}°
-                    </span>
-                  </div>
-                </div>
-              )
-            )}
         </div>
       </div>
 
@@ -340,7 +316,6 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
               className="flex items-center justify-between px-4 py-3 h-[72px] relative"
               onClick={() => {
                 setIsExpanded(true)
-                setShowSchedule(true)
               }}
             >
               <div className="flex flex-col min-w-0 flex-grow">
