@@ -617,18 +617,17 @@ const AppContent: React.FC = () => {
             }
           />
 
-          <Route
-            path="/program"
-            element={
-              selectedProgram ? (
-                <program={selectedProgram}
+          <ProgramDetail
+                program={selectedProgram}
                 liveMetadata={liveMetadata}
                 trackHistory={trackHistory}
                 isPlaying={isPlaying}
                 onListenClick={togglePlayback}
                 onBack={() => navigate(-1)}
                 onViewSchedule={() => navigate('/schedule')}
-                />
+                onBack={() => navigate(-1)}
+                onViewSchedule={() => navigate('/schedule')}
+         />
               ) : (
                 <Navigate to="/schedule" replace />
               )
@@ -636,22 +635,23 @@ const AppContent: React.FC = () => {
           />
 
           <Route
-  path="/program"
-  element={
-    selectedProgram ? (
-      <ProgramDetail
-        program={selectedProgram}
-        isPlaying={isPlaying}
-        onListenClick={togglePlayback}
-        onBack={() => navigate(-1)}
-        onViewSchedule={() => navigate('/schedule')}
+              path="/program"
+              element={
+              selectedProgram ? (
+         <ProgramDetail
+              program={selectedProgram}
+              liveMetadata={liveMetadata}
+              trackHistory={trackHistory}
+              isPlaying={isPlaying}
+              onListenClick={togglePlayback}
+              onBack={() => navigate(-1)}
+              onViewSchedule={() => navigate('/schedule')}
       />
-    ) : (
+      ) : (
       <Navigate to="/" replace />
-    )
-  }
-/>
-
+      )
+    }
+  />
           <Route path="/music" element={<Playlist />} />
 
           <Route
