@@ -621,7 +621,7 @@ const AppContent: React.FC = () => {
             path="/program"
             element={
               selectedProgram ? (
-                <ProgramMiniPage
+                <ProgramDetail
                   program={selectedProgram}
                   queue={queue}
                   liveMetadata={liveMetadata}
