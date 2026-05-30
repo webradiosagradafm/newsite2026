@@ -64,7 +64,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
   const [loadingHistory, setLoadingHistory] = useState(true)
   const eventSourceRef = useRef<EventSource | null>(null)
 
-  const storageKey = `history_v2_${program.id}`
+  const storageKey = 'praisefm_track_history'
 
   const [historyGroups, setHistoryGroups] = useState<DailyHistory>({})
 
