@@ -621,15 +621,13 @@ const AppContent: React.FC = () => {
             path="/program"
             element={
               selectedProgram ? (
-                <ProgramDetail
-                  program={selectedProgram}
-                  queue={queue}
-                  liveMetadata={liveMetadata}
-                  trackHistory={trackHistory}
-                  isPlaying={isPlaying}
-                  onListenClick={togglePlayback}
-                  onBack={() => navigate(-1)}
-                  onViewSchedule={() => navigate('/schedule')}
+                <program={selectedProgram}
+                liveMetadata={liveMetadata}
+                trackHistory={trackHistory}
+                isPlaying={isPlaying}
+                onListenClick={togglePlayback}
+                onBack={() => navigate(-1)}
+                onViewSchedule={() => navigate('/schedule')}
                 />
               ) : (
                 <Navigate to="/schedule" replace />
