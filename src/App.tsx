@@ -15,7 +15,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import RecentlyPlayed from './components/RecentlyPlayed'
 import LivePlayerBar from './components/LivePlayerBar'
-import ProgramMiniPage from './components/ProgramMiniPage'
+import ProgramDetail from './components/ProgramDetail'
 import Playlist from './components/Playlist'
 import ScheduleList from './components/ScheduleList'
 import SEO from './components/SEO'
@@ -637,12 +637,22 @@ const AppContent: React.FC = () => {
             }
           />
 
-          <Route path="/programs" element={<ProgramsPage />} />
-
           <Route
-            path="/program/:slug"
-            element={<ProgramEpisodesPage />}
-          />
+  path="/program"
+  element={
+    selectedProgram ? (
+      <ProgramDetail
+        program={selectedProgram}
+        isPlaying={isPlaying}
+        onListenClick={togglePlayback}
+        onBack={() => navigate(-1)}
+        onViewSchedule={() => navigate('/schedule')}
+      />
+    ) : (
+      <Navigate to="/" replace />
+    )
+  }
+/>
 
           <Route path="/music" element={<Playlist />} />
 
