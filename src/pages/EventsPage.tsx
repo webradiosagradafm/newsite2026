@@ -212,8 +212,21 @@ const EventsPage: React.FC = () => {
       results.forEach(r => {
         if (r.status === 'fulfilled') r.value.forEach(e => { if (!seen.has(e.id)) { seen.add(e.id); flat.push(e); } });
       });
-      flat.sort((a, b) => new Date(a.dates.start.localDate).getTime() - new Date(b.dates.start.localDate).getTime());
-      setEvents(flat);
+      const gospelOnly = flat.filter((event) => {
+  const eventName = event.name.toLowerCase()
+
+  return GOSPEL_KEYWORDS.some((artist) =>
+    eventName.includes(artist.toLowerCase())
+  )
+})
+
+gospelOnly.sort(
+  (a, b) =>
+    new Date(a.dates.start.localDate).getTime() -
+    new Date(b.dates.start.localDate).getTime()
+)
+    
+      setEvents(gospelOnly)
     } catch {
       setError('Erro ao carregar eventos. Verifique sua API key.');
     } finally {
