@@ -32,22 +32,31 @@ export default defineConfig({
       }
     })
   ],
+
   build: {
     chunkSizeWarningLimit: 1000,
 
     rollupOptions: {
       output: {
-        manualChunks: {
-          react: [
-            'react',
-            'react-dom',
-            'react-router-dom'
-          ],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (
+              id.includes('react') ||
+              id.includes('react-dom') ||
+              id.includes('react-router-dom')
+            ) {
+              return 'react'
+            }
 
-          ui: [
-            'lucide-react',
-            'swiper'
-          ]
+            if (
+              id.includes('lucide-react') ||
+              id.includes('swiper')
+            ) {
+              return 'ui'
+            }
+
+            return 'vendor'
+          }
         }
       }
     }
