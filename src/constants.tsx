@@ -78,7 +78,7 @@ const weekday: Program[] = [
   },
   {
     id: 'future-artists',
-    title: 'Praise FM Future Artists',
+    title: 'Future Artists',
     host: 'Sarah Jordan',
     startTime: '17:00',
     endTime: '18:00',
@@ -96,7 +96,7 @@ const weekday: Program[] = [
   },
   {
     id: 'praise-fm-rock',
-    title: 'Praise FM Rock',
+    title: 'Rock',
     host: 'Jake Hunter',
     startTime: '20:00',
     endTime: '21:00',
@@ -105,7 +105,7 @@ const weekday: Program[] = [
   },
   {
     id: 'praise-fm-classics',
-    title: 'Praise FM Classics',
+    title: 'Classics',
     host: 'Scott Turner',
     startTime: '21:00',
     endTime: '22:00',
@@ -114,7 +114,7 @@ const weekday: Program[] = [
   },
   {
     id: 'praise-fm-chill',
-    title: 'Praise FM Chill',
+    title: 'Chill',
     host: 'Ava Brooks',
     startTime: '22:00',
     endTime: '00:00',
@@ -148,7 +148,7 @@ const sunday: Program[] = [
     host: 'Matt Riley',
     startTime: '07:00',
     endTime: '12:00',
-    description: 'Sunday morning with worship.',
+    description: 'Sunday Morning with Faith and Worship.',
     image: IMAGES.MATT_RILEY
   },
   {
@@ -157,7 +157,7 @@ const sunday: Program[] = [
     host: 'Praise FM',
     startTime: '12:00',
     endTime: '13:00',
-    description: 'A midday hour of worship and reflection.',
+    description: 'A midday hour of Worship.',
     image: IMAGES.WORSHIP
   },
   {
@@ -166,7 +166,7 @@ const sunday: Program[] = [
     host: 'Michael Ray',
     startTime: '13:00',
     endTime: '16:00',
-    description: 'A smooth afternoon blend of worship, hope and Christian favorites.',
+    description: 'A smooth afternoon blend of Worship.',
     image: IMAGES.MICHAEL_RAY
   },
   {
