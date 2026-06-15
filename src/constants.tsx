@@ -12,7 +12,7 @@ const IMAGES = {
   MICHAEL_RAY: '/shows/michael-ray.jpg',
   STANCY_CAMPBELL: '/shows/stancy-campbell.jpg',
   MATT_RILEY: '/shows/matt-riley.jpg',
-  SUNDAY SERVICE: '/shows/sunday-service.jpg',
+  SUNDAY_SERVICE: '/shows/sunday-service.jpg',
   JAKE_HUNTER: '/shows/jake-hunter.jpg',
   AVA_BROOKS: '/shows/ava-brooks.jpg',
   SCOTT_TURNER: '/shows/scott-turner.jpg',
