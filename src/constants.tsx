@@ -28,7 +28,7 @@ const weekday: Program[] = [
     host: 'Daniel Brooks',
     startTime: '00:00',
     endTime: '06:00',
-    description: 'Peaceful worship and reflective Christian music for the overnight hours.',
+    description: 'Overnight worship.',
     image: IMAGES.DANIEL_BROOKS
   },
   {
@@ -37,7 +37,7 @@ const weekday: Program[] = [
     host: 'Praise FM',
     startTime: '06:00',
     endTime: '07:00',
-    description: 'Morning worship to start your day with faith and peace.',
+    description: 'start your day with worship.',
     image: IMAGES.WORSHIP
   },
   {
@@ -46,7 +46,7 @@ const weekday: Program[] = [
     host: 'Stancy Campbell',
     startTime: '07:00',
     endTime: '12:00',
-    description: 'Uplifting music, encouragement and a bright start to your day.',
+    description: 'Music, encouragement and inspiration.',
     image: IMAGES.STANCY_CAMPBELL
   },
   {
@@ -55,7 +55,7 @@ const weekday: Program[] = [
     host: 'Praise FM',
     startTime: '12:00',
     endTime: '13:00',
-    description: 'A midday hour of worship and reflection.',
+    description: 'A midday hour of worship.',
     image: IMAGES.WORSHIP
   },
   {
@@ -64,7 +64,7 @@ const weekday: Program[] = [
     host: 'Michael Ray',
     startTime: '13:00',
     endTime: '16:00',
-    description: 'A smooth afternoon blend of worship, hope and Christian favorites.',
+    description: 'Faith and encouragement through music.',
     image: IMAGES.MICHAEL_RAY
   },
   {
@@ -73,7 +73,7 @@ const weekday: Program[] = [
     host: 'DJ Zion',
     startTime: '16:00',
     endTime: '17:00',
-    description: 'Modern Christian pop, rhythm, flow and fresh energy.',
+    description: 'Christian pop, rhythm and energy.',
     image: IMAGES.DJ_ZION
   },
   {
@@ -82,7 +82,7 @@ const weekday: Program[] = [
     host: 'Sarah Jordan',
     startTime: '17:00',
     endTime: '18:00',
-    description: 'Discover new voices and the future sound of Christian music.',
+    description: 'Discover the next generation.',
     image: IMAGES.SARAH_JORDAN
   },
   {
@@ -91,7 +91,7 @@ const weekday: Program[] = [
     host: 'Rachael Harris',
     startTime: '18:00',
     endTime: '20:00',
-    description: 'Your drive-time companion with uplifting Christian music.',
+    description: 'Your drive-time companion.',
     image: IMAGES.RACHAEL_HARRIS
   },
   {
@@ -100,7 +100,7 @@ const weekday: Program[] = [
     host: 'Jake Hunter',
     startTime: '20:00',
     endTime: '21:00',
-    description: 'Faith, guitars and powerful Christian rock energy.',
+    description: 'Christian rock and powerful faith.',
     image: IMAGES.JAKE_HUNTER
   },
   {
@@ -109,7 +109,7 @@ const weekday: Program[] = [
     host: 'Scott Turner',
     startTime: '21:00',
     endTime: '22:00',
-    description: 'Timeless Christian songs and modern classics.',
+    description: 'Timeless Christian favorites.',
     image: IMAGES.SCOTT_TURNER
   },
   {
@@ -118,7 +118,7 @@ const weekday: Program[] = [
     host: 'Ava Brooks',
     startTime: '22:00',
     endTime: '00:00',
-    description: 'Relax, unwind and end the day with peaceful Christian music.',
+    description: 'Relax and unwind with worship.',
     image: IMAGES.AVA_BROOKS
   }
 ]
@@ -130,7 +130,7 @@ const sunday: Program[] = [
     host: 'Daniel Brooks',
     startTime: '00:00',
     endTime: '06:00',
-    description: 'Peaceful worship and reflective Christian music for the overnight hours.',
+    description: 'Overnight worship.',
     image: IMAGES.DANIEL_BROOKS
   },
   {
@@ -139,16 +139,16 @@ const sunday: Program[] = [
     host: 'Praise FM',
     startTime: '06:00',
     endTime: '07:00',
-    description: 'Morning worship to start Sunday with faith and peace.',
+    description: 'Start your Sunday with worship.',
     image: IMAGES.WORSHIP
   },
   {
     id: 'sunday-morning',
-    title: 'Sunday Morning With Christ',
+    title: 'Sunday Morning',
     host: 'Matt Riley',
     startTime: '07:00',
     endTime: '12:00',
-    description: 'A peaceful Sunday morning experience with worship and encouragement.',
+    description: 'Sunday morning with worship and encouragement.',
     image: IMAGES.MATT_RILEY
   },
   {
