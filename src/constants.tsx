@@ -12,7 +12,7 @@ const IMAGES = {
   MICHAEL_RAY: '/shows/michael-ray.jpg',
   STANCY_CAMPBELL: '/shows/stancy-campbell.jpg',
   MATT_RILEY: '/shows/matt-riley.jpg',
-  LIVING_THE_MESSAGE: '/shows/living-the-message.jpg',
+  SUNDAY SERVICE: '/shows/sunday-service.jpg',
   JAKE_HUNTER: '/shows/jake-hunter.jpg',
   AVA_BROOKS: '/shows/ava-brooks.jpg',
   SCOTT_TURNER: '/shows/scott-turner.jpg',
@@ -197,13 +197,13 @@ const sunday: Program[] = [
     image: IMAGES.WORSHIP
   },
   {
-    id: 'living-the-message',
-    title: 'Living The Message',
+    id: 'sunday-service',
+    title: 'Sunday Service',
     host: 'Praise FM',
     startTime: '20:00',
     endTime: '21:00',
     description: 'A focused message of faith, hope and encouragement.',
-    image: IMAGES.LIVING_THE_MESSAGE
+    image: IMAGES.SUNDAY_SERVICE
   },
   {
     id: 'sunday-praise-fm-classics',
