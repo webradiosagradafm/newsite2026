@@ -69,7 +69,7 @@ const weekday: Program[] = [
   },
   {
     id: 'praise-fm-flow',
-    title: 'Praise FM Flow',
+    title: 'Flow',
     host: 'DJ Zion',
     startTime: '16:00',
     endTime: '17:00',
