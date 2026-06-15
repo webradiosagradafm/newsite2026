@@ -148,7 +148,7 @@ const sunday: Program[] = [
     host: 'Matt Riley',
     startTime: '07:00',
     endTime: '12:00',
-    description: 'Sunday morning with worship and encouragement.',
+    description: 'Sunday morning with worship.',
     image: IMAGES.MATT_RILEY
   },
   {
