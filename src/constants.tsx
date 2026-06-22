@@ -118,7 +118,7 @@ const weekday: Program[] = [
     host: 'Ava Brooks',
     startTime: '22:00',
     endTime: '00:00',
-    description: 'Ava Brooks brings the best of Chill.',
+    description: 'Ava Brooks brings the best of the Chill',
     image: IMAGES.AVA_BROOKS
   }
 ]
