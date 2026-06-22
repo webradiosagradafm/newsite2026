@@ -24,8 +24,8 @@ const PRESENTERS_DATA = [
 
   {
     name: 'DJ Zion',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/dj-zion_rm7tdy.webp',
-    bio: 'DJ Zion brings energy, rhythm, and fresh urban gospel to Praise FM Flow, creating a bold and modern space for listeners who love faith with movement.',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/dj-zion_m2frte.webp',
+    bio: 'DJ Zion brings energy, rhythm, and fresh hip hop to Praise FM Flow.',
     programTitle: 'Praise FM Flow'
   },
 

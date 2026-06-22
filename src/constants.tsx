@@ -69,11 +69,11 @@ const weekday: Program[] = [
   },
   {
     id: 'praise-fm-flow',
-    title: 'Flow',
+    title: 'Praise FM Flow',
     host: 'DJ Zion',
     startTime: '16:00',
     endTime: '17:00',
-    description: 'Christian pop, rhythm and energy.',
+    description: 'Hip Hop and energy.',
     image: IMAGES.DJ_ZION
   },
   {
@@ -175,7 +175,7 @@ const sunday: Program[] = [
     host: 'DJ Zion',
     startTime: '16:00',
     endTime: '17:00',
-    description: 'Modern Christian pop, rhythm, flow and fresh energy.',
+    description: 'Hip Hop and energy.',
     image: IMAGES.DJ_ZION
   },
   {
