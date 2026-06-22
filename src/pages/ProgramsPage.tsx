@@ -27,7 +27,7 @@ const programs = [
     time: '8:00 PM - 9:00 PM',
     image:
       'https://res.cloudinary.com/dtecypmsh/image/upload/v1782153980/jack-hunter_qagiwm.webp',
-    description: 'Faith louder than ever.'
+    description: 'Rock and Faith.'
   }
 ]
 

@@ -60,7 +60,7 @@ const PRESENTERS_DATA = [
   {
     name: 'Ava Brooks',
     image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158973/ava-brooks_oyzibl.webp',
-    bio: 'Ava closes the day with sounds on Praise FM Chill, creating the perfect atmosphere.',
+    bio: 'Ava closes the day with Praise FM Chill, creating the perfect atmosphere.',
     programTitle: 'Praise FM Chill'
   },
 

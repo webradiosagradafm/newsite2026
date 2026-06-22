@@ -100,7 +100,7 @@ const weekday: Program[] = [
     host: 'Jake Hunter',
     startTime: '20:00',
     endTime: '21:00',
-    description: 'Christian rock and powerful faith.',
+    description: 'Christian rock and Faith.',
     image: IMAGES.JAKE_HUNTER
   },
   {
