@@ -82,7 +82,7 @@ const weekday: Program[] = [
     host: 'Sarah Jordan',
     startTime: '17:00',
     endTime: '18:00',
-    description: 'Discover the next generation.',
+    description: 'Discover the future sound of Christian music.',
     image: IMAGES.SARAH_JORDAN
   },
   {
@@ -180,11 +180,11 @@ const sunday: Program[] = [
   },
   {
     id: 'sunday-future-artists',
-    title: 'Praise FM Future Artists',
+    title: 'Future Artists',
     host: 'Sarah Jordan',
     startTime: '17:00',
     endTime: '18:00',
-    description: 'Discover new voices and the future sound of Christian music.',
+    description: 'Discover the future sound of Christian music.',
     image: IMAGES.SARAH_JORDAN
   },
   {
@@ -220,7 +220,7 @@ const sunday: Program[] = [
     host: 'Ava Brooks',
     startTime: '22:00',
     endTime: '00:00',
-    description: 'Ava Brooks brings the best of Chill.',
+    description: 'Ava Brooks brings the best of the Chill.',
     image: IMAGES.AVA_BROOKS
   }
 ]

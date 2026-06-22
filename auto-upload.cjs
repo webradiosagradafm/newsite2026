@@ -34,11 +34,11 @@ const PROGRAMS = [
   },
   {
     slug: 'future-artists',
-    title: 'Praise FM Future Artists',
+    title: 'Future Artists',
     presenter: 'Sarah Jordan',
     folder: 'FUTURE ARTISTS',
     image:
-      'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/sarah-jordan_jnuzrb.webp',
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/sarah-jordan_tfnxpp.webp',
   },
   {
     slug: 'praise-fm-rock',

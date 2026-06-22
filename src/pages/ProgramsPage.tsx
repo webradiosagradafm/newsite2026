@@ -18,7 +18,7 @@ const programs = [
     time: '5:00 PM - 6:00 PM',
     image:
       'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/sarah-jordan_jnuzrb.webp',
-    description: 'Fresh Christian artists and the future of worship music.'
+    description: 'Discover the future sound of Christian music.'
   },
   {
     slug: 'praise-fm-rock',

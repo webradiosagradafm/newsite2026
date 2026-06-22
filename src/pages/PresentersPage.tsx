@@ -32,14 +32,14 @@ const PRESENTERS_DATA = [
   {
     name: 'Sarah Jordan',
     image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/sarah-jordan_jnuzrb.webp',
-    bio: 'A champion for the new generation, Sarah hosts Future Artists, where she discovers and promotes independent faith-filled talent from around the world.',
+    bio: 'Sarah hosts Future Artists, where she discovers and promotes independent talent from around the world.',
     programTitle: 'Future Artists'
   },
 
   {
     name: 'Rachel Harris',
     image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/rachael-harris_pwfg0z.webp',
-    bio: 'Rachel makes your commute feel lighter. On Carpool, she mixes big songs, and drive-home atmosphere.',
+    bio: 'Rachel brings the hits and the perfect drive-home vibe on Praise FM Carpool.',
     programTitle: 'Praise FM Carpool'
   },
 
