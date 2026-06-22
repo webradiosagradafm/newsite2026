@@ -45,8 +45,8 @@ const PRESENTERS_DATA = [
 
   {
     name: 'Jake Hunter',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/jake-hunter_q6ligi.webp',
-    bio: 'Jake Hunter brings edge, attitude, and faith-driven energy to the evening lineup with Praise FM Rock.',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782153980/jack-hunter_qagiwm.webp',
+    bio: 'Jake Hunter brings attitude, and faith with Praise FM Rock.',
     programTitle: 'Praise FM Rock'
   },
 

@@ -26,7 +26,7 @@ const programs = [
     presenter: 'Jake Hunter',
     time: '8:00 PM - 9:00 PM',
     image:
-      'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/jake-hunter_q6ligi.webp',
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1782153980/jack-hunter_qagiwm.webp',
     description: 'Faith louder than ever.'
   }
 ]

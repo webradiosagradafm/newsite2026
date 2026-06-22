@@ -96,7 +96,7 @@ const weekday: Program[] = [
   },
   {
     id: 'praise-fm-rock',
-    title: 'Rock',
+    title: 'Praise FMRock',
     host: 'Jake Hunter',
     startTime: '20:00',
     endTime: '21:00',

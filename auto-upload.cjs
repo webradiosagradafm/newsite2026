@@ -46,7 +46,7 @@ const PROGRAMS = [
     presenter: 'Jake Hunter',
     folder: 'ROCK',
     image: 
-      'https://res.cloudinary.com/dtecypmsh/image/upload/v1747787873/rock.webp',
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1782153980/jack-hunter_qagiwm.webp',
   },
 ]
 
