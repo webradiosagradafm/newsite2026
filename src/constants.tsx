@@ -114,11 +114,11 @@ const weekday: Program[] = [
   },
   {
     id: 'praise-fm-chill',
-    title: 'Chill',
+    title: 'Praise FM Chill',
     host: 'Ava Brooks',
     startTime: '22:00',
     endTime: '00:00',
-    description: 'Relax and unwind with worship.',
+    description: 'Ava Brooks brings the best of Chill.',
     image: IMAGES.AVA_BROOKS
   }
 ]
@@ -220,7 +220,7 @@ const sunday: Program[] = [
     host: 'Ava Brooks',
     startTime: '22:00',
     endTime: '00:00',
-    description: 'Relax, unwind and end Sunday with peaceful Christian music.',
+    description: 'Ava Brooks brings the best of Chill.',
     image: IMAGES.AVA_BROOKS
   }
 ]
