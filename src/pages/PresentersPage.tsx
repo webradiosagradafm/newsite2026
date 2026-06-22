@@ -73,8 +73,8 @@ const PRESENTERS_DATA = [
 
   {
     name: 'Matt Riley',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/matt-riley_ucbrjg.webp',
-    bio: 'On Sundays, Matt Riley hosts Sunday Morning, guiding listeners through a reflective and worship-centered experience.',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/matt-riley_bun9ef.webp',
+    bio: 'On Sundays, Matt Riley guiding listeners through a reflective and worship experience.',
     programTitle: 'Sunday Morning'
   }
 ];
