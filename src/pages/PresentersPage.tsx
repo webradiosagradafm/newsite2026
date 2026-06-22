@@ -38,9 +38,9 @@ const PRESENTERS_DATA = [
 
   {
     name: 'Rachel Harris',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/rachael-harris_aj4rsh.webp',
-    bio: 'Rachel makes your commute feel lighter. On Carpool, she mixes big songs, familiar favorites, and a smooth drive-home atmosphere.',
-    programTitle: 'Carpool'
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/rachael-harris_pwfg0z.webp',
+    bio: 'Rachel makes your commute feel lighter. On Carpool, she mixes big songs, and drive-home atmosphere.',
+    programTitle: 'Praise FM Carpool'
   },
 
   {

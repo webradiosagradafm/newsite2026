@@ -87,11 +87,11 @@ const weekday: Program[] = [
   },
   {
     id: 'carpool',
-    title: 'Carpool',
+    title: 'Praise FM Carpool',
     host: 'Rachael Harris',
     startTime: '18:00',
     endTime: '20:00',
-    description: 'Your drive-time companion.',
+    description: 'Your company on the way home.',
     image: IMAGES.RACHAEL_HARRIS
   },
   {
