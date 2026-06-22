@@ -11,8 +11,8 @@ const PRESENTERS_DATA = [
   {
     name: 'Stancy Campbell',
     image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782150864/stancy-campbell_dlmteu.webp',
-    bio: 'The energetic voice behind the Breakfast.',
-    programTitle: 'Breakfast'
+    bio: 'The energetic voice behind the Morning Show.',
+    programTitle: 'Morning Show'
   },
 
   {
