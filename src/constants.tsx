@@ -41,8 +41,8 @@ const weekday: Program[] = [
     image: IMAGES.WORSHIP
   },
   {
-    id: 'morning-show',
-    title: 'Morning Show',
+    id: 'breakfast',
+    title: 'Breakfast',
     host: 'Stancy Campbell',
     startTime: '07:00',
     endTime: '12:00',

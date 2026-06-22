@@ -10,9 +10,9 @@ interface PresentersPageProps {
 const PRESENTERS_DATA = [
   {
     name: 'Stancy Campbell',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/stancy-campbell_vddy5r.webp',
-    bio: 'The energetic voice behind the Morning Show. Stancy brings bright conversation, uplifting music, and a strong start to the day for listeners across the United States and beyond.',
-    programTitle: 'Morning Show'
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782150864/stancy-campbell_dlmteu.webp',
+    bio: 'The energetic voice behind the Breakfast.',
+    programTitle: 'Breakfast'
   },
 
   {
