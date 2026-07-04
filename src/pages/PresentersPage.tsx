@@ -31,7 +31,7 @@ const PRESENTERS_DATA = [
 
   {
     name: 'Sarah Jordan',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/sarah-jordan_jnuzrb.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/sarah-jordan_tfnxpp.webp',
     bio: 'Sarah hosts Future Artists, where she discovers and promotes independent talent from around the world.',
     programTitle: 'Future Artists'
   },

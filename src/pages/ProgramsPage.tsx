@@ -17,7 +17,7 @@ const programs = [
     presenter: 'Sarah Jordan',
     time: '5:00 PM - 6:00 PM',
     image:
-      'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/sarah-jordan_jnuzrb.webp',
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/sarah-jordan_tfnxpp.webp',
     description: 'Discover the future sound of Christian music.'
   },
   {
