@@ -17,7 +17,7 @@ const PRESENTERS_DATA = [
 
   {
     name: 'Michael Ray',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/michael-ray_bs3c8x.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/michael-ray_n6ylzs.webp',
     bio: 'Michael Ray is your afternoon companion on Midday Grace, bringing worship, peace, and encouragement during the busiest part of the day.',
     programTitle: 'Midday Grace'
   },
@@ -52,7 +52,7 @@ const PRESENTERS_DATA = [
 
   {
     name: 'Scott Turner',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/scott-turner_wumkut.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/scott-turner_cwy1bc.webp',
     bio: 'A historian of worship music, Scott hosts Praise FM Classics, taking listeners back to timeless songs that shaped generations.',
     programTitle: 'Classics'
   },
@@ -66,7 +66,7 @@ const PRESENTERS_DATA = [
 
   {
     name: 'Daniel Brooks',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429830/daniel-brooks_yur5dq.webp',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/daniel-brooks_qbfdgc.webp',
     bio: 'The voice of the night. Daniel leads Midnight Grace with peaceful music and a calm overnight presence.',
     programTitle: 'Midnight Grace'
   },

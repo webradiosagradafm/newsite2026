@@ -8,7 +8,7 @@ const programs = [
     presenter: 'Scott Turner',
     time: '9:00 PM - 10:00 PM',
     image:
-      'https://res.cloudinary.com/dtecypmsh/image/upload/v1778429831/scott-turner_wumkut.webp',
+      'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/scott-turner_cwy1bc.webp',
     description: 'Christian classics from 2015 to 2022.'
   },
   {
