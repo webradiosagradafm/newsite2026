@@ -19,93 +19,103 @@ const format12h = (time24: string) => {
   return `${displayH}:${m.toString().padStart(2, '0')} ${period}`;
 };
 
-const ProgramProgressRing: React.FC<{ program: Program; isActive: boolean; nowMinutes: number }> = ({
-  program,
-  isActive,
-  nowMinutes
-}) => {
-  const progress = useMemo(() => {
-    if (!isActive) return 0;
+const ProgramProgressRing: React.FC<{ program: Program; isActive: boolean; nowMinutes: number }> = React.memo(
+  ({ program, isActive, nowMinutes }) => {
+    const progress = useMemo(() => {
+      if (!isActive) return 0;
 
-    const [sH, sM] = program.startTime.split(':').map(Number);
-    const [eH, eM] = program.endTime.split(':').map(Number);
+      const [sH, sM] = program.startTime.split(':').map(Number);
+      const [eH, eM] = program.endTime.split(':').map(Number);
 
-    const start = sH * 60 + sM;
-    let end = eH * 60 + eM;
+      const start = sH * 60 + sM;
+      let end = eH * 60 + eM;
 
-    if (end === 0 || end <= start) end = 24 * 60;
+      if (end === 0 || end <= start) end = 24 * 60;
 
-    const elapsed = nowMinutes - start;
-    const duration = end - start;
+      const elapsed = nowMinutes - start;
+      const duration = end - start;
 
-    return Math.min(Math.max(elapsed / duration, 0), 1);
-  }, [program, isActive, nowMinutes]);
+      return Math.min(Math.max(elapsed / duration, 0), 1);
+    }, [program, isActive, nowMinutes]);
 
-  const size = 120;
-  const strokeWidth = 3;
-  const innerSize = size - 24;
-  const radius = innerSize / 2 - strokeWidth / 2;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - progress * circumference;
+    const size = 120;
+    const strokeWidth = 3;
+    const innerSize = size - 24;
+    const radius = innerSize / 2 - strokeWidth / 2;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - progress * circumference;
 
-  return (
-    <div className="relative flex-shrink-0 flex items-center justify-center bg-[#f2f2f2] dark:bg-[#1a1a1a] p-3 group-hover:scale-105 transition-transform duration-500">
-      <div className="relative rounded-full overflow-hidden" style={{ width: innerSize, height: innerSize }}>
-        <img
-          src={program.image}
-          alt={program.title}
-          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-        />
-
-        <svg
-          width={innerSize}
-          height={innerSize}
-          className="absolute inset-0 -rotate-90 pointer-events-none"
-        >
-          <circle
-            cx={innerSize / 2}
-            cy={innerSize / 2}
-            r={radius}
-            stroke="#dbdbdb"
-            strokeWidth={strokeWidth}
-            fill="transparent"
-            className="dark:stroke-white/10"
+    return (
+      <div className="relative flex-shrink-0 flex items-center justify-center bg-[#f2f2f2] dark:bg-[#1a1a1a] p-3 group-hover:scale-105 transition-transform duration-500">
+        <div className="relative rounded-full overflow-hidden" style={{ width: innerSize, height: innerSize }}>
+          <img
+            src={program.image}
+            alt={program.title}
+            loading="lazy"
+            decoding="async"
+            width={innerSize}
+            height={innerSize}
+            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
           />
 
-          {isActive && (
+          <svg
+            width={innerSize}
+            height={innerSize}
+            className="absolute inset-0 -rotate-90 pointer-events-none"
+          >
             <circle
               cx={innerSize / 2}
               cy={innerSize / 2}
               r={radius}
-              stroke="#ff6600"
+              stroke="#dbdbdb"
               strokeWidth={strokeWidth}
               fill="transparent"
-              strokeDasharray={circumference}
-              strokeDashoffset={offset}
-              strokeLinecap="butt"
-              className="transition-all duration-1000"
+              className="dark:stroke-white/10"
             />
-          )}
-        </svg>
+
+            {isActive && (
+              <circle
+                cx={innerSize / 2}
+                cy={innerSize / 2}
+                r={radius}
+                stroke="#ff6600"
+                strokeWidth={strokeWidth}
+                fill="transparent"
+                strokeDasharray={circumference}
+                strokeDashoffset={offset}
+                strokeLinecap="butt"
+                className="transition-all duration-1000"
+              />
+            )}
+          </svg>
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
+
+ProgramProgressRing.displayName = 'ProgramProgressRing';
 
 const dayMeta = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack }) => {
   const [now, setNow] = useState(getChicagoDate());
+  const [today, setToday] = useState(getChicagoDate());
   const [selectedDay, setSelectedDay] = useState(getChicagoDate().getDay());
   const listContainerRef = useRef<HTMLDivElement>(null);
 
+  // Tick a cada 30s para o relógio/estado "ao vivo", mas só atualiza "today"
+  // (que dispara recálculo de weekDays) quando o dia civil realmente muda.
   useEffect(() => {
-    const timer = setInterval(() => setNow(getChicagoDate()), 30000);
+    const timer = setInterval(() => {
+      const chicagoNow = getChicagoDate();
+      setNow(chicagoNow);
+      setToday((prev) => (prev.getDate() !== chicagoNow.getDate() ? chicagoNow : prev));
+    }, 30000);
     return () => clearInterval(timer);
   }, []);
 
   const weekDays = useMemo(() => {
-    const today = getChicagoDate();
     const currentDay = today.getDay();
 
     return Array.from({ length: 7 }, (_, i) => {
@@ -127,7 +137,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
         isSunday: i === 0
       };
     });
-  }, [now]);
+  }, [today]);
 
   const selectedDayInfo = weekDays.find((d) => d.value === selectedDay) || weekDays[0];
 
@@ -174,8 +184,10 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
 
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
+  // Scroll automático até o programa ao vivo só quando o dia selecionado muda
+  // (não a cada tick de 30s do relógio).
   useEffect(() => {
-    if (selectedDay !== now.getDay()) return;
+    if (selectedDay !== getChicagoDate().getDay()) return;
 
     const scrollTimer = setTimeout(() => {
       const liveElement = document.querySelector('[data-live="true"]');
@@ -185,7 +197,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
     }, 300);
 
     return () => clearTimeout(scrollTimer);
-  }, [selectedDay, now]);
+  }, [selectedDay]);
 
   return (
     <section
