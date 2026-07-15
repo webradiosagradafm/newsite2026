@@ -121,9 +121,18 @@ const Hero: React.FC<HeroProps> = ({
               className="relative rounded-full overflow-hidden"
               style={{ width: circleSize, height: circleSize }}
             >
+              {/* LCP element: imagem principal do host ao vivo.
+                  fetchPriority + width/height + loading="eager" garantem
+                  que o navegador baixe e decodifique isso primeiro,
+                  sem competir com imagens abaixo da dobra. */}
               <img
                 src={currentProgram.image}
                 alt={currentProgram.title}
+                width={circleSize}
+                height={circleSize}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 className="w-full h-full object-cover"
               />
               <svg
@@ -205,9 +214,14 @@ const Hero: React.FC<HeroProps> = ({
                     onClick={() => onNavigateToProgram(prog)}
                   >
                     <div className="w-24 h-24 flex-shrink-0 bg-gray-100 overflow-hidden">
+                      {/* Abaixo da dobra: lazy loading libera banda pra imagem LCP acima. */}
                       <img
                         src={prog.image}
                         alt={prog.title}
+                        loading="lazy"
+                        decoding="async"
+                        width={96}
+                        height={96}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                     </div>
