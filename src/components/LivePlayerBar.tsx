@@ -232,11 +232,19 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
           <div className="p-3 border-b border-gray-100 dark:border-white/5">
             <div className="flex items-start space-x-3">
               <div className="w-16 h-16 flex-shrink-0 rounded overflow-hidden bg-gray-200 dark:bg-gray-700">
+                {/* Este painel fica sempre montado no DOM (só deslocado com
+                    translate-x-full quando fechado). loading="lazy" evita
+                    que essas imagens disputem banda com a imagem LCP do
+                    Hero logo no carregamento inicial da página. */}
                 {program.image && (
                   <img
                     src={program.image}
                     className="w-full h-full object-cover"
                     alt={program.title}
+                    loading="lazy"
+                    decoding="async"
+                    width={64}
+                    height={64}
                   />
                 )}
               </div>
@@ -270,6 +278,10 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
                       src={prog.image}
                       className="w-full h-full object-cover"
                       alt={prog.title}
+                      loading="lazy"
+                      decoding="async"
+                      width={64}
+                      height={64}
                     />
                   )}
                 </div>
@@ -386,6 +398,8 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
                       src={displayImage}
                       className="w-full h-full object-cover"
                       alt={displayTitle}
+                      loading="lazy"
+                      decoding="async"
                     />
                   )}
                 </div>
@@ -512,6 +526,8 @@ const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
                     src={displayImage}
                     alt=""
                     className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
                   />
                 )}
               </div>
