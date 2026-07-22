@@ -18,7 +18,8 @@ const IMAGES = {
   SCOTT_TURNER: '/shows/scott-turner.jpg',
   DJ_ZION: '/shows/dj-zion.jpg',
   SARAH_JORDAN: '/shows/sarah-jordan.jpg',
-  WORSHIP: '/shows/worship.jpg'
+  WORSHIP: '/shows/worship.jpg',
+  GOLDEN_HYMNS: '/shows/golden_hymns.jpg' // <-- Adicionado aqui
 }
 
 const weekday: Program[] = [
@@ -123,6 +124,22 @@ const weekday: Program[] = [
   }
 ]
 
+// Grade específica de Quarta-feira (Wednesday)
+const wednesday: Program[] = weekday.map((program) => {
+  if (program.id === 'praise-fm-classics') {
+    return {
+      id: 'praise-fm-golden-hymns',
+      title: 'Golden Hymns',
+      host: 'Praise FM',
+      startTime: '21:00',
+      endTime: '22:00',
+      description: 'Traditional hymns and classic faith songs.',
+      image: IMAGES.GOLDEN_HYMNS
+    }
+  }
+  return program
+})
+
 const sunday: Program[] = [
   {
     id: 'sunday-midnight-grace',
@@ -226,11 +243,11 @@ const sunday: Program[] = [
 ]
 
 export const SCHEDULES: Record<number, Program[]> = {
-  0: sunday,
-  1: weekday,
-  2: weekday,
-  3: weekday,
-  4: weekday,
-  5: weekday,
-  6: weekday
+  0: sunday,    // Domingo
+  1: weekday,   // Segunda
+  2: weekday,   // Terça
+  3: wednesday, // Quarta (Golden Hymns)
+  4: weekday,   // Quinta
+  5: weekday,   // Sexta
+  6: weekday    // Sábado
 }
