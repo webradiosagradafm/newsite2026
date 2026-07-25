@@ -19,7 +19,8 @@ const IMAGES = {
   DJ_ZION: '/shows/dj-zion.jpg',
   SARAH_JORDAN: '/shows/sarah-jordan.jpg',
   WORSHIP: '/shows/worship.jpg',
-  GOLDEN_HYMNS: '/shows/golden_hymns.jpg' // <-- Adicionado aqui
+  GOLDEN_HYMNS: '/shows/golden_hymns.jpg', // <-- Adicionado aqui
+  SCOTT_TURNER_TRIBUTE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/scott-turner-tribute_uuqi3m.webp' // <-- Adicionado aqui
 }
 
 const weekday: Program[] = [
@@ -140,6 +141,22 @@ const wednesday: Program[] = weekday.map((program) => {
   return program
 })
 
+// Grade específica de Sábado (Saturday)
+const saturday: Program[] = weekday.map((program) => {
+  if (program.id === 'praise-fm-classics') {
+    return {
+      id: 'praise-fm-classics-tributes',
+      title: 'Praise FM Classics Tributes',
+      host: 'Scott Turner',
+      startTime: '21:00',
+      endTime: '22:00',
+      description: 'Timeless Christian favorites.',
+      image: IMAGES.SCOTT_TURNER_TRIBUTE
+    }
+  }
+  return program
+})
+
 const sunday: Program[] = [
   {
     id: 'sunday-midnight-grace',
@@ -249,5 +266,5 @@ export const SCHEDULES: Record<number, Program[]> = {
   3: wednesday, // Quarta (Golden Hymns)
   4: weekday,   // Quinta
   5: weekday,   // Sexta
-  6: weekday    // Sábado
+  6: saturday   // Sábado (Classics Tributes)
 }
