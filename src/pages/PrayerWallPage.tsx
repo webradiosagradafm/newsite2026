@@ -79,7 +79,7 @@ export default function PrayerWallPage() {
             onChange={(e) => setName(e.target.value)}
             placeholder="Your first name"
             maxLength={50}
-            className="w-full rounded-xl px-4 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-white/10 outline-none focus:border-orange-500"
+            className="w-full rounded-xl px-4 py-2 bg-white dark:bg-[#0b0b0b] border border-gray-300 dark:border-white/10 outline-none focus:border-orange-500"
           />
         </div>
 
@@ -92,7 +92,7 @@ export default function PrayerWallPage() {
             rows={4}
             maxLength={500}
             placeholder="Share what's on your heart..."
-            className="w-full rounded-xl px-4 py-2 bg-white dark:bg-[#121212] border border-gray-300 dark:border-white/10 outline-none focus:border-orange-500 resize-none"
+            className="w-full rounded-xl px-4 py-2 bg-white dark:bg-[#0b0b0b] border border-gray-300 dark:border-white/10 outline-none focus:border-orange-500 resize-none"
           />
         </div>
 
