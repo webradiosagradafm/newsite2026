@@ -120,7 +120,7 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
   }, [displayedTracks])
 
   return (
-    <section className="bg-white dark:bg-black py-12">
+    <section className="bg-white dark:bg-[#121212] py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -137,7 +137,7 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
             Waiting for music...
           </p>
         ) : (
-          <div className="flex flex-col rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-[#0f0f0f]">
+          <div className="flex flex-col rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-[#121212]">
             {displayedTracks.map((track, idx) => {
               const key = `${track.artist}-${track.title}`
 
