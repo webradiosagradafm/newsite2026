@@ -70,7 +70,7 @@ export default function PrayerWallPage() {
         className="bg-gray-100 dark:bg-[#1A1A1A] rounded-2xl p-6 mb-12 space-y-4"
       >
         <div>
-          <label className="block text-sm font-bold mb-1">
+          <label className="block text-sm font-bold mb-1 text-gray-950 dark:text-white">
             Name <span className="text-gray-400 font-normal">(optional — leave blank to stay anonymous)</span>
           </label>
           <input
@@ -79,12 +79,12 @@ export default function PrayerWallPage() {
             onChange={(e) => setName(e.target.value)}
             placeholder="Your first name"
             maxLength={50}
-            className="w-full rounded-xl px-4 py-2 bg-white dark:bg-[#0b0b0b] border border-gray-300 dark:border-white/10 outline-none focus:border-orange-500"
+            className="w-full rounded-xl px-4 py-2 bg-white dark:bg-[#0b0b0b] border border-gray-300 dark:border-white/10 outline-none focus:border-orange-500 text-gray-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-bold mb-1">Prayer Request</label>
+          <label className="block text-sm font-bold mb-1 text-gray-950 dark:text-white">Prayer Request</label>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -92,7 +92,7 @@ export default function PrayerWallPage() {
             rows={4}
             maxLength={500}
             placeholder="Share what's on your heart..."
-            className="w-full rounded-xl px-4 py-2 bg-white dark:bg-[#0b0b0b] border border-gray-300 dark:border-white/10 outline-none focus:border-orange-500 resize-none"
+            className="w-full rounded-xl px-4 py-2 bg-white dark:bg-[#0b0b0b] border border-gray-300 dark:border-white/10 outline-none focus:border-orange-500 resize-none text-gray-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
           />
         </div>
 
