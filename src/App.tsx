@@ -581,7 +581,7 @@ const AppContent: React.FC = () => {
 
       <Footer />
 
-      
+      <a
         href={DONATE_URL}
         target="_blank"
         rel="noopener noreferrer"
