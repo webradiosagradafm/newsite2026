@@ -20,7 +20,9 @@ const IMAGES = {
   SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/sarah-jordan_tfnxpp.webp',
   WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/worship_jxoxce.webp',
   GOLDEN_HYMNS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/GOLDEN_HYMNS_2016_j7n2io.webp',
-  SCOTT_TURNER_TRIBUTE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/scott-turner-tribute_uuqi3m.webp'
+  SCOTT_TURNER_TRIBUTE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/scott-turner-tribute_uuqi3m.webp',
+  CHILL_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785297426/chill-mix_btpsnv.webp',
+  CLUB_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785297861/club-mix_ritmbx.webp'
 }
 
 const weekday: Program[] = [
@@ -154,6 +156,28 @@ const saturday: Program[] = weekday.map((program) => {
       image: IMAGES.SCOTT_TURNER_TRIBUTE
     }
   }
+  if (program.id === 'praise-fm-rock') {
+    return {
+      id: 'maia-millers-club-mix',
+      title: "Maia Miller's Club Mix",
+      host: 'Maia Miller',
+      startTime: '20:00',
+      endTime: '21:00',
+      description: 'An upbeat mix to kick off your Saturday night.',
+      image: IMAGES.CLUB_MIX
+    }
+  }
+  if (program.id === 'praise-fm-chill') {
+    return {
+      id: 'praise-fm-chill-mix',
+      title: 'Praise FM Chill Mix',
+      host: 'Praise FM',
+      startTime: '22:00',
+      endTime: '00:00',
+      description: 'A relaxed mix to wind down your Saturday.',
+      image: IMAGES.CHILL_MIX
+    }
+  }
   return program
 })
 
@@ -266,5 +290,5 @@ export const SCHEDULES: Record<number, Program[]> = {
   3: wednesday, // Quarta (Golden Hymns)
   4: weekday,   // Quinta
   5: weekday,   // Sexta
-  6: saturday   // Sábado (Classics Tributes)
+  6: saturday   // Sábado (Club Mix 20h, Chill Mix 22h, Classics Tributes 21h)
 }
