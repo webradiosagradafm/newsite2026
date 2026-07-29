@@ -151,7 +151,7 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
               return (
                 <div
                   key={key}
-                  className="flex items-center justify-between py-4 px-4 border-b border-gray-100 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/[0.03] transition"
+                  className="flex items-center justify-between py-4 px-4 border-b border-gray-100 dark:border-white/5 transition"
                 >
                   <div className="flex items-center gap-4 min-w-0">
                     <span className="text-sm text-gray-400 w-5 font-medium">
