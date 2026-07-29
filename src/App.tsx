@@ -357,17 +357,8 @@ const HomeBBC = ({
               </span>
             </button>
           </div>
-
-          <div className="py-4">
-            <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed text-center md:text-left">
-              {currentProgram?.description ||
-                'Listen live to Praise FM — Christian music, worship and devotionals.'}
-            </p>
-          </div>
         </div>
       </section>
-
-      <RecentlyPlayed tracks={trackHistory} />
     </>
   )
 }
