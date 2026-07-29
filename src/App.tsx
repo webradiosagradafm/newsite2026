@@ -43,6 +43,8 @@ import { Program } from './types'
 const DEFAULT_COVER = '/logo.png'
 const STREAM_URL = 'https://stream.zeno.fm/qalochfsdoftv'
 const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/qalochfsdoftv'
+const DONATE_URL = 'https://donate.stripe.com/bJe8wQ09o1zG5W78CO33W00'
+const DONATE_BADGE = 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785306619/donate_t5npp7.webp'
 
 const BLOCKED_METADATA_KEYWORDS = [
   'praise fm',
@@ -578,6 +580,19 @@ const AppContent: React.FC = () => {
       </main>
 
       <Footer />
+
+      
+        href={DONATE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-50 w-16 h-16 md:w-20 md:h-20 hover:scale-105 transition-transform"
+      >
+        <img
+          src={DONATE_BADGE}
+          alt="Donate via Stripe"
+          className="w-full h-full rounded-2xl shadow-lg"
+        />
+      </a>
 
       {currentProgram && (
         <LivePlayerBar
