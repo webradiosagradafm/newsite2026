@@ -59,7 +59,7 @@ export default function PrayerWallPage() {
     <div className="max-w-3xl mx-auto px-4 md:px-6 py-10">
       <div className="text-center mb-10">
         <Heart className="w-10 h-10 text-orange-500 mx-auto mb-3" />
-        <h1 className="text-3xl md:text-4xl font-black">Prayer Wall</h1>
+        <h1 className="text-3xl md:text-4xl font-black text-gray-950 dark:text-white">Prayer Wall</h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
           Share a prayer request with our community. You can stay anonymous if you'd like.
         </p>
@@ -113,7 +113,7 @@ export default function PrayerWallPage() {
       </form>
 
       <div>
-        <h2 className="text-xl font-bold mb-4">Community Prayer Requests</h2>
+        <h2 className="text-xl font-bold mb-4 text-gray-950 dark:text-white">Community Prayer Requests</h2>
 
         {fetching ? (
           <p className="text-gray-500">Loading...</p>
