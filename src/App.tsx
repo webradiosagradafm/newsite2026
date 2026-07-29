@@ -346,6 +346,10 @@ const HomeBBC = ({
             </a>
           </div>
 
+          <div className="mt-8">
+            <RecentlyPlayed tracks={trackHistory} />
+          </div>
+
           <div className="flex justify-center md:justify-end mt-3 mb-5">
             <button
               onClick={() => navigate('/advertise')}
