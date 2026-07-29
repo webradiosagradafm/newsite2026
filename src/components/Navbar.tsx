@@ -10,7 +10,7 @@ import {
   X,
   Ticket,
   Megaphone,
-  Headphones
+  Heart
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
@@ -30,7 +30,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home, path: '/' },
-    { id: 'programs', label: 'Programs', icon: Headphones, path: '/programs' },
+    { id: 'programs', label: 'Prayer Wall', icon: Heart, path: '/programs' },
     { id: 'music', label: 'Music', icon: Music, path: '/music' },
     { id: 'schedule', label: 'Schedule', icon: Calendar, path: '/schedule' },
     { id: 'events', label: 'Events', icon: Ticket, path: '/events' },
