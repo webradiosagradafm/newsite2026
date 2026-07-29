@@ -7,19 +7,19 @@ export const COLORS = {
 }
 
 const IMAGES = {
-  DANIEL_BROOKS: '/shows/daniel-brooks.jpg',
-  RACHAEL_HARRIS: '/shows/rachael-harris.jpg',
-  MICHAEL_RAY: '/shows/michael-ray.jpg',
-  STANCY_CAMPBELL: '/shows/stancy-campbell.jpg',
-  MATT_RILEY: '/shows/matt-riley.jpg',
-  SUNDAY_SERVICE: '/shows/sunday-service.jpg',
-  JAKE_HUNTER: '/shows/jake-hunter.jpg',
-  AVA_BROOKS: '/shows/ava-brooks.jpg',
-  SCOTT_TURNER: '/shows/scott-turner.jpg',
-  DJ_ZION: '/shows/dj-zion.jpg',
-  SARAH_JORDAN: '/shows/sarah-jordan.jpg',
-  WORSHIP: '/shows/worship.jpg',
-  GOLDEN_HYMNS: '/shows/golden_hymns.jpg', // <-- Adicionado aqui
+  DANIEL_BROOKS: '/shows/daniel-brooks.webp',
+  RACHAEL_HARRIS: '/shows/rachael-harris.webp',
+  MICHAEL_RAY: '/shows/michael-ray.webp',
+  STANCY_CAMPBELL: '/shows/stancy-campbell.webp',
+  MATT_RILEY: '/shows/matt-riley.webp',
+  SUNDAY_SERVICE: '/shows/sunday-service.webp',
+  JAKE_HUNTER: '/shows/jake-hunter.webp',
+  AVA_BROOKS: '/shows/ava-brooks.webp',
+  SCOTT_TURNER: '/shows/scott-turner.webp',
+  DJ_ZION: '/shows/dj-zion.webp',
+  SARAH_JORDAN: '/shows/sarah-jordan.webp',
+  WORSHIP: '/shows/worship.webp',
+  GOLDEN_HYMNS: '/shows/golden_hymns.webp', // <-- Adicionado aqui
   SCOTT_TURNER_TRIBUTE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/scott-turner-tribute_uuqi3m.webp' // <-- Adicionado aqui
 }
 
