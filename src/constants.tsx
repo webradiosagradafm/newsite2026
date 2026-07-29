@@ -7,20 +7,20 @@ export const COLORS = {
 }
 
 const IMAGES = {
-  DANIEL_BROOKS: '/shows/daniel-brooks.webp',
-  RACHAEL_HARRIS: '/shows/rachael-harris.webp',
-  MICHAEL_RAY: '/shows/michael-ray.webp',
-  STANCY_CAMPBELL: '/shows/stancy-campbell.webp',
-  MATT_RILEY: '/shows/matt-riley.webp',
-  SUNDAY_SERVICE: '/shows/sunday-service.webp',
-  JAKE_HUNTER: '/shows/jake-hunter.webp',
-  AVA_BROOKS: '/shows/ava-brooks.webp',
-  SCOTT_TURNER: '/shows/scott-turner.webp',
-  DJ_ZION: '/shows/dj-zion.webp',
-  SARAH_JORDAN: '/shows/sarah-jordan.webp',
-  WORSHIP: '/shows/worship.webp',
-  GOLDEN_HYMNS: '/shows/golden_hymns.webp', // <-- Adicionado aqui
-  SCOTT_TURNER_TRIBUTE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/scott-turner-tribute_uuqi3m.webp' // <-- Adicionado aqui
+  DANIEL_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/daniel-brooks_qbfdgc.webp',
+  RACHAEL_HARRIS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/rachael-harris_pwfg0z.webp',
+  MICHAEL_RAY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/michael-ray_n6ylzs.webp',
+  STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782150864/stancy-campbell_dlmteu.webp',
+  MATT_RILEY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/matt-riley_bun9ef.webp',
+  SUNDAY_SERVICE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1781538248/sunday-service_xmj94r.webp',
+  JAKE_HUNTER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782153980/jack-hunter_qagiwm.webp',
+  AVA_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158973/ava-brooks_oyzibl.webp',
+  SCOTT_TURNER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/scott-turner_cwy1bc.webp',
+  DJ_ZION: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/dj-zion_m2frte.webp',
+  SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/sarah-jordan_tfnxpp.webp',
+  WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/worship_jxoxce.webp',
+  GOLDEN_HYMNS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/GOLDEN_HYMNS_2016_j7n2io.webp',
+  SCOTT_TURNER_TRIBUTE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/scott-turner-tribute_uuqi3m.webp'
 }
 
 const weekday: Program[] = [
