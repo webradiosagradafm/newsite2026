@@ -317,6 +317,35 @@ const HomeBBC = ({
             ))}
           </div>
 
+          <div className="py-6 border-b border-gray-300 dark:border-white/10">
+            <a
+              href={DONATE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors rounded-2xl"
+            >
+              <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-xl">
+                <img
+                  src={DONATE_BADGE}
+                  alt="Donate"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-[11px] font-black text-orange-500 uppercase tracking-wide mb-0.5">
+                  Support Praise FM
+                </p>
+                <h3 className="text-sm font-bold leading-tight">
+                  Donate
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  Help keep us on air 24/7
+                </p>
+              </div>
+            </a>
+          </div>
+
           <div className="flex justify-center md:justify-end mt-3 mb-5">
             <button
               onClick={() => navigate('/advertise')}
@@ -580,19 +609,6 @@ const AppContent: React.FC = () => {
       </main>
 
       <Footer />
-
-      <a
-        href={DONATE_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-50 w-16 h-16 md:w-20 md:h-20 hover:scale-105 transition-transform"
-      >
-        <img
-          src={DONATE_BADGE}
-          alt="Donate via Stripe"
-          className="w-full h-full rounded-2xl shadow-lg"
-        />
-      </a>
 
       {currentProgram && (
         <LivePlayerBar
