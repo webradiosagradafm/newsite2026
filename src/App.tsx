@@ -569,8 +569,12 @@ const AppContent: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col pb-[120px] bg-white dark:bg-[#121212] transition-colors duration-1000"
-      style={{ backgroundColor: dynamicBg !== 'transparent' ? dynamicBg : undefined }}
+      className="min-h-screen flex flex-col pb-[120px] transition-colors duration-1000"
+      style={{ 
+        backgroundColor: dynamicBg !== 'transparent' 
+          ? dynamicBg 
+          : (theme === 'dark' ? '#121212' : '#ffffff') 
+      }}
     >
       <SEO title={seo.title} description={seo.description} url={window.location.href} />
 
