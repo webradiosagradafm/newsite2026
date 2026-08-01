@@ -1,18 +1,71 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+
+interface ForecastItem {
+  day: string
+  temp: string
+  condition: string
+}
 
 export default function WeatherBar() {
-  // Exemplo de previsão para os próximos dias
-  const [forecast] = useState([
-    { day: 'Today', temp: '72°F', condition: 'Sunny' },
-    { day: 'Tomorrow', temp: '68°F', condition: 'Cloudy' },
-    { day: 'Sun', temp: '75°F', condition: 'Clear' }
+  const [forecast, setForecast] = useState<ForecastItem[]>([
+    { day: 'Today', temp: '--°F', condition: 'Loading...' },
+    { day: 'Tomorrow', temp: '--°F', condition: 'Loading...' },
+    { day: 'Sun', temp: '--°F', condition: 'Loading...' }
   ])
+
+  useEffect(() => {
+    // Exemplo usando uma API pública gratuita (ex: Open-Meteo para Chicago, IL)
+    // Coordenadas de Chicago: Latitude 41.8781, Longitude -87.6298
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=41.8781&longitude=-87.6298&daily=temperature_2m_max,weathercode&temperature_unit=fahrenheit&timezone=America%2FChicago')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.daily) {
+          const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+          const todayIndex = new Date().getDay()
+
+          const updatedForecast = [
+            {
+              day: 'Today',
+              temp: `${Math.round(data.daily.temperature_2m_max[0])}°F`,
+              condition: getWeatherCondition(data.daily.weathercode[0])
+            },
+            {
+              day: 'Tomorrow',
+              temp: `${Math.round(data.daily.temperature_2m_max[1])}°F`,
+              condition: getWeatherCondition(data.daily.weathercode[1])
+            },
+            {
+              day: daysOfWeek[(todayIndex + 2) % 7],
+              temp: `${Math.round(data.daily.temperature_2m_max[2])}°F`,
+              condition: getWeatherCondition(data.daily.weathercode[2])
+            }
+          ]
+          setForecast(updatedForecast)
+        }
+      })
+      .catch(() => {
+        // Fallback caso falhe a requisição
+        setForecast([
+          { day: 'Today', temp: '72°F', condition: 'Sunny' },
+          { day: 'Tomorrow', temp: '68°F', condition: 'Cloudy' },
+          { day: 'Sun', temp: '75°F', condition: 'Clear' }
+        ])
+      })
+  }, [])
+
+  // Função auxiliar simples para traduzir o código do clima
+  const getWeatherCondition = (code: number) => {
+    if (code === 0) return 'Sunny'
+    if (code <= 3) return 'Partly Cloudy'
+    if (code <= 48) return 'Foggy'
+    if (code <= 67) return 'Rainy'
+    return 'Clear'
+  }
 
   return (
     <div className="py-6 border-b border-gray-300 dark:border-white/10">
       <div className="bg-gray-100 dark:bg-[#1A1A1A] p-4 transition-colors rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
         
-        {/* Título / Localização fixa */}
         <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#121212] shadow-sm flex items-center justify-center text-orange-500 flex-shrink-0">
@@ -42,7 +95,6 @@ export default function WeatherBar() {
           </div>
         </div>
 
-        {/* Dias da Semana / Previsão em colunas */}
         <div className="grid grid-cols-3 gap-3 w-full md:w-auto">
           {forecast.map((item, index) => (
             <div 
