@@ -1,132 +1,64 @@
-import { useEffect, useState } from "react";
-
-interface WeatherData {
-  current: {
-    temperature_2m: number;
-    weather_code: number;
-  };
-  daily: {
-    time: string[];
-    temperature_2m_max: number[];
-    temperature_2m_min: number[];
-    weather_code: number[];
-  };
-}
-
-const weatherIcons: Record<number, string> = {
-  0: "☀️",
-  1: "🌤️",
-  2: "⛅",
-  3: "☁️",
-  45: "🌫️",
-  48: "🌫️",
-  51: "🌦️",
-  53: "🌦️",
-  55: "🌦️",
-  61: "🌧️",
-  63: "🌧️",
-  65: "🌧️",
-  71: "❄️",
-  73: "❄️",
-  75: "❄️",
-  80: "🌦️",
-  81: "🌧️",
-  82: "⛈️",
-  95: "⛈️",
-};
+import React, { useEffect, useState } from 'react'
 
 export default function WeatherBar() {
-  const [weather, setWeather] = useState<WeatherData | null>(null);
-
-  useEffect(() => {
-    async function loadWeather() {
-      try {
-        const response = await fetch(
-          "https://api.open-meteo.com/v1/forecast?latitude=41.8781&longitude=-87.6298&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FChicago"
-        );
-
-        const data = await response.json();
-        setWeather(data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    loadWeather();
-  }, []);
-
-  if (!weather) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="rounded-2xl bg-slate-900 p-6 text-center text-white">
-          Loading weather...
-        </div>
-      </div>
-    );
-  }
+  // Exemplo de dados (você pode integrar com uma API de clima real depois se quiser)
+  const [weather, setWeather] = useState({
+    temp: '72°F',
+    condition: 'Partly Cloudy',
+    location: 'Chicago, IL'
+  })
 
   return (
-    <section className="max-w-7xl mx-auto px-4 py-6">
-      <div className="rounded-2xl bg-slate-900 border border-slate-700 p-6 shadow-lg">
-
-        <div className="flex items-center justify-between mb-6">
+    <div className="py-6 border-b border-gray-300 dark:border-white/10">
+      <div className="bg-gradient-to-r from-orange-500/10 via-amber-500/5 to-transparent dark:from-orange-500/20 dark:via-amber-500/10 dark:to-transparent p-4 md:p-5 rounded-2xl flex items-center justify-between border border-orange-500/20 shadow-sm">
+        
+        {/* Localização e Condição */}
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-xl bg-orange-500/15 dark:bg-orange-500/20 flex items-center justify-center text-orange-500 flex-shrink-0">
+            {/* Ícone SVG Moderno (Sol entre nuvens) */}
+            <svg 
+              className="w-6 h-6 animate-pulse" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              viewBox="0 0 24 24" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                d="M3 15a4 4 0 004 4h10a4 4 0 001.5-7.7A5 5 0 008.5 7.3 4.5 4.5 0 003 15z" 
+              />
+            </svg>
+          </div>
 
           <div>
-            <h2 className="text-white text-xl font-bold">
-              📍 Chicago Weather
-            </h2>
-
-            <p className="text-slate-400">
-              United States
-            </p>
-          </div>
-
-          <div className="text-right">
-            <div className="text-5xl">
-              {weatherIcons[weather.current.weather_code] ?? "☀️"}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black uppercase tracking-wider text-orange-500">
+                Weather Live
+              </span>
+              <span className="w-1 h-1 rounded-full bg-gray-400"></span>
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                {weather.location}
+              </span>
             </div>
-
-            <div className="text-white text-3xl font-bold">
-              {Math.round(weather.current.temperature_2m)}°
-            </div>
+            <h3 className="text-sm md:text-base font-bold text-gray-950 dark:text-white mt-0.5">
+              {weather.condition}
+            </h3>
           </div>
-
         </div>
 
-        <div className="grid grid-cols-7 gap-3">
-
-          {weather.daily.time.map((day, index) => {
-
-            const weekday = new Date(day).toLocaleDateString("en-US", {
-              weekday: "short",
-            });
-
-            return (
-              <div
-                key={day}
-                className="rounded-xl bg-slate-800 p-3 text-center"
-              >
-                <div className="text-slate-300 text-sm">
-                  {weekday}
-                </div>
-
-                <div className="text-3xl my-2">
-                  {weatherIcons[weather.daily.weather_code[index]] ?? "☀️"}
-                </div>
-
-                <div className="text-white font-semibold">
-                  {Math.round(weather.daily.temperature_2m_max[index])}°
-                </div>
-
-                <div className="text-slate-400 text-sm">
-                  {Math.round(weather.daily.temperature_2m_min[index])}°
-                </div>
-              </div>
-            );
-          })}
-
+        {/* Temperatura */}
+        <div className="text-right">
+          <span className="text-2xl md:text-3xl font-black text-gray-950 dark:text-white tracking-tight">
+            {weather.temp}
+          </span>
+          <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
+            RealTime
+          </p>
         </div>
+
       </div>
-    </section>
-  );
+    </div>
+  )
 }
