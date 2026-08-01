@@ -277,6 +277,13 @@ const HomeBBC = ({
                 {currentProgram?.description || 'Global Christian Radio'}
               </p>
 
+              {/* Adiciona o nome do host aqui */}
+              {currentProgram?.host && (
+                <p className="mt-1 text-sm font-bold text-orange-500 uppercase tracking-wider">
+                  Host: {currentProgram.host}
+                </p>
+              )}
+
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 {liveMetadata?.artist || 'Streaming 24/7'}
               </p>
