@@ -5,8 +5,6 @@ import {
   Clock,
   Headphones,
   Music,
-  Pause,
-  Play,
   Radio,
   UserRound
 } from 'lucide-react'
@@ -153,19 +151,16 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
   const isLive = isProgramLive(program)
   const nextProgram = getNextProgram(program)
 
-  // Combina o histórico global com a música atual para formar a lista completa
   const tracks = useMemo(() => {
     const list: LiveMetadata[] = []
     const seen = new Set<string>()
 
-    // Adiciona a música atual no topo se existir
     if (liveMetadata?.artist && liveMetadata?.title) {
       const key = `${liveMetadata.artist.toLowerCase()}-${liveMetadata.title.toLowerCase()}`
       seen.add(key)
       list.push(liveMetadata)
     }
 
-    // Adiciona o histórico acumulado
     trackHistory.forEach((track) => {
       if (!track.artist || !track.title) return
       const key = `${track.artist.toLowerCase()}-${track.title.toLowerCase()}`
@@ -258,14 +253,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={onListenClick}
-                  className="inline-flex items-center justify-center gap-3 bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-2xl font-black text-lg transition active:scale-95 shadow-xl shadow-orange-500/20"
-                >
-                  {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" fill="currentColor" />}
-                  {isPlaying ? 'Pause' : 'Listen Live'}
-                </button>
-
+                {/* Botão de Schedule mantido e centralizado */}
                 <button
                   onClick={onViewSchedule}
                   className="inline-flex items-center justify-center gap-3 bg-gray-100 hover:bg-gray-200 dark:bg-[#1b1b1b] dark:hover:bg-[#252525] px-8 py-4 rounded-2xl font-black text-lg transition"
@@ -440,17 +428,9 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
                 Praise FM USA
               </h3>
 
-              <p className="text-white/85 text-sm leading-relaxed mb-5">
+              <p className="text-white/85 text-sm leading-relaxed">
                 Worship, gospel, Christian hits and inspiring moments streaming 24/7 worldwide.
               </p>
-
-              <button
-                onClick={onListenClick}
-                className="w-full bg-white text-black hover:bg-black hover:text-white transition rounded-2xl px-5 py-4 font-black inline-flex items-center justify-center gap-2"
-              >
-                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" fill="currentColor" />}
-                {isPlaying ? 'Pause' : 'Listen Now'}
-              </button>
             </div>
           </aside>
         </div>
