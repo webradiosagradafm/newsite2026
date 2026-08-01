@@ -99,12 +99,22 @@ const getDominantColor = (imgSrc: string, callback: (color: string) => void) => 
       g = Math.floor(g / count)
       b = Math.floor(b / count)
 
-      // Retorna um tom bem suave para o fundo adaptado ao tema
-      callback(`rgba(${r}, ${g}, ${b}, 0.08)`)
+      // Garante uma intensidade mínima para a cor aparecer no fundo escuro
+      const max = Math.max(r, g, b)
+      if (max < 80) {
+        r = Math.min(255, r + 60)
+        g = Math.min(255, g + 60)
+        b = Math.min(255, b + 60)
+      }
+
+      // Retorna com uma opacidade elegante para harmonizar com o dark mode
+      callback(`rgba(${r}, ${g}, ${b}, 0.15)`)
     } catch {
-      callback('transparent')
+      callback('')
     }
   }
+
+  img.onerror = () => callback('')
 }
 
 const formatToAmPm = (time?: string) => {
