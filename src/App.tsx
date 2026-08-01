@@ -284,13 +284,15 @@ const HomeBBC = ({
               )}
 
               {/* REMOVA OU APAGUE ESTAS LINHAS ABAIXO */}
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {liveMetadata?.artist || 'Streaming 24/7'}
+              <p className="mt-2 text-base md:text-lg text-gray-700 dark:text-gray-300">
+                {currentProgram?.description || 'Global Christian Radio'}
               </p>
 
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {liveMetadata?.artist || 'Streaming 24/7'}
-              </p>
+              {currentProgram?.host && (
+                <p className="mt-1 text-sm font-bold text-orange-500 uppercase tracking-wider">
+                  Host: {currentProgram.host}
+                </p>
+              )}
 
               <button
                 onClick={onListenClick}
