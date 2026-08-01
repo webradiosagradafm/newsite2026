@@ -62,15 +62,6 @@ const BLOCKED_METADATA_KEYWORDS = [
   'bumper'
 ]
 
-// Mapeamento de cores suaves baseadas no nome ou tema do programa
-const PROGRAM_COLORS: Record<string, string> = {
-  'Praise FM Carpool': 'rgba(236, 72, 153, 0.08)', // Rosa suave
-  'Praise FM Rock': 'rgba(249, 115, 22, 0.08)',    // Laranja suave
-  'Classics': 'rgba(59, 130, 246, 0.08)',          // Azul suave
-  'Praise FM Chill': 'rgba(16, 185, 129, 0.08)',   // Verde suave
-  'Default': 'transparent'
-}
-
 interface LiveMetadata {
   artist: string
   title: string
@@ -201,12 +192,19 @@ const HomeBBC = ({
 
   return (
     <>
-      <section className="bg-transparent text-gray-950 dark:text-white">
+      <section className="bg-white dark:bg-[#121212] text-gray-950 dark:text-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-10">
+          
+          {/* Seção Principal (Topo) */}
           <div className="flex flex-col md:grid md:grid-cols-[220px_1fr] gap-8 md:gap-10 items-center border-b border-gray-300 dark:border-white/10 pb-8 md:pb-10">
-            <div className="relative w-[190px] h-[190px] mx-auto md:mx-0 flex-shrink-0">
+            
+            {/* Capa Principal com Efeito de Hover */}
+            <div 
+              className="relative w-[190px] h-[190px] mx-auto md:mx-0 flex-shrink-0 cursor-pointer transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/30 rounded-full"
+              onClick={() => currentProgram && onNavigateToProgram(currentProgram)}
+            >
               <svg
-                className="absolute inset-0 w-full h-full -rotate-90"
+                className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none"
                 viewBox={`0 0 ${size} ${size}`}
               >
                 <circle
@@ -245,11 +243,12 @@ const HomeBBC = ({
                 />
               </div>
 
-              <div className="absolute -right-3 bottom-1 w-16 h-16 rounded-full bg-black text-white flex items-center justify-center text-4xl font-black border-4 border-white dark:border-[#121212] shadow-lg">
+              <div className="absolute -right-3 bottom-1 w-16 h-16 rounded-full bg-black text-white flex items-center justify-center text-4xl font-black border-4 border-white dark:border-[#121212] shadow-lg pointer-events-none">
                 1
               </div>
             </div>
 
+            {/* Informações do Programa */}
             <div className="text-center md:text-left w-full">
               <div className="flex items-center justify-center md:justify-start gap-2 text-sm mb-2">
                 <span className="font-black text-orange-500">LIVE</span>
@@ -272,9 +271,17 @@ const HomeBBC = ({
                   </span>
                 </h1>
               </button>
+
+              {/* Nome do Host sem a palavra "Host" */}
+              {currentProgram?.host && (
+                <p className="mt-2 text-base md:text-lg font-bold text-orange-500 uppercase tracking-wider">
+                  {currentProgram.host}
+                </p>
+              )}
+
               <button
                 onClick={onListenClick}
-                className="mt-6 bg-orange-500 hover:bg-orange-600 text-white px-10 md:px-12 py-3 md:py-4 font-black text-lg transition active:scale-95 inline-flex items-center justify-center gap-3 mx-auto md:mx-0 rounded-xl"
+                className="mt-6 bg-orange-500 hover:bg-orange-600 text-white px-10 md:px-12 py-3 md:py-4 font-black text-lg transition active:scale-95 inline-flex items-center justify-center gap-3 mx-auto md:mx-0 rounded-xl shadow-lg shadow-orange-500/20"
               >
                 {isPlaying ? <Pause size={22} /> : <Play size={22} fill="currentColor" />}
                 {isPlaying ? 'Pause' : 'Play'}
@@ -282,14 +289,18 @@ const HomeBBC = ({
             </div>
           </div>
 
+          {/* Seção Próximos Programas (Upcoming) com Capas Interativas */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-8 border-b border-gray-300 dark:border-white/10">
             {[nextOne, nextTwo, nextThree].filter(Boolean).map((program) => (
-              <button
+              <div
                 key={(program as Program).id || (program as Program).title}
-                onClick={() => onNavigateToProgram(program as Program)}
-                className="flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors w-full rounded-2xl"
+                className="flex gap-4 text-left group items-center bg-gray-100 dark:bg-[#1A1A1A] p-4 rounded-2xl"
               >
-                <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-xl">
+                {/* Capa com hover individual */}
+                <div 
+                  className="relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-xl cursor-pointer transition-all duration-500 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25"
+                  onClick={() => onNavigateToProgram(program as Program)}
+                >
                   <img
                     src={getProgramImage(program as Program)}
                     alt={(program as Program).title}
@@ -297,7 +308,10 @@ const HomeBBC = ({
                   />
                 </div>
 
-                <div className="min-w-0">
+                <button
+                  onClick={() => onNavigateToProgram(program as Program)}
+                  className="min-w-0 text-left flex-1"
+                >
                   <p className="text-[11px] font-black text-orange-500 uppercase tracking-wide mb-0.5">
                     {formatRangeToAmPm(
                       (program as Program).startTime,
@@ -312,21 +326,22 @@ const HomeBBC = ({
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
                     {(program as Program).host}
                   </p>
-                </div>
-              </button>
+                </button>
+              </div>
             ))}
           </div>
 
           <WeatherBar />
 
+          {/* Seção Donate */}
           <div className="py-6 border-b border-gray-300 dark:border-white/10">
             <a
               href={DONATE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-4 bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors rounded-2xl"
+              className="flex items-center gap-4 bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors rounded-2xl group"
             >
-              <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-xl">
+              <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-xl transition-all duration-500 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-orange-500/25">
                 <img
                   src={DONATE_BADGE}
                   alt="Donate"
@@ -417,12 +432,6 @@ const AppContent: React.FC = () => {
       queue: nextPrograms
     }
   }, [day, total])
-
-  // Pega a cor baseada no título do programa atual
-  const currentProgramColor = useMemo(() => {
-    if (!currentProgram?.title) return '#121212'
-    return PROGRAM_COLORS[currentProgram.title] || 'rgba(249, 115, 22, 0.06)'
-  }, [currentProgram])
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
@@ -527,13 +536,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div 
-      className="min-h-screen flex flex-col pb-[120px] transition-colors duration-1000"
-      style={{ 
-        backgroundColor: theme === 'dark' ? '#121212' : '#ffffff',
-        backgroundImage: `linear-gradient(to bottom, ${currentProgramColor}, ${theme === 'dark' ? '#121212' : '#ffffff'} 70%)`
-      }}
-    >
+    <div className="min-h-screen flex flex-col pb-[120px] bg-white dark:bg-[#121212] transition-colors">
       <SEO title={seo.title} description={seo.description} url={window.location.href} />
 
       <Navbar
