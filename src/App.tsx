@@ -272,13 +272,6 @@ const HomeBBC = ({
                   </span>
                 </h1>
               </button>
-
-              {currentProgram?.host && (
-                <p className="mt-1 text-sm font-bold text-orange-500 uppercase tracking-wider">
-                  {currentProgram.host}
-                </p>
-              )}
-
               <button
                 onClick={onListenClick}
                 className="mt-6 bg-orange-500 hover:bg-orange-600 text-white px-10 md:px-12 py-3 md:py-4 font-black text-lg transition active:scale-95 inline-flex items-center justify-center gap-3 mx-auto md:mx-0 rounded-xl"
