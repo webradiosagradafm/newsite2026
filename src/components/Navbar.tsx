@@ -18,12 +18,14 @@ interface NavbarProps {
   activeTab: string
   theme: 'light' | 'dark'
   onToggleTheme: () => void
+  programColor?: string // <--- Adicionado para receber a cor dinâmica
 }
 
 const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   theme,
-  onToggleTheme
+  onToggleTheme,
+  programColor
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
@@ -38,8 +40,18 @@ const Navbar: React.FC<NavbarProps> = ({
     { id: 'advertise', label: 'Advertise', icon: Megaphone, path: '/advertise' }
   ]
 
+  // Define a cor de fundo com prioridade para a cor dinâmica do programa
+  const headerBgStyle = {
+    backgroundColor: programColor && programColor !== 'transparent'
+      ? programColor
+      : (theme === 'dark' ? '#0b0b0b' : '#ffffff')
+  }
+
   return (
-    <header className="bg-white dark:bg-[#0b0b0b] text-black dark:text-white">
+    <header 
+      className="text-black dark:text-white transition-colors duration-1000 border-b border-gray-200 dark:border-white/10"
+      style={headerBgStyle}
+    >
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center h-full space-x-8">
           <div
@@ -88,7 +100,7 @@ const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center">
           <button
             onClick={onToggleTheme}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-gray-400 mr-8 md:mr-12"
+            className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-gray-400 mr-8 md:mr-12"
           >
             {theme === 'light' ? (
               <Moon className="w-4 h-4" />
@@ -111,7 +123,10 @@ const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 top-16 bg-white dark:bg-black z-40 md:hidden p-6 overflow-y-auto">
+        <div 
+          className="fixed inset-0 top-16 z-40 md:hidden p-6 overflow-y-auto transition-colors duration-1000"
+          style={headerBgStyle}
+        >
           <nav className="flex flex-col space-y-4">
             {navItems.map((item) => {
               const Icon = item.icon
@@ -123,7 +138,7 @@ const Navbar: React.FC<NavbarProps> = ({
                     navigate(item.path)
                     setIsMobileMenuOpen(false)
                   }}
-                  className="flex items-center space-x-4 p-4 rounded-xl text-lg font-medium text-gray-600 dark:text-gray-400 uppercase tracking-tighter"
+                  className="flex items-center space-x-4 p-4 rounded-xl text-lg font-medium text-gray-600 dark:text-gray-400 uppercase tracking-tighter hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                 >
                   <Icon className="w-5 h-5" />
                   <span>{item.label}</span>
