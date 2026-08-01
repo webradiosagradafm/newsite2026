@@ -158,16 +158,12 @@ const RecentlyPlayed: React.FC<RecentlyPlayedProps> = ({ tracks }) => {
                       {idx + 1}
                     </span>
 
-                    {/* --- CAPA COM HOVER APLICADO --- */}
-                    <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 transition-all duration-500 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25 cursor-pointer">
-                      <img
-                        src={artwork}
-                        alt={track.title}
-                        loading="lazy"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    {/* ------------------------------ */}
+                    <img
+                      src={artwork}
+                      alt={track.title}
+                      loading="lazy"
+                      className="w-14 h-14 object-cover rounded-xl shadow-sm"
+                    />
 
                     <div className="flex flex-col min-w-0">
                       <span className="text-sm md:text-base font-semibold text-black dark:text-white truncate">
