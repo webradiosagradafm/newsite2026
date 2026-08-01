@@ -275,12 +275,6 @@ const HomeBBC = ({
 
               {currentProgram?.host && (
                 <p className="mt-1 text-sm font-bold text-orange-500 uppercase tracking-wider">
-                  Host: {currentProgram.host}
-                </p>
-              )}
-
-              {currentProgram?.host && (
-                <p className="mt-1 text-sm font-bold text-orange-500 uppercase tracking-wider">
                   {currentProgram.host}
                 </p>
               )}
