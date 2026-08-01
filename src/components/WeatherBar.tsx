@@ -10,41 +10,57 @@ export default function WeatherBar() {
   const [forecast, setForecast] = useState<ForecastItem[]>([
     { day: 'Today', temp: '--°F', condition: 'Loading...' },
     { day: 'Tomorrow', temp: '--°F', condition: 'Loading...' },
-    { day: 'Sun', temp: '--°F', condition: 'Loading...' }
+    { day: 'Next', temp: '--°F', condition: 'Loading...' }
   ])
 
+  // Sua chave da OpenWeatherMap
+  const API_KEY = '46c6e2c5797e2e465e06600d29810afe'
+  // Coordenadas de Chicago, IL
+  const LAT = '41.8781'
+  const LON = '-87.6298'
+
   useEffect(() => {
-    // Exemplo usando uma API pública gratuita (ex: Open-Meteo para Chicago, IL)
-    // Coordenadas de Chicago: Latitude 41.8781, Longitude -87.6298
-    fetch('https://api.open-meteo.com/v1/forecast?latitude=41.8781&longitude=-87.6298&daily=temperature_2m_max,weathercode&temperature_unit=fahrenheit&timezone=America%2FChicago')
+    // Usamos a API One Call ou Forecast da OpenWeatherMap (em Fahrenheit)
+    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&units=imperial&appid=${API_KEY}`
+
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        if (data && data.daily) {
+        if (data && data.list) {
+          // A API de forecast retorna blocos de 3 em 3 horas. 
+          // Vamos filtrar um item por dia (ex: índice 0 para hoje, 8 para amanhã, 16 para depois)
+          const todayData = data.list[0]
+          const tomorrowData = data.list[8] || data.list[1]
+          const nextDayData = data.list[16] || data.list[2]
+
           const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
           const todayIndex = new Date().getDay()
 
-          const updatedForecast = [
+          const formatDayName = (offset: number) => {
+            return daysOfWeek[(todayIndex + offset) % 7]
+          }
+
+          setForecast([
             {
               day: 'Today',
-              temp: `${Math.round(data.daily.temperature_2m_max[0])}°F`,
-              condition: getWeatherCondition(data.daily.weathercode[0])
+              temp: `${Math.round(todayData.main.temp)}°F`,
+              condition: todayData.weather[0].main
             },
             {
               day: 'Tomorrow',
-              temp: `${Math.round(data.daily.temperature_2m_max[1])}°F`,
-              condition: getWeatherCondition(data.daily.weathercode[1])
+              temp: `${Math.round(tomorrowData.main.temp)}°F`,
+              condition: tomorrowData.weather[0].main
             },
             {
-              day: daysOfWeek[(todayIndex + 2) % 7],
-              temp: `${Math.round(data.daily.temperature_2m_max[2])}°F`,
-              condition: getWeatherCondition(data.daily.weathercode[2])
+              day: formatDayName(2),
+              temp: `${Math.round(nextDayData.main.temp)}°F`,
+              condition: nextDayData.weather[0].main
             }
-          ]
-          setForecast(updatedForecast)
+          ])
         }
       })
       .catch(() => {
-        // Fallback caso falhe a requisição
+        // Fallback caso ocorra algum erro na requisição
         setForecast([
           { day: 'Today', temp: '72°F', condition: 'Sunny' },
           { day: 'Tomorrow', temp: '68°F', condition: 'Cloudy' },
@@ -52,15 +68,6 @@ export default function WeatherBar() {
         ])
       })
   }, [])
-
-  // Função auxiliar simples para traduzir o código do clima
-  const getWeatherCondition = (code: number) => {
-    if (code === 0) return 'Sunny'
-    if (code <= 3) return 'Partly Cloudy'
-    if (code <= 48) return 'Foggy'
-    if (code <= 67) return 'Rainy'
-    return 'Clear'
-  }
 
   return (
     <div className="py-6 border-b border-gray-300 dark:border-white/10">
