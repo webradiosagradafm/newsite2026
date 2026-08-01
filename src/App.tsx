@@ -69,6 +69,44 @@ interface LiveMetadata {
   isMusic?: boolean
 }
 
+// Utilitário para extrair a cor dominante da imagem de capa
+const getDominantColor = (imgSrc: string, callback: (color: string) => void) => {
+  const img = new Image()
+  img.crossOrigin = 'Anonymous'
+  img.src = imgSrc
+
+  img.onload = () => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    canvas.width = 50
+    canvas.height = 50
+    ctx.drawImage(img, 0, 0, 50, 50)
+
+    try {
+      const data = ctx.getImageData(0, 0, 50, 50).data
+      let r = 0, g = 0, b = 0, count = 0
+
+      for (let i = 0; i < data.length; i += 16) {
+        r += data[i]
+        g += data[i + 1]
+        b += data[i + 2]
+        count++
+      }
+
+      r = Math.floor(r / count)
+      g = Math.floor(g / count)
+      b = Math.floor(b / count)
+
+      // Retorna um tom bem suave para o fundo adaptado ao tema
+      callback(`rgba(${r}, ${g}, ${b}, 0.08)`)
+    } catch {
+      callback('transparent')
+    }
+  }
+}
+
 const formatToAmPm = (time?: string) => {
   if (!time) return ''
 
@@ -374,6 +412,7 @@ const AppContent: React.FC = () => {
   const [liveMetadata, setLiveMetadata] = useState<LiveMetadata | null>(null)
   const [trackHistory, setTrackHistory] = useState<LiveMetadata[]>([])
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
+  const [dynamicBg, setDynamicBg] = useState<string>('transparent')
 
   const [theme, setTheme] = useState<'light' | 'dark'>(
     () => (localStorage.getItem('praise-theme') as 'light' | 'dark') || 'light'
@@ -417,6 +456,14 @@ const AppContent: React.FC = () => {
       queue: nextPrograms
     }
   }, [day, total])
+
+  // Atualiza a cor de fundo dinamicamente baseada na imagem do programa atual
+  useEffect(() => {
+    const imageUrl = getProgramImage(currentProgram)
+    getDominantColor(imageUrl, (color) => {
+      setDynamicBg(color)
+    })
+  }, [currentProgram])
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
@@ -521,7 +568,10 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col pb-[120px] bg-white dark:bg-[#121212] transition-colors">
+    <div 
+      className="min-h-screen flex flex-col pb-[120px] bg-white dark:bg-[#121212] transition-colors duration-1000"
+      style={{ backgroundColor: dynamicBg !== 'transparent' ? dynamicBg : undefined }}
+    >
       <SEO title={seo.title} description={seo.description} url={window.location.href} />
 
       <Navbar
