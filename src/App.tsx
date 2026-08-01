@@ -11,7 +11,6 @@ import {
 import { Play, Pause, Megaphone } from 'lucide-react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import { Analytics } from '@vercel/analytics/react'
-
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import RecentlyPlayed from './components/RecentlyPlayed'
@@ -20,6 +19,7 @@ import ProgramDetail from './components/ProgramDetail'
 import Playlist from './components/Playlist'
 import ScheduleList from './components/ScheduleList'
 import SEO from './components/SEO'
+import WeatherBar from './components/WeatherBar'
 
 import PrayerWallPage from './pages/PrayerWallPage'
 import ProgramEpisodesPage from './pages/ProgramEpisodesPage'
@@ -316,6 +316,8 @@ const HomeBBC = ({
               </button>
             ))}
           </div>
+
+          <WeatherBar />
 
           <div className="py-6 border-b border-gray-300 dark:border-white/10">
             <a
