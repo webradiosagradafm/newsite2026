@@ -55,7 +55,9 @@ const ProgramProgressRing: React.FC<{ program: Program; isActive: boolean; nowMi
             decoding="async"
             width={innerSize}
             height={innerSize}
-            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+            className={`w-full h-full object-cover transition-all duration-700 ${
+              isActive ? 'grayscale-0' : 'grayscale group-hover:grayscale-0'
+            }`}
           />
 
           <svg
@@ -104,8 +106,6 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
   const [selectedDay, setSelectedDay] = useState(getChicagoDate().getDay());
   const listContainerRef = useRef<HTMLDivElement>(null);
 
-  // Tick a cada 30s para o relógio/estado "ao vivo", mas só atualiza "today"
-  // (que dispara recálculo de weekDays) quando o dia civil realmente muda.
   useEffect(() => {
     const timer = setInterval(() => {
       const chicagoNow = getChicagoDate();
@@ -184,8 +184,6 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
 
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
-  // Scroll automático até o programa ao vivo só quando o dia selecionado muda
-  // (não a cada tick de 30s do relógio).
   useEffect(() => {
     if (selectedDay !== getChicagoDate().getDay()) return;
 
@@ -293,25 +291,29 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
                       key={prog.id}
                       data-live={active}
                       onClick={() => onNavigateToProgram(prog)}
-                      className={`relative flex flex-col md:flex-row items-start p-6 transition-all cursor-pointer group rounded-sm ${
+                      className={`relative flex flex-col md:flex-row items-start p-6 transition-all cursor-pointer group rounded-2xl md:rounded-3xl border ${
                         active
-                          ? 'bg-gray-50 dark:bg-white/5 border-l-8 border-[#ff6600] shadow-lg'
-                          : 'border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5'
+                          ? 'bg-orange-500/10 dark:bg-orange-500/10 border-orange-500 shadow-xl shadow-orange-500/10'
+                          : 'bg-white dark:bg-[#171717] border-black/5 dark:border-white/5 opacity-80 hover:opacity-100 hover:border-black/20 dark:hover:border-white/20'
                       }`}
                     >
+                      {active && (
+                        <div className="absolute left-0 top-0 bottom-0 w-2.5 bg-[#ff6600] rounded-l-2xl md:rounded-l-3xl" />
+                      )}
+
                       <div className="w-32 flex-shrink-0 flex flex-col mb-6 md:mb-0 pt-1">
                         <span
                           className={`text-2xl font-bold tracking-tight ${
                             active
                               ? 'text-[#ff6600]'
-                              : 'text-gray-300 dark:text-gray-700 group-hover:text-black dark:group-hover:text-white'
+                              : 'text-gray-400 dark:text-gray-500 group-hover:text-black dark:group-hover:text-white'
                           }`}
                         >
                           {format12h(prog.startTime)}
                         </span>
 
                         {active && (
-                          <div className="mt-3 inline-flex items-center justify-center bg-[#ff6600] text-white text-[10px] font-bold px-3 py-1 uppercase tracking-wider w-24">
+                          <div className="mt-3 inline-flex items-center justify-center bg-[#ff6600] text-white text-[10px] font-bold px-3 py-1 uppercase tracking-wider w-24 rounded-full shadow-md">
                             ON AIR
                           </div>
                         )}
@@ -326,7 +328,9 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
                       </div>
 
                       <div className="flex-grow min-w-0 pt-1">
-                        <h4 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#ff6600] leading-tight tracking-tight mb-2 transition-all duration-300">
+                        <h4 className={`text-2xl md:text-3xl font-bold leading-tight tracking-tight mb-2 transition-all duration-300 ${
+                          active ? 'text-[#ff6600]' : 'text-gray-900 dark:text-white group-hover:text-[#ff6600]'
+                        }`}>
                           {prog.title}
                         </h4>
 
