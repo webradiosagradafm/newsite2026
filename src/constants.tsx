@@ -156,14 +156,14 @@ const saturday: Program[] = weekday.map((program) => {
       image: IMAGES.SCOTT_TURNER_TRIBUTE
     }
   }
-  if (program.id === 'praise-fm-rock') {
+  if (program.id === 'praise-fm-flow') {
     return {
       id: 'maia-millers-club-mix',
       title: "Maia Miller's Club Mix",
       host: 'Maia Miller',
-      startTime: '20:00',
-      endTime: '21:00',
-      description: 'An upbeat mix to kick off your Saturday night.',
+      startTime: '16:00',
+      endTime: '17:00',
+      description: 'An upbeat mix to kick off your Saturday afternoon.',
       image: IMAGES.CLUB_MIX
     }
   }
@@ -290,5 +290,5 @@ export const SCHEDULES: Record<number, Program[]> = {
   3: wednesday, // Quarta (Golden Hymns)
   4: weekday,   // Quinta
   5: weekday,   // Sexta
-  6: saturday   // Sábado (Club Mix 20h, Chill Mix 22h, Classics Tributes 21h)
+  6: saturday   // Sábado (Club Mix 16h, Chill Mix 22h, Classics Tributes 21h)
 }
