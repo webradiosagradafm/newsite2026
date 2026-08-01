@@ -62,59 +62,20 @@ const BLOCKED_METADATA_KEYWORDS = [
   'bumper'
 ]
 
+// Mapeamento de cores suaves baseadas no nome ou tema do programa
+const PROGRAM_COLORS: Record<string, string> = {
+  'Praise FM Carpool': 'rgba(236, 72, 153, 0.08)', // Rosa suave
+  'Praise FM Rock': 'rgba(249, 115, 22, 0.08)',    // Laranja suave
+  'Classics': 'rgba(59, 130, 246, 0.08)',          // Azul suave
+  'Praise FM Chill': 'rgba(16, 185, 129, 0.08)',   // Verde suave
+  'Default': 'transparent'
+}
+
 interface LiveMetadata {
   artist: string
   title: string
   playedAt?: Date
   isMusic?: boolean
-}
-
-// Utilitário para extrair a cor dominante da imagem de capa
-const getDominantColor = (imgSrc: string, callback: (color: string) => void) => {
-  const img = new Image()
-  img.crossOrigin = 'Anonymous'
-  img.src = imgSrc
-
-  img.onload = () => {
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    canvas.width = 50
-    canvas.height = 50
-    ctx.drawImage(img, 0, 0, 50, 50)
-
-    try {
-      const data = ctx.getImageData(0, 0, 50, 50).data
-      let r = 0, g = 0, b = 0, count = 0
-
-      for (let i = 0; i < data.length; i += 16) {
-        r += data[i]
-        g += data[i + 1]
-        b += data[i + 2]
-        count++
-      }
-
-      r = Math.floor(r / count)
-      g = Math.floor(g / count)
-      b = Math.floor(b / count)
-
-      // Garante uma intensidade mínima para a cor aparecer no fundo escuro
-      const max = Math.max(r, g, b)
-      if (max < 80) {
-        r = Math.min(255, r + 60)
-        g = Math.min(255, g + 60)
-        b = Math.min(255, b + 60)
-      }
-
-      // Retorna com uma opacidade elegante para harmonizar com o dark mode
-      callback(`rgba(${r}, ${g}, ${b}, 0.15)`)
-    } catch {
-      callback('')
-    }
-  }
-
-  img.onerror = () => callback('')
 }
 
 const formatToAmPm = (time?: string) => {
@@ -240,7 +201,7 @@ const HomeBBC = ({
 
   return (
     <>
-      <section className="bg-white dark:bg-[#121212] text-gray-950 dark:text-white">
+      <section className="bg-transparent text-gray-950 dark:text-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-10">
           <div className="flex flex-col md:grid md:grid-cols-[220px_1fr] gap-8 md:gap-10 items-center border-b border-gray-300 dark:border-white/10 pb-8 md:pb-10">
             <div className="relative w-[190px] h-[190px] mx-auto md:mx-0 flex-shrink-0">
@@ -422,7 +383,6 @@ const AppContent: React.FC = () => {
   const [liveMetadata, setLiveMetadata] = useState<LiveMetadata | null>(null)
   const [trackHistory, setTrackHistory] = useState<LiveMetadata[]>([])
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
-  const [dynamicBg, setDynamicBg] = useState<string>('transparent')
 
   const [theme, setTheme] = useState<'light' | 'dark'>(
     () => (localStorage.getItem('praise-theme') as 'light' | 'dark') || 'light'
@@ -467,12 +427,10 @@ const AppContent: React.FC = () => {
     }
   }, [day, total])
 
-  // Atualiza a cor de fundo dinamicamente baseada na imagem do programa atual
-  useEffect(() => {
-    const imageUrl = getProgramImage(currentProgram)
-    getDominantColor(imageUrl, (color) => {
-      setDynamicBg(color)
-    })
+  // Pega a cor baseada no título do programa atual
+  const currentProgramColor = useMemo(() => {
+    if (!currentProgram?.title) return '#121212'
+    return PROGRAM_COLORS[currentProgram.title] || 'rgba(249, 115, 22, 0.06)'
   }, [currentProgram])
 
   useEffect(() => {
@@ -581,9 +539,8 @@ const AppContent: React.FC = () => {
     <div 
       className="min-h-screen flex flex-col pb-[120px] transition-colors duration-1000"
       style={{ 
-        backgroundColor: dynamicBg !== 'transparent' 
-          ? dynamicBg 
-          : (theme === 'dark' ? '#121212' : '#ffffff') 
+        backgroundColor: theme === 'dark' ? '#121212' : '#ffffff',
+        backgroundImage: `linear-gradient(to bottom, ${currentProgramColor}, ${theme === 'dark' ? '#121212' : '#ffffff'} 70%)`
       }}
     >
       <SEO title={seo.title} description={seo.description} url={window.location.href} />
