@@ -153,19 +153,29 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
   const isLive = isProgramLive(program)
   const nextProgram = getNextProgram(program)
 
+  // Combina o histórico global com a música atual para formar a lista completa
   const tracks = useMemo(() => {
-    const unique = new Map<string, LiveMetadata>()
+    const list: LiveMetadata[] = []
+    const seen = new Set<string>()
 
+    // Adiciona a música atual no topo se existir
     if (liveMetadata?.artist && liveMetadata?.title) {
-      unique.set(`${liveMetadata.artist}-${liveMetadata.title}`, liveMetadata)
+      const key = `${liveMetadata.artist.toLowerCase()}-${liveMetadata.title.toLowerCase()}`
+      seen.add(key)
+      list.push(liveMetadata)
     }
 
+    // Adiciona o histórico acumulado
     trackHistory.forEach((track) => {
       if (!track.artist || !track.title) return
-      unique.set(`${track.artist}-${track.title}`, track)
+      const key = `${track.artist.toLowerCase()}-${track.title.toLowerCase()}`
+      if (!seen.has(key)) {
+        seen.add(key)
+        list.push(track)
+      }
     })
 
-    return Array.from(unique.values()).slice(0, 12)
+    return list.slice(0, 15)
   }, [liveMetadata, trackHistory])
 
   return (
@@ -307,8 +317,8 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
                 <div className="divide-y divide-black/5 dark:divide-white/10">
                   {tracks.map((track, index) => {
                     const isCurrent =
-                      liveMetadata?.artist === track.artist &&
-                      liveMetadata?.title === track.title
+                      liveMetadata?.artist?.toLowerCase() === track.artist?.toLowerCase() &&
+                      liveMetadata?.title?.toLowerCase() === track.title?.toLowerCase()
 
                     return (
                       <div
