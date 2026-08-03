@@ -582,6 +582,36 @@ const AppContent: React.FC = () => {
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
 
+    // Quando um dispositivo de áudio conecta/desconecta (ex: a
+    // caixinha Bluetooth caiu e voltou), o navegador às vezes
+    // mantém a stream de áudio presa no dispositivo antigo, sem
+    // disparar nenhum evento de erro. Forçamos reconexão nesse caso.
+    const handleDeviceChange = () => {
+      if (!shouldBePlayingRef.current) return
+      // Pequeno atraso pra deixar o SO estabilizar a troca de
+      // dispositivo antes de recriar a stream.
+      setTimeout(() => reconnect(), 1000)
+    }
+
+    if (navigator.mediaDevices && 'addEventListener' in navigator.mediaDevices) {
+      navigator.mediaDevices.addEventListener('devicechange', handleDeviceChange)
+    }
+
+    // Rede de segurança: a cada 15s, confere se o currentTime do
+    // áudio realmente avançou. Cobre travamentos silenciosos (ex:
+    // troca de dispositivo de saída) que não disparam nenhum evento.
+    let lastCheckedTime = -1
+    const heartbeat = setInterval(() => {
+      if (!shouldBePlayingRef.current) return
+      if (audio.paused) return
+
+      if (audio.currentTime === lastCheckedTime) {
+        reconnect()
+      }
+
+      lastCheckedTime = audio.currentTime
+    }, 15000)
+
     return () => {
       audio.removeEventListener('play', handlePlay)
       audio.removeEventListener('playing', handlePlaying)
@@ -592,6 +622,11 @@ const AppContent: React.FC = () => {
       audio.removeEventListener('error', handleError)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
 
+      if (navigator.mediaDevices && 'removeEventListener' in navigator.mediaDevices) {
+        navigator.mediaDevices.removeEventListener('devicechange', handleDeviceChange)
+      }
+
+      clearInterval(heartbeat)
       clearStallTimer()
       clearRetryTimer()
 
