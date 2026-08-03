@@ -46,6 +46,11 @@ const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/qalochfsdoft
 const DONATE_URL = 'https://donate.stripe.com/bJe8wQ09o1zG5W78CO33W00'
 const DONATE_BADGE = 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785306619/donate_t5npp7.webp'
 
+// Tempo máximo (ms) sem sinal de vida do áudio antes de considerarmos
+// que a conexão travou e precisamos reconectar.
+const STALL_RECONNECT_DELAY = 8000
+const MAX_RETRY_DELAY = 30000
+
 const BLOCKED_METADATA_KEYWORDS = [
   'praise fm',
   'praisefm',
@@ -397,6 +402,15 @@ const AppContent: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const eventSourceRef = useRef<EventSource | null>(null)
 
+  // --- Controle de reconexão automática do stream ---
+  // Guarda se o usuário QUER que esteja tocando (independente do
+  // estado real da conexão), pra sabermos se devemos reconectar.
+  const shouldBePlayingRef = useRef(false)
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const stallTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const retryCountRef = useRef(0)
+  const reconnectingRef = useRef(false)
+
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -445,17 +459,142 @@ const AppContent: React.FC = () => {
     audio.preload = 'none'
     audio.volume = parseFloat(localStorage.getItem('praise-volume') || '0.8')
 
-    const handlePlay = () => setIsPlaying(true)
-    const handlePause = () => setIsPlaying(false)
+    const clearStallTimer = () => {
+      if (stallTimeoutRef.current) {
+        clearTimeout(stallTimeoutRef.current)
+        stallTimeoutRef.current = null
+      }
+    }
+
+    const clearRetryTimer = () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current)
+        retryTimeoutRef.current = null
+      }
+    }
+
+    // Recria a conexão com o stream do zero (equivalente ao F5,
+    // mas sem recarregar a página).
+    const reconnect = () => {
+      if (reconnectingRef.current) return
+      if (!shouldBePlayingRef.current) return
+
+      reconnectingRef.current = true
+      clearStallTimer()
+
+      const cacheBustUrl = `${STREAM_URL}?_=${Date.now()}`
+      audio.src = cacheBustUrl
+      audio.load()
+
+      audio
+        .play()
+        .then(() => {
+          retryCountRef.current = 0
+          reconnectingRef.current = false
+        })
+        .catch(() => {
+          reconnectingRef.current = false
+          scheduleRetry()
+        })
+    }
+
+    const scheduleRetry = () => {
+      clearRetryTimer()
+
+      const delay = Math.min(
+        2000 * 2 ** retryCountRef.current,
+        MAX_RETRY_DELAY
+      )
+      retryCountRef.current += 1
+
+      retryTimeoutRef.current = setTimeout(reconnect, delay)
+    }
+
+    // Se o áudio ficar "esperando dados" por tempo demais, tratamos
+    // como conexão travada e reconectamos.
+    const armStallTimer = () => {
+      clearStallTimer()
+      if (!shouldBePlayingRef.current) return
+
+      stallTimeoutRef.current = setTimeout(() => {
+        reconnect()
+      }, STALL_RECONNECT_DELAY)
+    }
+
+    const handlePlay = () => {
+      setIsPlaying(true)
+      clearStallTimer()
+      clearRetryTimer()
+      retryCountRef.current = 0
+    }
+
+    const handlePlaying = () => {
+      setIsPlaying(true)
+      clearStallTimer()
+      clearRetryTimer()
+      retryCountRef.current = 0
+    }
+
+    const handlePause = () => {
+      setIsPlaying(false)
+      // Só entendemos como "pausa intencional" se o usuário não
+      // queria mais tocar. Se ele queria, é queda de conexão.
+      if (shouldBePlayingRef.current) {
+        scheduleRetry()
+      }
+    }
+
+    const handleWaitingOrStalled = () => {
+      armStallTimer()
+    }
+
+    const handleError = () => {
+      setIsPlaying(false)
+      clearStallTimer()
+      if (shouldBePlayingRef.current) {
+        scheduleRetry()
+      }
+    }
 
     audio.addEventListener('play', handlePlay)
+    audio.addEventListener('playing', handlePlaying)
     audio.addEventListener('pause', handlePause)
+    audio.addEventListener('waiting', handleWaitingOrStalled)
+    audio.addEventListener('stalled', handleWaitingOrStalled)
+    audio.addEventListener('suspend', handleWaitingOrStalled)
+    audio.addEventListener('error', handleError)
 
     audioRef.current = audio
 
+    // Quando a aba volta a ficar visível, confere se o áudio
+    // realmente está tocando; se não, reconecta.
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== 'visible') return
+      if (!shouldBePlayingRef.current) return
+
+      const readyEnoughAndPlaying =
+        !audio.paused && !audio.ended && audio.readyState >= 3
+
+      if (!readyEnoughAndPlaying) {
+        reconnect()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
     return () => {
       audio.removeEventListener('play', handlePlay)
+      audio.removeEventListener('playing', handlePlaying)
       audio.removeEventListener('pause', handlePause)
+      audio.removeEventListener('waiting', handleWaitingOrStalled)
+      audio.removeEventListener('stalled', handleWaitingOrStalled)
+      audio.removeEventListener('suspend', handleWaitingOrStalled)
+      audio.removeEventListener('error', handleError)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+
+      clearStallTimer()
+      clearRetryTimer()
+
       audio.pause()
       audio.src = ''
       audioRef.current = null
@@ -466,10 +605,12 @@ const AppContent: React.FC = () => {
     if (!audioRef.current) return
 
     if (isPlaying) {
+      shouldBePlayingRef.current = false
       audioRef.current.pause()
       return
     }
 
+    shouldBePlayingRef.current = true
     audioRef.current.play().catch(() => setIsPlaying(false))
   }
 
