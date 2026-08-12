@@ -22,7 +22,8 @@ const IMAGES = {
   GOLDEN_HYMNS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/GOLDEN_HYMNS_2016_j7n2io.webp',
   SCOTT_TURNER_TRIBUTE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/scott-turner-tribute_uuqi3m.webp',
   CHILL_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785297426/chill-mix_btpsnv.webp',
-  CLUB_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785297861/club-mix_ritmbx.webp'
+  CLUB_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785297861/club-mix_ritmbx.webp',
+  BLACK_SOUL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1786538567/praisefmblacksoul_hvo3ah.webp'
 }
 
 const weekday: Program[] = [
@@ -167,6 +168,17 @@ const saturday: Program[] = weekday.map((program) => {
       image: IMAGES.CLUB_MIX
     }
   }
+  if (program.id === 'future-artists') {
+    return {
+      id: 'praise-fm-black-soul',
+      title: 'Praise FM Black Soul',
+      host: 'Praise FM',
+      startTime: '17:00',
+      endTime: '18:00',
+      description: 'Celebrating Black gospel and soul music.',
+      image: IMAGES.BLACK_SOUL
+    }
+  }
   if (program.id === 'praise-fm-chill') {
     return {
       id: 'praise-fm-chill-mix',
@@ -290,5 +302,5 @@ export const SCHEDULES: Record<number, Program[]> = {
   3: wednesday, // Quarta (Golden Hymns)
   4: weekday,   // Quinta
   5: weekday,   // Sexta
-  6: saturday   // Sábado (Club Mix 16h, Chill Mix 22h, Classics Tributes 21h)
+  6: saturday   // Sábado (Club Mix 16h, Black Soul 17h, Classics Tributes 21h, Chill Mix 22h)
 }
