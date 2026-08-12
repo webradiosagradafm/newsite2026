@@ -134,7 +134,7 @@ const wednesday: Program[] = weekday.map((program) => {
     return {
       id: 'praise-fm-golden-hymns',
       title: 'Golden Hymns',
-      host: 'Praise FM',
+      host: 'Scott Turner',
       startTime: '21:00',
       endTime: '22:00',
       description: 'Traditional hymns and classic faith songs.',
@@ -172,7 +172,7 @@ const saturday: Program[] = weekday.map((program) => {
     return {
       id: 'praise-fm-black-soul',
       title: 'Praise FM Black Soul',
-      host: 'Praise FM',
+      host: 'Jeff Olumbe',
       startTime: '17:00',
       endTime: '18:00',
       description: 'Celebrating Black gospel and soul music.',
@@ -269,7 +269,7 @@ const sunday: Program[] = [
   {
     id: 'sunday-service',
     title: 'Sunday Service',
-    host: 'Praise FM',
+    host: 'Guest Churches',
     startTime: '20:00',
     endTime: '21:00',
     description: 'A focused message of faith, hope and encouragement.',
