@@ -74,6 +74,25 @@ interface LiveMetadata {
   isMusic?: boolean
 }
 
+// Helper central pra atualizar o Media Session — usado tanto na
+// criação do áudio quanto sempre que a metadata (faixa tocando) muda.
+// É essencial pro Chrome/Android saber que existe uma sessão de mídia
+// ativa: isso faz o app ganhar a notificação/controles de mídia e ser
+// isento do throttling agressivo de background que corta o áudio ao
+// trocar de app ou bloquear a tela.
+const updateMediaSessionMetadata = (title: string, artist: string) => {
+  if (!('mediaSession' in navigator)) return
+
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title,
+    artist,
+    album: 'Praise FM USA',
+    artwork: [
+      { src: '/logo.png', sizes: '512x512', type: 'image/png' }
+    ]
+  })
+}
+
 const formatToAmPm = (time?: string) => {
   if (!time) return ''
 
@@ -526,6 +545,9 @@ const AppContent: React.FC = () => {
       clearStallTimer()
       clearRetryTimer()
       retryCountRef.current = 0
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'playing'
+      }
     }
 
     const handlePlaying = () => {
@@ -533,10 +555,16 @@ const AppContent: React.FC = () => {
       clearStallTimer()
       clearRetryTimer()
       retryCountRef.current = 0
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'playing'
+      }
     }
 
     const handlePause = () => {
       setIsPlaying(false)
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'paused'
+      }
       // Só entendemos como "pausa intencional" se o usuário não
       // queria mais tocar. Se ele queria, é queda de conexão.
       if (shouldBePlayingRef.current) {
@@ -565,6 +593,37 @@ const AppContent: React.FC = () => {
     audio.addEventListener('error', handleError)
 
     audioRef.current = audio
+
+    // --- Media Session API ---
+    // Essencial pro Chrome/Android reconhecer isto como uma sessão
+    // de mídia ativa: sem isso, o app não ganha a notificação/
+    // controles de mídia e fica sujeito ao throttling agressivo de
+    // background que suspende a aba e corta o áudio ao trocar de
+    // app ou bloquear a tela.
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setActionHandler('play', () => {
+        shouldBePlayingRef.current = true
+        audio.play().catch(() => {})
+      })
+
+      navigator.mediaSession.setActionHandler('pause', () => {
+        shouldBePlayingRef.current = false
+        audio.pause()
+      })
+
+      navigator.mediaSession.setActionHandler('stop', () => {
+        shouldBePlayingRef.current = false
+        audio.pause()
+      })
+
+      // Rádio ao vivo não tem "próxima/anterior" nem seek — desabilita
+      // pra não confundir o usuário nos controles do sistema.
+      navigator.mediaSession.setActionHandler('previoustrack', null)
+      navigator.mediaSession.setActionHandler('nexttrack', null)
+      navigator.mediaSession.setActionHandler('seekto', null)
+
+      updateMediaSessionMetadata('Praise FM USA', 'Live')
+    }
 
     // Quando a aba volta a ficar visível, confere se o áudio
     // realmente está tocando; se não, reconecta.
@@ -693,6 +752,10 @@ const AppContent: React.FC = () => {
           }
 
           setTrackHistory((history) => [meta, ...history].slice(0, 10))
+
+          // Mantém a notificação de mídia / lock screen com a
+          // faixa que está tocando agora.
+          updateMediaSessionMetadata(title, artist)
 
           return meta
         })
