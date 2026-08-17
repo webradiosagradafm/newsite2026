@@ -40,7 +40,7 @@ import AdvertisePage from './pages/AdvertisePage'
 import { SCHEDULES } from './constants'
 import { Program } from './types'
 
-const DEFAULT_COVER = '/logo.png'
+const DEFAULT_COVER = '/icon-512.png'
 const STREAM_URL = 'https://stream.zeno.fm/qalochfsdoftv'
 const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/qalochfsdoftv'
 const DONATE_URL = 'https://donate.stripe.com/bJe8wQ09o1zG5W78CO33W00'
@@ -88,7 +88,7 @@ const updateMediaSessionMetadata = (title: string, artist: string) => {
     artist,
     album: 'Praise FM USA',
     artwork: [
-      { src: '/logo.png', sizes: '512x512', type: 'image/png' }
+      { src: '/icon-512.png', sizes: '512x512', type: 'image/png' }
     ]
   })
 }
