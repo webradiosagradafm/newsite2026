@@ -7,6 +7,19 @@ export default defineConfig({
     react(),
 
     VitePWA({
+      // injectManifest: usa o NOSSO sw.js (em src/sw.js) como base e
+      // injeta a lista de assets pra cache dentro dele, em vez de
+      // gerar um sw.js automático que sobrescreveria o nosso e
+      // perderia a lógica que ignora o stream de áudio.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js',
+      injectManifest: {
+        // Evita que o manifesto de precache tente incluir o próprio
+        // stream ou qualquer coisa não construída pelo Vite.
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}']
+      },
+
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
