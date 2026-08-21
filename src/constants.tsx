@@ -23,7 +23,9 @@ const IMAGES = {
   SCOTT_TURNER_TRIBUTE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/scott-turner-tribute_uuqi3m.webp',
   CHILL_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785297426/chill-mix_btpsnv.webp',
   CLUB_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785297861/club-mix_ritmbx.webp',
-  BLACK_SOUL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1786538567/praisefmblacksoul_hvo3ah.webp'
+  BLACK_SOUL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1786538567/praisefmblacksoul_hvo3ah.webp',
+  WORLD_BEATS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1787173961/world-beats_vhjv2i.webp',
+  JULIA_WORTMAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1787173960/julia-wortman_qcrjhe.webp'
 }
 
 const weekday: Program[] = [
@@ -190,6 +192,17 @@ const saturday: Program[] = weekday.map((program) => {
       image: IMAGES.CHILL_MIX
     }
   }
+  if (program.id === 'praise-fm-rock') {
+    return {
+      id: 'worlds-beat',
+      title: "World's Beat",
+      host: 'Marc Powell',
+      startTime: '20:00',
+      endTime: '21:00',
+      description: 'Global worship rhythms from around the world.',
+      image: IMAGES.WORLD_BEATS
+    }
+  }
   return program
 })
 
@@ -249,13 +262,13 @@ const sunday: Program[] = [
     image: IMAGES.DJ_ZION
   },
   {
-    id: 'sunday-future-artists',
-    title: 'Future Artists',
-    host: 'Sarah Jordan',
+    id: 'weekend-gospel-chart',
+    title: 'Weekend Gospel Chart',
+    host: 'Julia Wortman',
     startTime: '17:00',
     endTime: '18:00',
-    description: 'Discover the future sound of Christian music.',
-    image: IMAGES.SARAH_JORDAN
+    description: "Counting down the week's biggest gospel hits.",
+    image: IMAGES.JULIA_WORTMAN
   },
   {
     id: 'sunday-worship-evening',
@@ -296,11 +309,11 @@ const sunday: Program[] = [
 ]
 
 export const SCHEDULES: Record<number, Program[]> = {
-  0: sunday,    // Domingo
+  0: sunday,    // Domingo (Weekend Gospel Chart 17h)
   1: weekday,   // Segunda
   2: weekday,   // Terça
   3: wednesday, // Quarta (Golden Hymns)
   4: weekday,   // Quinta
   5: weekday,   // Sexta
-  6: saturday   // Sábado (Club Mix 16h, Black Soul 17h, Classics Tributes 21h, Chill Mix 22h)
+  6: saturday   // Sábado (Club Mix 16h, Black Soul 17h, World's Beat 20h, Classics Tributes 21h, Chill Mix 22h)
 }
