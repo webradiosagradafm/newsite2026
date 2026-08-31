@@ -1,10 +1,5 @@
 ```tsx
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   Play,
   Pause,
@@ -31,252 +26,84 @@ interface LivePlayerBarProps {
   audioRef?: React.RefObject<HTMLAudioElement | null>
 }
 
-/* ============================================================
-   HEARTBEAT / GOOGLE ANALYTICS 4
-============================================================ */
-
-const HEARTBEAT_INTERVAL = 60000
-
-const getAnalyticsSessionId = (): string => {
-  const storageKey = 'praise-analytics-session-id'
-
+const formatTimeToAmPm = (timeString: string): string => {
   try {
-    let sessionId =
-      sessionStorage.getItem(storageKey)
-
-    if (!sessionId) {
-      sessionId =
-        String(Date.now()) +
-        '-' +
-        Math.random()
-          .toString(36)
-          .slice(2, 11)
-
-      sessionStorage.setItem(
-        storageKey,
-        sessionId
-      )
-    }
-
-    return sessionId
-  } catch {
-    return (
-      String(Date.now()) +
-      '-' +
-      Math.random()
-        .toString(36)
-        .slice(2, 11)
-    )
-  }
-}
-
-const sendGA4Event = (
-  eventName: string,
-  params: Record<
-    string,
-    string | number
-  >
-) => {
-  if (
-    typeof window === 'undefined'
-  ) {
-    return
-  }
-
-  const gtag = (
-    window as Window & {
-      gtag?: (
-        command: string,
-        eventName: string,
-        params?: Record<
-          string,
-          string | number
-        >
-      ) => void
-    }
-  ).gtag
-
-  if (typeof gtag === 'function') {
-    gtag(
-      'event',
-      eventName,
-      params
-    )
-  }
-}
-
-/* ============================================================
-   TIME FORMAT
-============================================================ */
-
-const formatTimeToAmPm = (
-  timeString: string
-): string => {
-  try {
-    if (
-      timeString.includes('AM') ||
-      timeString.includes('PM')
-    ) {
+    if (timeString.includes('AM') || timeString.includes('PM')) {
       return timeString
     }
 
-    const parts =
-      timeString.split(':')
+    const [hours, minutes] = timeString.split(':')
+    let hour = parseInt(hours, 10)
+    const period = hour >= 12 ? 'PM' : 'AM'
 
-    const hours = parts[0]
-    const minutes =
-      parts[1] || '00'
+    hour = hour % 12 || 12
 
-    let hour = parseInt(
-      hours,
-      10
-    )
-
-    const period =
-      hour >= 12 ? 'PM' : 'AM'
-
-    hour =
-      hour % 12 || 12
-
-    return (
-      String(hour) +
-      ':' +
-      minutes +
-      ' ' +
-      period
-    )
+    return `${hour}:${minutes || '00'} ${period}`
   } catch {
     return timeString
   }
 }
 
-/* ============================================================
-   CHICAGO TIME
-============================================================ */
+const getChicagoDayAndTotalMinutes = () => {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Chicago',
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })
 
-const getChicagoDayAndTotalMinutes =
-  () => {
-    const formatter =
-      new Intl.DateTimeFormat(
-        'en-US',
-        {
-          timeZone:
-            'America/Chicago',
-          weekday: 'short',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-        }
-      )
+  const parts = formatter.formatToParts(new Date())
 
-    const parts =
-      formatter.formatToParts(
-        new Date()
-      )
+  const weekday =
+    parts.find((p) => p.type === 'weekday')?.value || 'Mon'
 
-    const weekday =
-      parts.find(
-        (p) =>
-          p.type ===
-          'weekday'
-      )?.value || 'Mon'
+  const hour = Number(
+    parts.find((p) => p.type === 'hour')?.value || 0
+  )
 
-    const hour = Number(
-      parts.find(
-        (p) =>
-          p.type === 'hour'
-      )?.value || 0
-    )
+  const minute = Number(
+    parts.find((p) => p.type === 'minute')?.value || 0
+  )
 
-    const minute = Number(
-      parts.find(
-        (p) =>
-          p.type === 'minute'
-      )?.value || 0
-    )
-
-    const dayMap: Record<
-      string,
-      number
-    > = {
-      Sun: 0,
-      Mon: 1,
-      Tue: 2,
-      Wed: 3,
-      Thu: 4,
-      Fri: 5,
-      Sat: 6,
-    }
-
-    return {
-      day:
-        dayMap[weekday] ?? 1,
-      total:
-        hour * 60 + minute,
-    }
+  const dayMap: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
   }
 
-/* ============================================================
-   PROGRAM PROGRESS
-============================================================ */
-
-const getProgramProgress = (
-  program?: Program
-): number => {
-  if (!program) {
-    return 0
+  return {
+    day: dayMap[weekday] ?? 1,
+    total: hour * 60 + minute,
   }
+}
 
-  const { total } =
-    getChicagoDayAndTotalMinutes()
+const getProgramProgress = (program?: Program): number => {
+  if (!program) return 0
 
-  const startParts =
-    program.startTime
-      .split(':')
-      .map(Number)
+  const { total } = getChicagoDayAndTotalMinutes()
 
-  const endParts =
-    program.endTime
-      .split(':')
-      .map(Number)
+  const [sH, sM] = program.startTime.split(':').map(Number)
+  const [eH, eM] = program.endTime.split(':').map(Number)
 
-  const start =
-    startParts[0] * 60 +
-    startParts[1]
+  const start = sH * 60 + sM
+  let end = eH * 60 + eM
 
-  let end =
-    endParts[0] * 60 +
-    endParts[1]
-
-  if (
-    end === 0 ||
-    end <= start
-  ) {
+  if (end === 0 || end <= start) {
     end = 24 * 60
   }
 
-  if (total <= start) {
-    return 0
-  }
+  if (total <= start) return 0
+  if (total >= end) return 100
 
-  if (total >= end) {
-    return 100
-  }
-
-  return Math.round(
-    ((total - start) /
-      (end - start)) *
-      100
-  )
+  return Math.round(((total - start) / (end - start)) * 100)
 }
 
-/* ============================================================
-   COMPONENT
-============================================================ */
-
-const LivePlayerBar: React.FC<
-  LivePlayerBarProps
-> = ({
+const LivePlayerBar: React.FC<LivePlayerBarProps> = ({
   isPlaying = false,
   onTogglePlayback = () => {},
   program = {
@@ -290,258 +117,79 @@ const LivePlayerBar: React.FC<
   },
   liveMetadata = null,
   queue = [],
-  audioRef = {
-    current: null,
-  },
+  audioRef = { current: null },
 }) => {
-  const [
-    isExpanded,
-    setIsExpanded,
-  ] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [showSchedule, setShowSchedule] = useState(false)
 
-  const [
-    showSchedule,
-    setShowSchedule,
-  ] = useState(false)
+  const [volume, setVolume] = useState(() => {
+    return parseFloat(localStorage.getItem('praise-volume') || '0.8')
+  })
 
-  const [volume, setVolume] =
-    useState(() => {
-      try {
-        return parseFloat(
-          localStorage.getItem(
-            'praise-volume'
-          ) || '0.8'
-        )
-      } catch {
-        return 0.8
-      }
-    })
-
-  const [
-    isMuted,
-    setIsMuted,
-  ] = useState(false)
-
-  const [
-    prevVolume,
-    setPrevVolume,
-  ] = useState(0.8)
-
-  const [
-    showVolumeSlider,
-    setShowVolumeSlider,
-  ] = useState(false)
-
-  const [
-    playbackRate,
-    setPlaybackRate,
-  ] = useState(1)
-
-  /* ==========================================================
-     HEARTBEAT REFS
-  ========================================================== */
-
-  const heartbeatIntervalRef =
-    useRef<
-      ReturnType<
-        typeof setInterval
-      > | null
-    >(null)
-
-  const listeningSecondsRef =
-    useRef(0)
-
-  const analyticsStartedRef =
-    useRef(false)
-
-  const analyticsSessionIdRef =
-    useRef('')
-
-  /* ==========================================================
-     ANALYTICS SESSION
-  ========================================================== */
-
-  useEffect(() => {
-    analyticsSessionIdRef.current =
-      getAnalyticsSessionId()
-  }, [])
-
-  /* ==========================================================
-     DISPLAY DATA
-  ========================================================== */
+  const [isMuted, setIsMuted] = useState(false)
+  const [prevVolume, setPrevVolume] = useState(0.8)
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false)
+  const [playbackRate, setPlaybackRate] = useState(1)
 
   const progress = useMemo(
-    () =>
-      getProgramProgress(
-        program
-      ),
+    () => getProgramProgress(program),
     [program]
   )
 
-  const displayTitle =
-    liveMetadata?.title ||
-    program.title
+  const displayTitle = liveMetadata?.title || program.title
+  const displayArtist = liveMetadata?.artist || program.host
+  const displayImage = liveMetadata?.artwork || program.image
 
-  const displayArtist =
-    liveMetadata?.artist ||
-    program.host
-
-  const displayImage =
-    liveMetadata?.artwork ||
-    program.image
-
-  /* ==========================================================
-     AUDIO SETTINGS
-  ========================================================== */
+  /*
+   * ============================================================
+   * HEARTBEAT DO GA4
+   * Envia um evento a cada 60 segundos enquanto a rádio
+   * estiver realmente tocando.
+   * ============================================================
+   */
 
   useEffect(() => {
-    const audio =
-      audioRef.current
-
-    if (!audio) {
-      return
-    }
-
-    audio.volume =
-      isMuted ? 0 : volume
-
-    audio.muted = isMuted
-
-    audio.playbackRate =
-      playbackRate
-  }, [
-    volume,
-    isMuted,
-    playbackRate,
-    audioRef,
-  ])
-
-  /* ==========================================================
-     HEARTBEAT
-  ========================================================== */
-
-  useEffect(() => {
-    if (
-      heartbeatIntervalRef.current
-    ) {
-      clearInterval(
-        heartbeatIntervalRef.current
-      )
-
-      heartbeatIntervalRef.current =
-        null
-    }
-
     if (!isPlaying) {
       return
     }
 
-    /* --------------------------------------------------------
-       START
-    -------------------------------------------------------- */
+    const sendHeartbeat = () => {
+      const audio = audioRef.current
 
-    if (
-      !analyticsStartedRef.current
-    ) {
-      analyticsStartedRef.current =
-        true
+      if (audio && audio.paused) {
+        return
+      }
 
-      listeningSecondsRef.current =
-        0
-
-      sendGA4Event(
-        'audio_start',
-        {
-          station:
-            'Praise FM',
-
-          program:
-            program.title ||
-            'Unknown',
-
-          host:
-            program.host ||
-            'Unknown',
-
-          player:
-            'website',
-
-          session_id:
-            analyticsSessionIdRef
-              .current,
+      const gtag = (
+        window as typeof window & {
+          gtag?: (
+            command: string,
+            eventName: string,
+            params?: Record<string, string | number>
+          ) => void
         }
-      )
+      ).gtag
+
+      if (typeof gtag !== 'function') {
+        return
+      }
+
+      gtag('event', 'audio_heartbeat', {
+        station: 'Praise FM',
+        program: program.title || 'Praise FM',
+        host: program.host || '',
+        listening_minutes: 1,
+        player: 'website',
+      })
     }
 
-    /* --------------------------------------------------------
-       HEARTBEAT
-    -------------------------------------------------------- */
-
-    heartbeatIntervalRef.current =
-      setInterval(() => {
-        const audio =
-          audioRef.current
-
-        /*
-         * Só contabiliza se o áudio
-         * realmente estiver tocando.
-         */
-
-        if (
-          audio &&
-          audio.paused
-        ) {
-          return
-        }
-
-        listeningSecondsRef.current +=
-          60
-
-        sendGA4Event(
-          'audio_heartbeat',
-          {
-            station:
-              'Praise FM',
-
-            program:
-              program.title ||
-              'Unknown',
-
-            host:
-              program.host ||
-              'Unknown',
-
-            player:
-              'website',
-
-            session_id:
-              analyticsSessionIdRef
-                .current,
-
-            listening_minutes:
-              1,
-
-            listening_seconds:
-              60,
-
-            total_listening_seconds:
-              listeningSecondsRef
-                .current,
-          }
-        )
-      }, HEARTBEAT_INTERVAL)
+    const heartbeat = window.setInterval(
+      sendHeartbeat,
+      60000
+    )
 
     return () => {
-      if (
-        heartbeatIntervalRef.current
-      ) {
-        clearInterval(
-          heartbeatIntervalRef.current
-        )
-
-        heartbeatIntervalRef.current =
-          null
-      }
+      window.clearInterval(heartbeat)
     }
   }, [
     isPlaying,
@@ -550,129 +198,57 @@ const LivePlayerBar: React.FC<
     audioRef,
   ])
 
-  /* ==========================================================
-     AUDIO PAUSE
-  ========================================================== */
+  /*
+   * ============================================================
+   * EVENTO QUANDO COMEÇA A OUVIR
+   * ============================================================
+   */
 
   useEffect(() => {
-    if (
-      isPlaying ||
-      !analyticsStartedRef.current
-    ) {
+    if (!isPlaying) {
       return
     }
 
-    sendGA4Event(
-      'audio_pause',
-      {
-        station:
-          'Praise FM',
-
-        program:
-          program.title ||
-          'Unknown',
-
-        host:
-          program.host ||
-          'Unknown',
-
-        player:
-          'website',
-
-        session_id:
-          analyticsSessionIdRef
-            .current,
-
-        listening_seconds:
-          listeningSecondsRef
-            .current,
-
-        listening_minutes:
-          Math.floor(
-            listeningSecondsRef
-              .current / 60
-          ),
+    const gtag = (
+      window as typeof window & {
+        gtag?: (
+          command: string,
+          eventName: string,
+          params?: Record<string, string | number>
+        ) => void
       }
-    )
-  }, [
-    isPlaying,
-    program.title,
-    program.host,
-  ])
+    ).gtag
 
-  /* ==========================================================
-     PAGE EXIT
-  ========================================================== */
+    if (typeof gtag !== 'function') {
+      return
+    }
+
+    gtag('event', 'audio_start', {
+      station: 'Praise FM',
+      program: program.title || 'Praise FM',
+      host: program.host || '',
+      player: 'website',
+    })
+  }, [isPlaying, program.title, program.host])
+
+  /*
+   * ============================================================
+   * AUDIO
+   * ============================================================
+   */
 
   useEffect(() => {
-    const handlePageExit = () => {
-      if (
-        !analyticsStartedRef.current
-      ) {
-        return
-      }
-
-      sendGA4Event(
-        'audio_stop',
-        {
-          station:
-            'Praise FM',
-
-          program:
-            program.title ||
-            'Unknown',
-
-          host:
-            program.host ||
-            'Unknown',
-
-          player:
-            'website',
-
-          session_id:
-            analyticsSessionIdRef
-              .current,
-
-          listening_seconds:
-            listeningSecondsRef
-              .current,
-
-          listening_minutes:
-            Math.floor(
-              listeningSecondsRef
-                .current / 60
-            ),
-        }
-      )
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume
+      audioRef.current.muted = isMuted
+      audioRef.current.playbackRate = playbackRate
     }
-
-    window.addEventListener(
-      'pagehide',
-      handlePageExit
-    )
-
-    return () => {
-      window.removeEventListener(
-        'pagehide',
-        handlePageExit
-      )
-    }
-  }, [
-    program.title,
-    program.host,
-  ])
-
-  /* ==========================================================
-     VOLUME
-  ========================================================== */
+  }, [volume, isMuted, playbackRate, audioRef])
 
   const handleVolumeChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const val =
-      parseFloat(
-        e.target.value
-      )
+    const val = parseFloat(e.target.value)
 
     setVolume(val)
 
@@ -683,115 +259,52 @@ const LivePlayerBar: React.FC<
       setIsMuted(true)
     }
 
-    try {
-      localStorage.setItem(
-        'praise-volume',
-        String(val)
-      )
-    } catch {}
+    localStorage.setItem('praise-volume', val.toString())
   }
 
   const toggleMute = () => {
     if (isMuted) {
       setIsMuted(false)
-
-      setVolume(
-        prevVolume > 0.05
-          ? prevVolume
-          : 0.8
-      )
+      setVolume(prevVolume > 0.05 ? prevVolume : 0.8)
     } else {
       setPrevVolume(volume)
       setIsMuted(true)
     }
   }
 
-  /* ==========================================================
-     PLAYBACK RATE
-  ========================================================== */
+  const cyclePlaybackRate = () => {
+    const rates = [1, 1.25, 1.5, 2]
+    const idx = rates.indexOf(playbackRate)
 
-  const cyclePlaybackRate =
-    () => {
-      const rates = [
-        1,
-        1.25,
-        1.5,
-        2,
-      ]
-
-      const index =
-        rates.indexOf(
-          playbackRate
-        )
-
-      setPlaybackRate(
-        rates[
-          (index + 1) %
-            rates.length
-        ]
-      )
-    }
-
-  /* ==========================================================
-     VOLUME ICON
-  ========================================================== */
+    setPlaybackRate(rates[(idx + 1) % rates.length])
+  }
 
   const VolumeIcon = () => {
-    if (
-      isMuted ||
-      volume === 0
-    ) {
-      return (
-        <VolumeX className="w-5 h-5" />
-      )
+    if (isMuted || volume === 0) {
+      return <VolumeX className="w-5 h-5" />
     }
 
     if (volume < 0.5) {
-      return (
-        <Volume1 className="w-5 h-5" />
-      )
+      return <Volume1 className="w-5 h-5" />
     }
 
-    return (
-      <Volume2 className="w-5 h-5" />
-    )
+    return <Volume2 className="w-5 h-5" />
   }
-
-  /* ==========================================================
-     BODY SCROLL
-  ========================================================== */
 
   useEffect(() => {
     document.body.style.overflow =
-      showSchedule ||
-      isExpanded
-        ? 'hidden'
-        : 'unset'
+      showSchedule || isExpanded ? 'hidden' : 'unset'
 
     return () => {
-      document.body.style.overflow =
-        'unset'
+      document.body.style.overflow = 'unset'
     }
-  }, [
-    showSchedule,
-    isExpanded,
-  ])
-
-  /* ==========================================================
-     RENDER
-  ========================================================== */
+  }, [showSchedule, isExpanded])
 
   return (
     <>
-      {/* ======================================================
-          SCHEDULE
-      ====================================================== */}
-
       <div
         className={`fixed top-0 right-0 bottom-[72px] md:bottom-0 w-full md:w-96 z-[100] bg-white dark:bg-[#121212] transition-transform duration-300 flex flex-col shadow-2xl ${
-          showSchedule
-            ? 'translate-x-0'
-            : 'translate-x-full'
+          showSchedule ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
@@ -800,11 +313,7 @@ const LivePlayerBar: React.FC<
           </h2>
 
           <button
-            onClick={() =>
-              setShowSchedule(
-                false
-              )
-            }
+            onClick={() => setShowSchedule(false)}
             aria-label="Close schedule"
             className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
           >
@@ -818,13 +327,9 @@ const LivePlayerBar: React.FC<
               <div className="w-16 h-16 flex-shrink-0 rounded overflow-hidden bg-gray-200 dark:bg-gray-700">
                 {program.image && (
                   <img
-                    src={
-                      program.image
-                    }
+                    src={program.image}
                     className="w-full h-full object-cover"
-                    alt={
-                      program.title
-                    }
+                    alt={program.title}
                     loading="lazy"
                     decoding="async"
                     width={64}
@@ -835,139 +340,92 @@ const LivePlayerBar: React.FC<
 
               <div className="flex flex-col min-w-0 flex-grow">
                 <span className="font-bold text-base text-black dark:text-white leading-tight mb-1 truncate">
-                  {
-                    program.title
-                  }
+                  {program.title}
                 </span>
 
                 <span className="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
-                  {
-                    program.host
-                  }
+                  {program.host}
                 </span>
 
                 <span className="text-xs text-gray-400 dark:text-gray-500 truncate">
-                  {formatTimeToAmPm(
-                    program.startTime
-                  )}{' '}
-                  -{' '}
-                  {formatTimeToAmPm(
-                    program.endTime
-                  )}{' '}
-                  • LIVE
+                  {formatTimeToAmPm(program.startTime)} -{' '}
+                  {formatTimeToAmPm(program.endTime)} • LIVE
                 </span>
               </div>
             </div>
           </div>
 
-          {queue
-            .slice(0, 4)
-            .map(
-              (
-                prog,
-                index
-              ) => (
-                <div
-                  key={prog.id}
-                  className="p-3 border-b border-gray-100 dark:border-white/5"
-                >
-                  <div className="flex items-start space-x-3">
-                    <div className="w-16 h-16 flex-shrink-0 rounded overflow-hidden bg-gray-200 dark:bg-gray-700">
-                      {prog.image && (
-                        <img
-                          src={
-                            prog.image
-                          }
-                          className="w-full h-full object-cover"
-                          alt={
-                            prog.title
-                          }
-                          loading="lazy"
-                          decoding="async"
-                          width={64}
-                          height={64}
-                        />
-                      )}
-                    </div>
-
-                    <div className="flex flex-col min-w-0 flex-grow">
-                      <span className="font-bold text-base text-black dark:text-white leading-tight mb-1 truncate">
-                        {
-                          prog.title
-                        }
-                      </span>
-
-                      <span className="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
-                        {
-                          prog.host
-                        }
-                      </span>
-
-                      <span className="text-xs text-gray-400 dark:text-gray-500 truncate">
-                        {formatTimeToAmPm(
-                          prog.startTime
-                        )}{' '}
-                        -{' '}
-                        {formatTimeToAmPm(
-                          prog.endTime
-                        )}
-                      </span>
-                    </div>
-
-                    <span className="text-xs font-medium text-orange-500 mt-1">
-                      {index +
-                        2}
-                      °
-                    </span>
-                  </div>
+          {queue.slice(0, 4).map((prog, index) => (
+            <div
+              key={prog.id}
+              className="p-3 border-b border-gray-100 dark:border-white/5"
+            >
+              <div className="flex items-start space-x-3">
+                <div className="w-16 h-16 flex-shrink-0 rounded overflow-hidden bg-gray-200 dark:bg-gray-700">
+                  {prog.image && (
+                    <img
+                      src={prog.image}
+                      className="w-full h-full object-cover"
+                      alt={prog.title}
+                      loading="lazy"
+                      decoding="async"
+                      width={64}
+                      height={64}
+                    />
+                  )}
                 </div>
-              )
-            )}
+
+                <div className="flex flex-col min-w-0 flex-grow">
+                  <span className="font-bold text-base text-black dark:text-white leading-tight mb-1 truncate">
+                    {prog.title}
+                  </span>
+
+                  <span className="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
+                    {prog.host}
+                  </span>
+
+                  <span className="text-xs text-gray-400 dark:text-gray-500 truncate">
+                    {formatTimeToAmPm(prog.startTime)} -{' '}
+                    {formatTimeToAmPm(prog.endTime)}
+                  </span>
+                </div>
+
+                <span className="text-xs font-medium text-orange-500 mt-1">
+                  {index + 2}°
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
       {showSchedule && (
         <div
           className="fixed inset-0 bg-black/50 z-[99] md:hidden"
-          onClick={() =>
-            setShowSchedule(
-              false
-            )
-          }
+          onClick={() => setShowSchedule(false)}
         />
       )}
-
-      {/* ======================================================
-          MOBILE PLAYER
-      ====================================================== */}
 
       {isPlaying && (
         <div
           className={`fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 md:hidden transition-all duration-300 ${
-            isExpanded
-              ? 'h-auto'
-              : 'h-[72px]'
+            isExpanded ? 'h-auto' : 'h-[72px]'
           }`}
         >
           {!isExpanded ? (
             <div
               className="flex items-center justify-between px-4 py-3 h-[72px] relative"
-              onClick={() =>
+              onClick={() => {
                 setIsExpanded(true)
-              }
+              }}
             >
               <div className="flex flex-col min-w-0 flex-grow">
                 <span className="text-base font-bold text-black dark:text-white leading-tight truncate">
-                  {
-                    displayTitle
-                  }
+                  {displayTitle}
                 </span>
 
                 <span className="text-sm text-gray-500 dark:text-gray-400 truncate leading-tight">
-                  {
-                    displayArtist
-                  }{' '}
-                  • LIVE
+                  {displayArtist} • LIVE
                 </span>
               </div>
 
@@ -977,26 +435,16 @@ const LivePlayerBar: React.FC<
                     e.stopPropagation()
                     onTogglePlayback()
                   }}
-                  aria-label={
-                    isPlaying
-                      ? 'Pause radio'
-                      : 'Play radio'
-                  }
+                  aria-label="Pause radio"
                   className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-black dark:border-white flex items-center justify-center bg-white dark:bg-[#121212]"
                 >
-                  {isPlaying ? (
-                    <Pause className="w-4 h-4 text-black dark:text-white fill-current" />
-                  ) : (
-                    <Play className="w-4 h-4 text-black dark:text-white fill-current ml-0.5" />
-                  )}
+                  <Pause className="w-4 h-4 text-black dark:text-white fill-current" />
                 </button>
 
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
-                    setShowSchedule(
-                      true
-                    )
+                    setShowSchedule(true)
                   }}
                   aria-label="Open schedule"
                   className="p-2 text-gray-700 dark:text-gray-300"
@@ -1008,13 +456,7 @@ const LivePlayerBar: React.FC<
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200 dark:bg-white/10">
                 <div
                   className="h-full bg-orange-500 transition-all duration-1000 ease-out"
-                  style={{
-                    width:
-                      String(
-                        progress
-                      ) +
-                      '%',
-                  }}
+                  style={{ width: `${progress}%` }}
                 />
               </div>
             </div>
@@ -1027,12 +469,8 @@ const LivePlayerBar: React.FC<
 
                 <button
                   onClick={() => {
-                    setIsExpanded(
-                      false
-                    )
-                    setShowSchedule(
-                      false
-                    )
+                    setIsExpanded(false)
+                    setShowSchedule(false)
                   }}
                   aria-label="Close player"
                   className="p-2"
@@ -1045,13 +483,9 @@ const LivePlayerBar: React.FC<
                 <div className="w-14 h-14 flex-shrink-0 rounded overflow-hidden bg-gray-200 dark:bg-gray-700">
                   {displayImage && (
                     <img
-                      src={
-                        displayImage
-                      }
+                      src={displayImage}
                       className="w-full h-full object-cover"
-                      alt={
-                        displayTitle
-                      }
+                      alt={displayTitle}
                       loading="lazy"
                       decoding="async"
                     />
@@ -1060,26 +494,16 @@ const LivePlayerBar: React.FC<
 
                 <div className="min-w-0 flex-grow">
                   <span className="font-bold text-base text-black dark:text-white leading-tight block truncate">
-                    {
-                      displayTitle
-                    }
+                    {displayTitle}
                   </span>
 
                   <span className="text-sm text-gray-500 dark:text-gray-400 block truncate">
-                    {
-                      displayArtist
-                    }
+                    {displayArtist}
                   </span>
 
                   <span className="text-xs text-gray-400 dark:text-gray-500">
-                    {formatTimeToAmPm(
-                      program.startTime
-                    )}{' '}
-                    -{' '}
-                    {formatTimeToAmPm(
-                      program.endTime
-                    )}{' '}
-                    • LIVE
+                    {formatTimeToAmPm(program.startTime)} -{' '}
+                    {formatTimeToAmPm(program.endTime)} • LIVE
                   </span>
                 </div>
               </div>
@@ -1088,27 +512,17 @@ const LivePlayerBar: React.FC<
                 <div className="w-full h-2 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-orange-500 rounded-full transition-all duration-1000 ease-out"
-                    style={{
-                      width:
-                        String(
-                          progress
-                        ) +
-                        '%',
-                    }}
+                    style={{ width: `${progress}%` }}
                   />
                 </div>
 
                 <div className="flex justify-between mt-1">
                   <span className="text-[10px] text-gray-400">
-                    {formatTimeToAmPm(
-                      program.startTime
-                    )}
+                    {formatTimeToAmPm(program.startTime)}
                   </span>
 
                   <span className="text-[10px] text-gray-400">
-                    {formatTimeToAmPm(
-                      program.endTime
-                    )}
+                    {formatTimeToAmPm(program.endTime)}
                   </span>
                 </div>
               </div>
@@ -1126,21 +540,11 @@ const LivePlayerBar: React.FC<
                 </button>
 
                 <button
-                  onClick={
-                    onTogglePlayback
-                  }
-                  aria-label={
-                    isPlaying
-                      ? 'Pause radio'
-                      : 'Play radio'
-                  }
+                  onClick={onTogglePlayback}
+                  aria-label="Pause radio"
                   className="w-12 h-12 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-lg"
                 >
-                  {isPlaying ? (
-                    <Pause className="w-5 h-5 fill-current" />
-                  ) : (
-                    <Play className="w-5 h-5 fill-current ml-0.5" />
-                  )}
+                  <Pause className="w-5 h-5 fill-current" />
                 </button>
 
                 <button
@@ -1158,14 +562,8 @@ const LivePlayerBar: React.FC<
               <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-white/5">
                 <div className="flex items-center space-x-2 flex-grow">
                   <button
-                    onClick={
-                      toggleMute
-                    }
-                    aria-label={
-                      isMuted
-                        ? 'Unmute'
-                        : 'Mute'
-                    }
+                    onClick={toggleMute}
+                    aria-label={isMuted ? 'Unmute' : 'Mute'}
                     className="p-2"
                   >
                     <VolumeIcon />
@@ -1176,39 +574,23 @@ const LivePlayerBar: React.FC<
                     min="0"
                     max="1"
                     step="0.01"
-                    value={
-                      isMuted
-                        ? 0
-                        : volume
-                    }
-                    onChange={
-                      handleVolumeChange
-                    }
+                    value={isMuted ? 0 : volume}
+                    onChange={handleVolumeChange}
                     aria-label="Volume"
                     className="flex-grow h-1 bg-gray-200 dark:bg-white/20 rounded-lg appearance-none cursor-pointer accent-orange-500"
                   />
 
                   <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 w-6 text-right">
-                    {Math.round(
-                      (isMuted
-                        ? 0
-                        : volume) *
-                        10
-                    )}
+                    {Math.round((isMuted ? 0 : volume) * 10)}
                   </span>
                 </div>
 
                 <div className="flex items-center space-x-3 ml-4">
                   <button
-                    onClick={
-                      cyclePlaybackRate
-                    }
+                    onClick={cyclePlaybackRate}
                     className="px-2.5 py-1 text-xs font-semibold text-black dark:text-white border border-gray-300 dark:border-white/30 rounded"
                   >
-                    {
-                      playbackRate
-                    }
-                    ×
+                    {playbackRate}×
                   </button>
 
                   <div className="flex items-center space-x-1.5">
@@ -1225,22 +607,12 @@ const LivePlayerBar: React.FC<
         </div>
       )}
 
-      {/* ======================================================
-          DESKTOP PLAYER
-      ====================================================== */}
-
       {isPlaying && (
         <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 hidden md:flex flex-col transition-colors duration-300">
           <div className="w-full h-1.5 bg-gray-200 dark:bg-white/10">
             <div
               className="h-full bg-orange-500 transition-all duration-1000 ease-out"
-              style={{
-                width:
-                  String(
-                    progress
-                  ) +
-                  '%',
-              }}
+              style={{ width: `${progress}%` }}
             />
           </div>
 
@@ -1249,9 +621,7 @@ const LivePlayerBar: React.FC<
               <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-200 dark:border-white/10 shadow-sm bg-gray-200 dark:bg-gray-700">
                 {displayImage && (
                   <img
-                    src={
-                      displayImage
-                    }
+                    src={displayImage}
                     alt=""
                     className="w-full h-full object-cover"
                     loading="lazy"
@@ -1262,15 +632,11 @@ const LivePlayerBar: React.FC<
 
               <div className="min-w-0">
                 <h4 className="font-semibold text-gray-900 dark:text-white leading-tight truncate text-[15px]">
-                  {
-                    displayTitle
-                  }
+                  {displayTitle}
                 </h4>
 
                 <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate mt-0.5">
-                  {
-                    displayArtist
-                  }
+                  {displayArtist}
                 </p>
               </div>
             </div>
@@ -1288,21 +654,11 @@ const LivePlayerBar: React.FC<
               </button>
 
               <button
-                onClick={
-                  onTogglePlayback
-                }
-                aria-label={
-                  isPlaying
-                    ? 'Pause radio'
-                    : 'Play radio'
-                }
+                onClick={onTogglePlayback}
+                aria-label="Pause radio"
                 className="w-12 h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-full flex items-center justify-center hover:scale-105 transition-all active:scale-95 shadow-md"
               >
-                {isPlaying ? (
-                  <Pause className="w-5 h-5 fill-current" />
-                ) : (
-                  <Play className="w-5 h-5 fill-current ml-0.5" />
-                )}
+                <Pause className="w-5 h-5 fill-current" />
               </button>
 
               <button
@@ -1320,26 +676,12 @@ const LivePlayerBar: React.FC<
             <div className="flex items-center justify-end space-x-4 w-[30%]">
               <div
                 className="flex items-center space-x-2 relative"
-                onMouseEnter={() =>
-                  setShowVolumeSlider(
-                    true
-                  )
-                }
-                onMouseLeave={() =>
-                  setShowVolumeSlider(
-                    false
-                  )
-                }
+                onMouseEnter={() => setShowVolumeSlider(true)}
+                onMouseLeave={() => setShowVolumeSlider(false)}
               >
                 <button
-                  onClick={
-                    toggleMute
-                  }
-                  aria-label={
-                    isMuted
-                      ? 'Unmute'
-                      : 'Mute'
-                  }
+                  onClick={toggleMute}
+                  aria-label={isMuted ? 'Unmute' : 'Mute'}
                   className="p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
                 >
                   <VolumeIcon />
@@ -1357,53 +699,31 @@ const LivePlayerBar: React.FC<
                     min="0"
                     max="1"
                     step="0.01"
-                    value={
-                      isMuted
-                        ? 0
-                        : volume
-                    }
-                    onChange={
-                      handleVolumeChange
-                    }
+                    value={isMuted ? 0 : volume}
+                    onChange={handleVolumeChange}
                     aria-label="Volume"
                     className="w-full h-1 bg-gray-200 dark:bg-white/20 rounded-lg appearance-none cursor-pointer accent-orange-500"
                   />
 
                   <span className="ml-2 text-xs font-medium text-gray-600 dark:text-gray-400 w-6 text-right">
-                    {Math.round(
-                      (isMuted
-                        ? 0
-                        : volume) *
-                        10
-                    )}
+                    {Math.round((isMuted ? 0 : volume) * 10)}
                   </span>
                 </div>
               </div>
 
               <button
-                onClick={
-                  cyclePlaybackRate
-                }
+                onClick={cyclePlaybackRate}
                 className="px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white border border-gray-300 dark:border-white/20 rounded hover:border-black dark:hover:border-white transition-all"
               >
-                {
-                  playbackRate
-                }
-                ×
+                {playbackRate}×
               </button>
 
               <button
-                onClick={() =>
-                  setShowSchedule(
-                    true
-                  )
-                }
+                onClick={() => setShowSchedule(true)}
                 aria-label="Open schedule"
                 className="p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
               >
-                <List
-                  className="w-6 h-6"
-                />
+                <List className="w-6 h-6" strokeWidth={2} />
               </button>
 
               <div className="flex items-center space-x-1.5 px-2">
