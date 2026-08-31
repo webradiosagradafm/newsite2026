@@ -18,92 +18,6 @@ import {
 } from 'lucide-react'
 import { Program } from '../types'
 
-/* ============================================================
-   LIVE PULSE ANIMATION
-============================================================ */
-
-const LivePulseAnimation = () => {
-  useEffect(() => {
-    const style = document.createElement('style')
-
-    style.textContent = `
-      @keyframes live-pulse {
-        0%, 100% {
-          opacity: 0.7;
-          transform: translate(-50%, -50%) scale(0.9);
-        }
-
-        50% {
-          opacity: 1;
-          transform: translate(-50%, -50%) scale(1.3);
-        }
-      }
-
-      .animate-live-pulse {
-        animation: live-pulse 1.8s infinite;
-      }
-    `
-
-    document.head.appendChild(style)
-
-    return () => {
-      document.head.removeChild(style)
-    }
-  }, [])
-
-  return null
-}
-
-/* ============================================================
-   ANALYTICS / HEARTBEAT
-============================================================ */
-
-const HEARTBEAT_INTERVAL = 60000
-
-const getAnalyticsSessionId = (): string => {
-  const storageKey = 'praise-analytics-session-id'
-
-  let sessionId = sessionStorage.getItem(storageKey)
-
-  if (!sessionId) {
-    sessionId =
-      String(Date.now()) +
-      '-' +
-      Math.random().toString(36).slice(2, 11)
-
-    sessionStorage.setItem(storageKey, sessionId)
-  }
-
-  return sessionId
-}
-
-const sendGA4Event = (
-  eventName: string,
-  params: Record<string, string | number>
-) => {
-  if (typeof window === 'undefined') {
-    return
-  }
-
-  const gtag = (
-    window as Window & {
-      gtag?: (
-        command: string,
-        eventName: string,
-        params?: Record<string, string | number>
-      ) => void
-    }
-  ).gtag
-
-  if (typeof gtag === 'function') {
-    gtag('event', eventName, params)
-  }
-}
-
-/* ============================================================
-   TYPES
-============================================================ */
-
 interface LivePlayerBarProps {
   isPlaying?: boolean
   onTogglePlayback?: () => void
@@ -115,6 +29,80 @@ interface LivePlayerBarProps {
   } | null
   queue?: Program[]
   audioRef?: React.RefObject<HTMLAudioElement | null>
+}
+
+/* ============================================================
+   HEARTBEAT / GOOGLE ANALYTICS 4
+============================================================ */
+
+const HEARTBEAT_INTERVAL = 60000
+
+const getAnalyticsSessionId = (): string => {
+  const storageKey = 'praise-analytics-session-id'
+
+  try {
+    let sessionId =
+      sessionStorage.getItem(storageKey)
+
+    if (!sessionId) {
+      sessionId =
+        String(Date.now()) +
+        '-' +
+        Math.random()
+          .toString(36)
+          .slice(2, 11)
+
+      sessionStorage.setItem(
+        storageKey,
+        sessionId
+      )
+    }
+
+    return sessionId
+  } catch {
+    return (
+      String(Date.now()) +
+      '-' +
+      Math.random()
+        .toString(36)
+        .slice(2, 11)
+    )
+  }
+}
+
+const sendGA4Event = (
+  eventName: string,
+  params: Record<
+    string,
+    string | number
+  >
+) => {
+  if (
+    typeof window === 'undefined'
+  ) {
+    return
+  }
+
+  const gtag = (
+    window as Window & {
+      gtag?: (
+        command: string,
+        eventName: string,
+        params?: Record<
+          string,
+          string | number
+        >
+      ) => void
+    }
+  ).gtag
+
+  if (typeof gtag === 'function') {
+    gtag(
+      'event',
+      eventName,
+      params
+    )
+  }
 }
 
 /* ============================================================
@@ -132,20 +120,28 @@ const formatTimeToAmPm = (
       return timeString
     }
 
-    const [hours, minutes] =
+    const parts =
       timeString.split(':')
 
-    let hour = parseInt(hours, 10)
+    const hours = parts[0]
+    const minutes =
+      parts[1] || '00'
+
+    let hour = parseInt(
+      hours,
+      10
+    )
 
     const period =
       hour >= 12 ? 'PM' : 'AM'
 
-    hour = hour % 12 || 12
+    hour =
+      hour % 12 || 12
 
     return (
       String(hour) +
       ':' +
-      (minutes || '00') +
+      minutes +
       ' ' +
       period
     )
@@ -158,58 +154,67 @@ const formatTimeToAmPm = (
    CHICAGO TIME
 ============================================================ */
 
-const getChicagoDayAndTotalMinutes = () => {
-  const formatter =
-    new Intl.DateTimeFormat('en-US', {
-      timeZone: 'America/Chicago',
-      weekday: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    })
+const getChicagoDayAndTotalMinutes =
+  () => {
+    const formatter =
+      new Intl.DateTimeFormat(
+        'en-US',
+        {
+          timeZone:
+            'America/Chicago',
+          weekday: 'short',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        }
+      )
 
-  const parts =
-    formatter.formatToParts(
-      new Date()
+    const parts =
+      formatter.formatToParts(
+        new Date()
+      )
+
+    const weekday =
+      parts.find(
+        (p) =>
+          p.type ===
+          'weekday'
+      )?.value || 'Mon'
+
+    const hour = Number(
+      parts.find(
+        (p) =>
+          p.type === 'hour'
+      )?.value || 0
     )
 
-  const weekday =
-    parts.find(
-      (p) => p.type === 'weekday'
-    )?.value || 'Mon'
+    const minute = Number(
+      parts.find(
+        (p) =>
+          p.type === 'minute'
+      )?.value || 0
+    )
 
-  const hour = Number(
-    parts.find(
-      (p) => p.type === 'hour'
-    )?.value || 0
-  )
+    const dayMap: Record<
+      string,
+      number
+    > = {
+      Sun: 0,
+      Mon: 1,
+      Tue: 2,
+      Wed: 3,
+      Thu: 4,
+      Fri: 5,
+      Sat: 6,
+    }
 
-  const minute = Number(
-    parts.find(
-      (p) => p.type === 'minute'
-    )?.value || 0
-  )
-
-  const dayMap: Record<
-    string,
-    number
-  > = {
-    Sun: 0,
-    Mon: 1,
-    Tue: 2,
-    Wed: 3,
-    Thu: 4,
-    Fri: 5,
-    Sat: 6,
+    return {
+      day:
+        dayMap[weekday] ?? 1,
+      total:
+        hour * 60 + minute,
+    }
   }
-
-  return {
-    day:
-      dayMap[weekday] ?? 1,
-    total:
-      hour * 60 + minute,
-  }
-}
 
 /* ============================================================
    PROGRAM PROGRESS
@@ -225,21 +230,23 @@ const getProgramProgress = (
   const { total } =
     getChicagoDayAndTotalMinutes()
 
-  const [sH, sM] =
+  const startParts =
     program.startTime
       .split(':')
       .map(Number)
 
-  const [eH, eM] =
+  const endParts =
     program.endTime
       .split(':')
       .map(Number)
 
   const start =
-    sH * 60 + sM
+    startParts[0] * 60 +
+    startParts[1]
 
   let end =
-    eH * 60 + eM
+    endParts[0] * 60 +
+    endParts[1]
 
   if (
     end === 0 ||
@@ -287,43 +294,59 @@ const LivePlayerBar: React.FC<
     current: null,
   },
 }) => {
-  const [isExpanded, setIsExpanded] =
-    useState(false)
+  const [
+    isExpanded,
+    setIsExpanded,
+  ] = useState(false)
 
-  const [showSchedule, setShowSchedule] =
-    useState(false)
+  const [
+    showSchedule,
+    setShowSchedule,
+  ] = useState(false)
 
   const [volume, setVolume] =
     useState(() => {
-      return parseFloat(
-        localStorage.getItem(
-          'praise-volume'
-        ) || '0.8'
-      )
+      try {
+        return parseFloat(
+          localStorage.getItem(
+            'praise-volume'
+          ) || '0.8'
+        )
+      } catch {
+        return 0.8
+      }
     })
 
-  const [isMuted, setIsMuted] =
-    useState(false)
+  const [
+    isMuted,
+    setIsMuted,
+  ] = useState(false)
 
-  const [prevVolume, setPrevVolume] =
-    useState(0.8)
+  const [
+    prevVolume,
+    setPrevVolume,
+  ] = useState(0.8)
 
   const [
     showVolumeSlider,
     setShowVolumeSlider,
   ] = useState(false)
 
-  const [playbackRate, setPlaybackRate] =
-    useState(1)
+  const [
+    playbackRate,
+    setPlaybackRate,
+  ] = useState(1)
 
   /* ==========================================================
      HEARTBEAT REFS
   ========================================================== */
 
   const heartbeatIntervalRef =
-    useRef<ReturnType<
-      typeof setInterval
-    > | null>(null)
+    useRef<
+      ReturnType<
+        typeof setInterval
+      > | null
+    >(null)
 
   const listeningSecondsRef =
     useRef(0)
@@ -335,7 +358,7 @@ const LivePlayerBar: React.FC<
     useRef('')
 
   /* ==========================================================
-     CREATE ANALYTICS SESSION
+     ANALYTICS SESSION
   ========================================================== */
 
   useEffect(() => {
@@ -349,7 +372,9 @@ const LivePlayerBar: React.FC<
 
   const progress = useMemo(
     () =>
-      getProgramProgress(program),
+      getProgramProgress(
+        program
+      ),
     [program]
   )
 
@@ -370,17 +395,19 @@ const LivePlayerBar: React.FC<
   ========================================================== */
 
   useEffect(() => {
-    if (!audioRef.current) {
+    const audio =
+      audioRef.current
+
+    if (!audio) {
       return
     }
 
-    audioRef.current.volume =
+    audio.volume =
       isMuted ? 0 : volume
 
-    audioRef.current.muted =
-      isMuted
+    audio.muted = isMuted
 
-    audioRef.current.playbackRate =
+    audio.playbackRate =
       playbackRate
   }, [
     volume,
@@ -406,48 +433,11 @@ const LivePlayerBar: React.FC<
     }
 
     if (!isPlaying) {
-      if (
-        analyticsStartedRef.current
-      ) {
-        sendGA4Event(
-          'audio_pause',
-          {
-            station:
-              'Praise FM',
-
-            program:
-              program.title ||
-              'Unknown',
-
-            host:
-              program.host ||
-              'Unknown',
-
-            player:
-              'website',
-
-            session_id:
-              analyticsSessionIdRef
-                .current,
-
-            listening_seconds:
-              listeningSecondsRef
-                .current,
-
-            listening_minutes:
-              Math.floor(
-                listeningSecondsRef
-                  .current / 60
-              ),
-          }
-        )
-      }
-
       return
     }
 
     /* --------------------------------------------------------
-       AUDIO START
+       START
     -------------------------------------------------------- */
 
     if (
@@ -484,13 +474,18 @@ const LivePlayerBar: React.FC<
     }
 
     /* --------------------------------------------------------
-       HEARTBEAT EVERY 60 SECONDS
+       HEARTBEAT
     -------------------------------------------------------- */
 
     heartbeatIntervalRef.current =
       setInterval(() => {
         const audio =
           audioRef.current
+
+        /*
+         * Só contabiliza se o áudio
+         * realmente estiver tocando.
+         */
 
         if (
           audio &&
@@ -553,6 +548,56 @@ const LivePlayerBar: React.FC<
     program.title,
     program.host,
     audioRef,
+  ])
+
+  /* ==========================================================
+     AUDIO PAUSE
+  ========================================================== */
+
+  useEffect(() => {
+    if (
+      isPlaying ||
+      !analyticsStartedRef.current
+    ) {
+      return
+    }
+
+    sendGA4Event(
+      'audio_pause',
+      {
+        station:
+          'Praise FM',
+
+        program:
+          program.title ||
+          'Unknown',
+
+        host:
+          program.host ||
+          'Unknown',
+
+        player:
+          'website',
+
+        session_id:
+          analyticsSessionIdRef
+            .current,
+
+        listening_seconds:
+          listeningSecondsRef
+            .current,
+
+        listening_minutes:
+          Math.floor(
+            listeningSecondsRef
+              .current / 60
+          ),
+      }
+    )
+  }, [
+    isPlaying,
+    program.title,
+    program.host,
   ])
 
   /* ==========================================================
@@ -625,7 +670,9 @@ const LivePlayerBar: React.FC<
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const val =
-      parseFloat(e.target.value)
+      parseFloat(
+        e.target.value
+      )
 
     setVolume(val)
 
@@ -636,10 +683,12 @@ const LivePlayerBar: React.FC<
       setIsMuted(true)
     }
 
-    localStorage.setItem(
-      'praise-volume',
-      val.toString()
-    )
+    try {
+      localStorage.setItem(
+        'praise-volume',
+        String(val)
+      )
+    } catch {}
   }
 
   const toggleMute = () => {
@@ -661,26 +710,27 @@ const LivePlayerBar: React.FC<
      PLAYBACK RATE
   ========================================================== */
 
-  const cyclePlaybackRate = () => {
-    const rates = [
-      1,
-      1.25,
-      1.5,
-      2,
-    ]
-
-    const idx =
-      rates.indexOf(
-        playbackRate
-      )
-
-    setPlaybackRate(
-      rates[
-        (idx + 1) %
-          rates.length
+  const cyclePlaybackRate =
+    () => {
+      const rates = [
+        1,
+        1.25,
+        1.5,
+        2,
       ]
-    )
-  }
+
+      const index =
+        rates.indexOf(
+          playbackRate
+        )
+
+      setPlaybackRate(
+        rates[
+          (index + 1) %
+            rates.length
+        ]
+      )
+    }
 
   /* ==========================================================
      VOLUME ICON
@@ -733,8 +783,6 @@ const LivePlayerBar: React.FC<
 
   return (
     <>
-      <LivePulseAnimation />
-
       {/* ======================================================
           SCHEDULE
       ====================================================== */}
@@ -753,7 +801,9 @@ const LivePlayerBar: React.FC<
 
           <button
             onClick={() =>
-              setShowSchedule(false)
+              setShowSchedule(
+                false
+              )
             }
             aria-label="Close schedule"
             className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
@@ -768,9 +818,13 @@ const LivePlayerBar: React.FC<
               <div className="w-16 h-16 flex-shrink-0 rounded overflow-hidden bg-gray-200 dark:bg-gray-700">
                 {program.image && (
                   <img
-                    src={program.image}
+                    src={
+                      program.image
+                    }
                     className="w-full h-full object-cover"
-                    alt={program.title}
+                    alt={
+                      program.title
+                    }
                     loading="lazy"
                     decoding="async"
                     width={64}
@@ -781,11 +835,15 @@ const LivePlayerBar: React.FC<
 
               <div className="flex flex-col min-w-0 flex-grow">
                 <span className="font-bold text-base text-black dark:text-white leading-tight mb-1 truncate">
-                  {program.title}
+                  {
+                    program.title
+                  }
                 </span>
 
                 <span className="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
-                  {program.host}
+                  {
+                    program.host
+                  }
                 </span>
 
                 <span className="text-xs text-gray-400 dark:text-gray-500 truncate">
@@ -872,7 +930,9 @@ const LivePlayerBar: React.FC<
         <div
           className="fixed inset-0 bg-black/50 z-[99] md:hidden"
           onClick={() =>
-            setShowSchedule(false)
+            setShowSchedule(
+              false
+            )
           }
         />
       )}
@@ -1058,10 +1118,7 @@ const LivePlayerBar: React.FC<
                   aria-label="Rewind 30 seconds"
                   className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300"
                 >
-                  <RotateCcw
-                    className="w-5 h-5"
-                    strokeWidth={2}
-                  />
+                  <RotateCcw className="w-5 h-5" />
 
                   <span className="absolute text-[9px] font-bold mt-[2px]">
                     30
@@ -1090,10 +1147,7 @@ const LivePlayerBar: React.FC<
                   aria-label="Forward 30 seconds"
                   className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300"
                 >
-                  <RotateCw
-                    className="w-5 h-5"
-                    strokeWidth={2}
-                  />
+                  <RotateCw className="w-5 h-5" />
 
                   <span className="absolute text-[9px] font-bold mt-[2px]">
                     30
@@ -1226,10 +1280,7 @@ const LivePlayerBar: React.FC<
                 aria-label="Rewind 30 seconds"
                 className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
               >
-                <RotateCcw
-                  className="w-5 h-5"
-                  strokeWidth={2}
-                />
+                <RotateCcw className="w-5 h-5" />
 
                 <span className="absolute text-[9px] font-bold mt-[2px]">
                   30
@@ -1258,10 +1309,7 @@ const LivePlayerBar: React.FC<
                 aria-label="Forward 30 seconds"
                 className="relative w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
               >
-                <RotateCw
-                  className="w-5 h-5"
-                  strokeWidth={2}
-                />
+                <RotateCw className="w-5 h-5" />
 
                 <span className="absolute text-[9px] font-bold mt-[2px]">
                   30
@@ -1355,7 +1403,6 @@ const LivePlayerBar: React.FC<
               >
                 <List
                   className="w-6 h-6"
-                  strokeWidth={2}
                 />
               </button>
 
