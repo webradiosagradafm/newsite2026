@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import {
   Play,
   Pause,
@@ -214,6 +214,18 @@ const LivePlayerBar: React.FC<
     setPlaybackRate,
   ] = useState(1)
 
+  // GA4 listening-session control.
+  // These refs survive metadata/program updates without causing
+  // duplicate audio_start / audio_60sec events.
+  const audioStartSentRef =
+    useRef(false)
+
+  const audioPlayedSecondsRef =
+    useRef(0)
+
+  const audio60SentRef =
+    useRef(false)
+
   const progress = useMemo(
     () =>
       getProgramProgress(
@@ -320,11 +332,24 @@ const LivePlayerBar: React.FC<
   /*
    * ==========================================================
    * AUDIO START
+   * One event per listening session.
+   * Program/host metadata can change while the stream keeps
+   * playing; the ref prevents those updates from creating
+   * false new Session Starts.
    * ==========================================================
    */
 
   useEffect(() => {
     if (!isPlaying) {
+      audioStartSentRef.current =
+        false
+
+      return
+    }
+
+    if (
+      audioStartSentRef.current
+    ) {
       return
     }
 
@@ -346,6 +371,9 @@ const LivePlayerBar: React.FC<
     ) {
       return
     }
+
+    audioStartSentRef.current =
+      true
 
     win.gtag(
       'event',
@@ -370,6 +398,118 @@ const LivePlayerBar: React.FC<
     isPlaying,
     program.title,
     program.host,
+  ])
+
+  /*
+   * ==========================================================
+   * AUDIO 60SEC
+   * One event after 60 seconds of actual playback in the
+   * current listening session.
+   * ==========================================================
+   */
+
+  useEffect(() => {
+    if (!isPlaying) {
+      audioPlayedSecondsRef.current =
+        0
+
+      audio60SentRef.current =
+        false
+
+      return
+    }
+
+    const interval =
+      window.setInterval(
+        () => {
+          const audio =
+            audioRef.current
+
+          // If the HTMLAudioElement exists, only count time
+          // while it is genuinely playing.
+          if (
+            audio &&
+            (
+              audio.paused ||
+              audio.ended
+            )
+          ) {
+            return
+          }
+
+          audioPlayedSecondsRef.current +=
+            1
+
+          if (
+            audioPlayedSecondsRef.current <
+              60 ||
+            audio60SentRef.current
+          ) {
+            return
+          }
+
+          audio60SentRef.current =
+            true
+
+          const win =
+            window as typeof window & {
+              gtag?: (
+                command: string,
+                eventName: string,
+                params?: Record<
+                  string,
+                  string | number
+                >
+              ) => void
+            }
+
+          if (
+            typeof win.gtag !==
+            'function'
+          ) {
+            return
+          }
+
+          win.gtag(
+            'event',
+            'audio_60sec',
+            {
+              station:
+                'Praise FM',
+
+              program:
+                program.title ||
+                'Praise FM',
+
+              host:
+                program.host ||
+                '',
+
+              seconds_played:
+                60,
+
+              player:
+                'website',
+            }
+          )
+
+          window.clearInterval(
+            interval
+          )
+        },
+        1000
+      )
+
+    return () => {
+      window.clearInterval(
+        interval
+      )
+    }
+  }, [
+    isPlaying,
+    program.title,
+    program.host,
+    audioRef,
   ])
 
   /*
