@@ -41,8 +41,8 @@ import { SCHEDULES } from './constants'
 import { Program } from './types'
 
 const DEFAULT_COVER = '/icon-512.png'
-const STREAM_URL = 'https://stream.zeno.fm/qalochfsdoftv'
-const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/qalochfsdoftv'
+const STREAM_URL = 'https://stream.zeno.fm/vku09lx2rkntv'
+const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/vku09lx2rkntv'
 const DONATE_URL = 'https://donate.stripe.com/bJe8wQ09o1zG5W78CO33W00'
 const DONATE_BADGE = 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785306619/donate_t5npp7.webp'
 
