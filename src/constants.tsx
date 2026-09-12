@@ -186,7 +186,7 @@ const saturday: Program[] = weekday.map((program) => {
     return {
       id: 'praise-fm-live-lounge',
       title: 'Praise FM Live Lounge',
-      host: 'The most famous artists',
+      host: 'the most famous artists',
       startTime: '22:00',
       endTime: '00:00',
       description: "Amazing performances from Praise FM's world famous Live Lounge!",
@@ -283,7 +283,7 @@ const sunday: Program[] = [
   {
     id: 'sunday-service',
     title: 'Sunday Service',
-    host: 'Guest Churches',
+    host: 'Guest Pastor',
     startTime: '20:00',
     endTime: '21:00',
     description: 'A focused message of faith, hope and encouragement.',
