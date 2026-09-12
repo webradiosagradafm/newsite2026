@@ -25,7 +25,8 @@ const IMAGES = {
   CLUB_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785297861/club-mix_ritmbx.webp',
   BLACK_SOUL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1786538567/praisefmblacksoul_hvo3ah.webp',
   WORLD_BEATS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1787173961/world-beats_vhjv2i.webp',
-  JULIA_WORTMAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1787173960/julia-wortman_qcrjhe.webp'
+  JULIA_WORTMAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1787173960/julia-wortman_qcrjhe.webp',
+  LIVE_LOUNGE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1788703028/live-louge_h8zx91.webp'
 }
 
 const weekday: Program[] = [
@@ -183,13 +184,13 @@ const saturday: Program[] = weekday.map((program) => {
   }
   if (program.id === 'praise-fm-chill') {
     return {
-      id: 'praise-fm-chill-mix',
-      title: 'Praise FM Chill Mix',
-      host: 'Praise FM',
+      id: 'praise-fm-live-lounge',
+      title: 'Praise FM Live Lounge',
+      host: '',
       startTime: '22:00',
       endTime: '00:00',
-      description: 'A relaxed mix to wind down your Saturday.',
-      image: IMAGES.CHILL_MIX
+      description: "Amazing performances from Praise FM's world famous Live Lounge!",
+      image: IMAGES.LIVE_LOUNGE
     }
   }
   if (program.id === 'praise-fm-rock') {
@@ -315,5 +316,5 @@ export const SCHEDULES: Record<number, Program[]> = {
   3: wednesday, // Quarta (Golden Hymns)
   4: weekday,   // Quinta
   5: weekday,   // Sexta
-  6: saturday   // Sábado (Club Mix 16h, Black Soul 17h, World's Beat 20h, Classics Tributes 21h, Chill Mix 22h)
+  6: saturday   // Sábado (Club Mix 16h, Black Soul 17h, World's Beat 20h, Classics Tributes 21h, Chill Mix 22h → agora Live Lounge)
 }
