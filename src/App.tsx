@@ -774,9 +774,24 @@ const AppContent: React.FC = () => {
       'Listen live to Praise FM USA — 24/7 Christian radio streaming worship music, gospel hits, devotionals, and uplifting shows.'
   }
 
+  const homeJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'RadioStation',
+    name: 'Praise FM USA',
+    url: 'https://praisefmradio.vercel.app',
+    logo: 'https://praisefmradio.vercel.app/icon-512.png',
+    description: seo.description,
+    address: { '@type': 'PostalAddress', addressCountry: 'US' }
+  }
+
   return (
     <div className="min-h-screen flex flex-col pb-[120px] bg-white dark:bg-[#121212] transition-colors">
-      <SEO title={seo.title} description={seo.description} url={window.location.href} />
+      <SEO
+        title={seo.title}
+        description={seo.description}
+        url={window.location.href}
+        jsonLd={location.pathname === '/' ? homeJsonLd : undefined}
+      />
 
       <Navbar
         activeTab={location.pathname === '/' ? 'home' : location.pathname.split('/')[1]}
