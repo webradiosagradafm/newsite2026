@@ -11,10 +11,9 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.js',
       injectManifest: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        rollupOptions: {
-          codeSplitting: false // ✅ Coloque AQUI (no nível de rollupOptions, NÃO dentro de output)
-        }
+        // Evita que o manifesto de precache tente incluir o próprio
+        // stream ou qualquer coisa não construída pelo Vite.
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}']
       },
 
       registerType: 'autoUpdate',
