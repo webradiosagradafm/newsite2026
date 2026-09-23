@@ -17,7 +17,12 @@ export default defineConfig({
       injectManifest: {
         // Evita que o manifesto de precache tente incluir o próprio
         // stream ou qualquer coisa não construída pelo Vite.
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}']
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        rollupOptions: {
+          output: {
+            codeSplitting: false // ✅ Resolve o aviso de deprecation do Service Worker
+          }
+        }
       },
 
       registerType: 'autoUpdate',
