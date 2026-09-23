@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabaseClient'
+import { useState } from 'react'
+// Supabase removido temporariamente — o import e as chamadas abaixo
+// estão comentados até um novo backend ser conectado.
+// import { supabase } from '../lib/supabaseClient'
 import { Heart, Send } from 'lucide-react'
 
 interface PrayerRequest {
@@ -10,49 +12,54 @@ interface PrayerRequest {
 }
 
 export default function PrayerWallPage() {
-  const [requests, setRequests] = useState<PrayerRequest[]>([])
+  const [requests] = useState<PrayerRequest[]>([])
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const [fetching, setFetching] = useState(true)
+  const [fetching] = useState(false)
 
-  const fetchRequests = async () => {
-    setFetching(true)
-    const { data } = await supabase
-      .from('prayer_requests')
-      .select('id, name, message, created_at')
-      .eq('approved', true)
-      .order('created_at', { ascending: false })
-
-    setRequests(data || [])
-    setFetching(false)
-  }
-
-  useEffect(() => {
-    fetchRequests()
-  }, [])
+  // const fetchRequests = async () => {
+  //   setFetching(true)
+  //   const { data } = await supabase
+  //     .from('prayer_requests')
+  //     .select('id, name, message, created_at')
+  //     .eq('approved', true)
+  //     .order('created_at', { ascending: false })
+  //
+  //   setRequests(data || [])
+  //   setFetching(false)
+  // }
+  //
+  // useEffect(() => {
+  //   fetchRequests()
+  // }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!message.trim()) return
+    // Envio desativado temporariamente (sem backend conectado).
+    // Quando o Supabase (ou outro backend) voltar, restaure o
+    // bloco comentado abaixo e remova este early return.
+    return
 
-    setLoading(true)
-
-    const { error } = await supabase.from('prayer_requests').insert({
-      name: name.trim() || null,
-      message: message.trim(),
-      approved: false
-    })
-
-    setLoading(false)
-
-    if (!error) {
-      setSubmitted(true)
-      setName('')
-      setMessage('')
-    }
+    // if (!message.trim()) return
+    //
+    // setLoading(true)
+    //
+    // const { error } = await supabase.from('prayer_requests').insert({
+    //   name: name.trim() || null,
+    //   message: message.trim(),
+    //   approved: false
+    // })
+    //
+    // setLoading(false)
+    //
+    // if (!error) {
+    //   setSubmitted(true)
+    //   setName('')
+    //   setMessage('')
+    // }
   }
 
   return (
@@ -104,6 +111,10 @@ export default function PrayerWallPage() {
           <Send size={18} />
           {loading ? 'Sending...' : 'Submit Prayer Request'}
         </button>
+
+        <p className="text-sm text-center text-gray-500">
+          Prayer requests are temporarily unavailable — check back soon.
+        </p>
 
         {submitted && (
           <p className="text-sm text-center text-green-600 dark:text-green-400">
