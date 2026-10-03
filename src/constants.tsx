@@ -144,67 +144,84 @@ const wednesday: Program[] = weekday.map((program) => {
       image: IMAGES.GOLDEN_HYMNS
     }
   }
+
   return program
 })
 
 // Grade específica de Sábado (Saturday)
-const saturday: Program[] = weekday.map((program) => {
-  if (program.id === 'praise-fm-classics') {
-    return {
-      id: 'praise-fm-classics-tributes',
-      title: 'Praise FM Classics Tributes',
-      host: 'Scott Turner',
-      startTime: '21:00',
-      endTime: '22:00',
-      description: 'Timeless Christian favorites.',
-      image: IMAGES.SCOTT_TURNER_TRIBUTE
+const saturday: Program[] = weekday
+  .map((program) => {
+    if (program.id === 'praise-fm-classics') {
+      return {
+        id: 'praise-fm-classics-tributes',
+        title: 'Praise FM Classics Tributes',
+        host: 'Scott Turner',
+        startTime: '21:00',
+        endTime: '22:00',
+        description: 'Timeless Christian favorites.',
+        image: IMAGES.SCOTT_TURNER_TRIBUTE
+      }
     }
-  }
-  if (program.id === 'praise-fm-flow') {
-    return {
-      id: 'maia-millers-club-mix',
-      title: "Maia Miller's Club Mix",
-      host: 'Maia Miller',
-      startTime: '16:00',
-      endTime: '17:00',
-      description: 'An upbeat mix to kick off your Saturday afternoon.',
-      image: IMAGES.CLUB_MIX
+
+    if (program.id === 'praise-fm-flow') {
+      return {
+        id: 'maia-millers-club-mix',
+        title: "Maia Miller's Club Mix",
+        host: 'Maia Miller',
+        startTime: '16:00',
+        endTime: '17:00',
+        description: 'An upbeat mix to kick off your Saturday afternoon.',
+        image: IMAGES.CLUB_MIX
+      }
     }
-  }
-  if (program.id === 'future-artists') {
-    return {
-      id: 'praise-fm-black-soul',
-      title: 'Praise FM Black Soul',
-      host: 'Jeff Olumbe',
-      startTime: '17:00',
-      endTime: '18:00',
-      description: 'Celebrating Black gospel and soul music.',
-      image: IMAGES.BLACK_SOUL
+
+    if (program.id === 'future-artists') {
+      return {
+        id: 'praise-fm-black-soul',
+        title: 'Praise FM Black Soul',
+        host: 'Jeff Olumbe',
+        startTime: '17:00',
+        endTime: '18:00',
+        description: 'Celebrating Black gospel and soul music.',
+        image: IMAGES.BLACK_SOUL
+      }
     }
-  }
-  if (program.id === 'praise-fm-chill') {
-    return {
-      id: 'praise-fm-live-lounge',
-      title: 'Praise FM Live Lounge',
-      host: 'the most famous artists',
-      startTime: '22:00',
-      endTime: '00:00',
-      description: "Amazing performances from Praise FM's world famous Live Lounge!",
-      image: IMAGES.LIVE_LOUNGE
+
+    if (program.id === 'praise-fm-chill') {
+      return {
+        id: 'praise-fm-live-lounge',
+        title: 'Praise FM Live Lounge',
+        host: 'the most famous artists',
+        startTime: '22:00',
+        endTime: '23:00',
+        description: "Amazing performances from Praise FM's world famous Live Lounge!",
+        image: IMAGES.LIVE_LOUNGE
+      }
     }
-  }
-  if (program.id === 'praise-fm-rock') {
-    return {
-      id: 'worlds-beat',
-      title: "World's Beat",
-      host: 'Marc Powell',
-      startTime: '20:00',
-      endTime: '21:00',
-      description: 'Global worship rhythms from around the world.',
-      image: IMAGES.WORLD_BEATS
+
+    if (program.id === 'praise-fm-rock') {
+      return {
+        id: 'worlds-beat',
+        title: "World's Beat",
+        host: 'Marc Powell',
+        startTime: '20:00',
+        endTime: '21:00',
+        description: 'Global worship rhythms from around the world.',
+        image: IMAGES.WORLD_BEATS
+      }
     }
-  }
-  return program
+
+    return program
+  })
+
+saturday.push({
+  id: 'saturday-chill-mix',
+  title: 'Chill Mix',
+  host: 'Praise FM',
+  startTime: '23:00',
+  endTime: '00:00',
+  description: 'A smooth late-night mix to close out Saturday.',
+  image: IMAGES.CHILL_MIX
 })
 
 const sunday: Program[] = [
@@ -316,5 +333,5 @@ export const SCHEDULES: Record<number, Program[]> = {
   3: wednesday, // Quarta (Golden Hymns)
   4: weekday,   // Quinta
   5: weekday,   // Sexta
-  6: saturday   // Sábado (Club Mix 16h, Black Soul 17h, World's Beat 20h, Classics Tributes 21h, Chill Mix 22h → agora Live Lounge)
+  6: saturday   // Sábado (Club Mix 16h, Black Soul 17h, World's Beat 20h, Classics Tributes 21h, Live Lounge 22h, Chill Mix 23h)
 }
