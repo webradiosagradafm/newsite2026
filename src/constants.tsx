@@ -170,7 +170,7 @@ const saturday: Program[] = weekday
         host: 'Maia Miller',
         startTime: '16:00',
         endTime: '17:00',
-        description: 'An upbeat mix to kick off your Saturday afternoon.',
+        description: 'kick off your Saturday afternoon.',
         image: IMAGES.CLUB_MIX
       }
     }
@@ -191,7 +191,7 @@ const saturday: Program[] = weekday
       return {
         id: 'praise-fm-live-lounge',
         title: 'Praise FM Live Lounge',
-        host: 'the most famous artists',
+        host: 'Various',
         startTime: '22:00',
         endTime: '23:00',
         description: "Amazing performances from Praise FM's world famous Live Lounge!",
