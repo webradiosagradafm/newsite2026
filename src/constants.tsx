@@ -300,7 +300,7 @@ const sunday: Program[] = [
   {
     id: 'sunday-service',
     title: 'Sunday Service',
-    host: 'Guest Pastor',
+    host: 'Guest',
     startTime: '20:00',
     endTime: '21:00',
     description: 'A focused message of faith, hope and encouragement.',
