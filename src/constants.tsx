@@ -18,7 +18,7 @@ const IMAGES = {
   SCOTT_TURNER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/scott-turner_cwy1bc.webp',
   DJ_ZION: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/dj-zion_m2frte.webp',
   SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/sarah-jordan_tfnxpp.webp',
-  WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/worship_jxoxce.webp',
+  WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176390/worship_tlnp2j.webp',
   GOLDEN_HYMNS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/GOLDEN_HYMNS_2016_j7n2io.webp',
   SCOTT_TURNER_TRIBUTE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/scott-turner-tribute_uuqi3m.webp',
   CHILL_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785297426/chill-mix_btpsnv.webp',
