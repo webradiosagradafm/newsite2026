@@ -21,7 +21,6 @@ import ScheduleList from './components/ScheduleList'
 import SEO from './components/SEO'
 import WeatherBar from './components/WeatherBar'
 
-import PrayerWallPage from './pages/PrayerWallPage'
 import ProgramEpisodesPage from './pages/ProgramEpisodesPage'
 import DevotionalPage from './pages/DevotionalPage'
 import EventsPage from './pages/EventsPage'
@@ -834,8 +833,6 @@ const AppContent: React.FC = () => {
               )
             }
           />
-
-          <Route path="/programs" element={<PrayerWallPage />} />
 
           <Route path="/program/:slug" element={<ProgramEpisodesPage />} />
 
