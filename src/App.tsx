@@ -42,8 +42,6 @@ import { Program } from './types'
 const DEFAULT_COVER = '/icon-512.png'
 const STREAM_URL = 'https://stream.zeno.fm/vku09lx2rkntv'
 const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/vku09lx2rkntv'
-const DONATE_URL = 'https://donate.stripe.com/bJe8wQ09o1zG5W78CO33W00'
-const DONATE_BADGE = 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785306619/donate_t5npp7.webp'
 
 // Tempo máximo (ms) sem sinal de vida do áudio antes de considerarmos
 // que a conexão travou e precisamos reconectar.
@@ -355,36 +353,10 @@ const HomeBBC = ({
           </div>
 
           <WeatherBar />
-
-          {/* Seção Donate */}
-          <div className="py-6 border-b border-gray-300 dark:border-white/10">
-            <a
-              href={DONATE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 bg-gray-100 dark:bg-[#1A1A1A] hover:bg-gray-200 dark:hover:bg-[#252525] p-4 transition-colors rounded-2xl group"
-            >
+          
               <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-xl transition-all duration-500 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-orange-500/25">
-                <img
-                  src={DONATE_BADGE}
-                  alt="Donate"
-                  className="w-full h-full object-cover"
-                />
+                
               </div>
-
-              <div className="min-w-0">
-                <p className="text-[11px] font-black text-orange-500 uppercase tracking-wide mb-0.5">
-                  Support Praise FM
-                </p>
-                <h3 className="text-sm font-bold leading-tight">
-                  Donate
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  Help keep us on air 24/7
-                </p>
-              </div>
-            </a>
-          </div>
 
           <div className="mt-8">
             <RecentlyPlayed tracks={trackHistory} />
