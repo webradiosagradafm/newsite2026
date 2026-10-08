@@ -26,7 +26,13 @@ const IMAGES = {
   BLACK_SOUL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1786538567/praisefmblacksoul_hvo3ah.webp',
   WORLD_BEATS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1787173961/world-beats_vhjv2i.webp',
   JULIA_WORTMAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1787173960/julia-wortman_qcrjhe.webp',
-  LIVE_LOUNGE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1788703028/live-louge_h8zx91.webp'
+  LIVE_LOUNGE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1788703028/live-louge_h8zx91.webp',
+  INSOMNIA_CLUB_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176390/insomnia-club-mix_vy81u6.webp',
+  COUNTRY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176495/praise-fm-country_wi9hll.webp',
+  ROCK_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176390/praise-fm-rock-mix_fstjt3.webp',
+  CLASSICS_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791177197/praise-fm-classics-mix_s6iy8j.webp',
+  NON_STOP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176390/non-stop_frjo6q.webp',
+  FLOW_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176390/praise-fm-flow-mix_uccp2e.webp'
 }
 
 const weekday: Program[] = [
@@ -149,80 +155,116 @@ const wednesday: Program[] = weekday.map((program) => {
 })
 
 // Grade específica de Sábado (Saturday)
-const saturday: Program[] = weekday
-  .map((program) => {
-    if (program.id === 'praise-fm-classics') {
-      return {
-        id: 'praise-fm-classics-tributes',
-        title: 'Praise FM Classics Tributes',
-        host: 'Scott Turner',
-        startTime: '21:00',
-        endTime: '22:00',
-        description: 'Timeless Christian favorites.',
-        image: IMAGES.SCOTT_TURNER_TRIBUTE
-      }
-    }
-
-    if (program.id === 'praise-fm-flow') {
-      return {
-        id: 'maia-millers-club-mix',
-        title: "Maia Miller's Club Mix",
-        host: 'Maia Miller',
-        startTime: '16:00',
-        endTime: '17:00',
-        description: 'kick off your Saturday afternoon.',
-        image: IMAGES.CLUB_MIX
-      }
-    }
-
-    if (program.id === 'future-artists') {
-      return {
-        id: 'praise-fm-black-soul',
-        title: 'Praise FM Black Soul',
-        host: 'Jeff Olumbe',
-        startTime: '17:00',
-        endTime: '18:00',
-        description: 'Celebrating Black gospel and soul music.',
-        image: IMAGES.BLACK_SOUL
-      }
-    }
-
-    if (program.id === 'praise-fm-chill') {
-      return {
-        id: 'praise-fm-live-lounge',
-        title: 'Praise FM Live Lounge',
-        host: 'Various',
-        startTime: '22:00',
-        endTime: '23:00',
-        description: "Amazing performances from Praise FM's world famous Live Lounge!",
-        image: IMAGES.LIVE_LOUNGE
-      }
-    }
-
-    if (program.id === 'praise-fm-rock') {
-      return {
-        id: 'worlds-beat',
-        title: "World's Beat",
-        host: 'Marc Powell',
-        startTime: '20:00',
-        endTime: '21:00',
-        description: 'Global worship rhythms from around the world.',
-        image: IMAGES.WORLD_BEATS
-      }
-    }
-
-    return program
-  })
-
-saturday.push({
-  id: 'saturday-chill-mix',
-  title: 'Chill Mix',
-  host: 'Praise FM',
-  startTime: '23:00',
-  endTime: '00:00',
-  description: 'A smooth late-night mix to close out Saturday.',
-  image: IMAGES.CHILL_MIX
-})
+const saturday: Program[] = [
+  {
+    id: 'saturday-insomnia-club-mix',
+    title: 'Insomnia Club Mix',
+    host: 'Praise FM',
+    startTime: '00:00',
+    endTime: '06:00',
+    description: 'An overnight mix of uplifting sounds.',
+    image: IMAGES.INSOMNIA_CLUB_MIX
+  },
+  {
+    id: 'saturday-worship-morning',
+    title: 'Worship',
+    host: 'Praise FM',
+    startTime: '06:00',
+    endTime: '07:00',
+    description: 'Start your Saturday with worship.',
+    image: IMAGES.WORSHIP
+  },
+  {
+    id: 'saturday-morning-show',
+    title: 'Morning Show',
+    host: 'Stancy Campbell',
+    startTime: '07:00',
+    endTime: '12:00',
+    description: 'Music, encouragement and inspiration.',
+    image: IMAGES.STANCY_CAMPBELL
+  },
+  {
+    id: 'saturday-worship-midday',
+    title: 'Worship',
+    host: 'Praise FM',
+    startTime: '12:00',
+    endTime: '13:00',
+    description: 'A midday hour of worship.',
+    image: IMAGES.WORSHIP
+  },
+  {
+    id: 'saturday-midday-grace',
+    title: 'Midday Grace',
+    host: 'Michael Ray',
+    startTime: '13:00',
+    endTime: '16:00',
+    description: 'Faith and encouragement through music.',
+    image: IMAGES.MICHAEL_RAY
+  },
+  {
+    id: 'maia-millers-club-mix',
+    title: "Maia Miller's Club Mix",
+    host: 'DJ Maia Miller',
+    startTime: '16:00',
+    endTime: '17:00',
+    description: 'Kick off your Saturday with high-energy Christian music.',
+    image: IMAGES.CLUB_MIX
+  },
+  {
+    id: 'praise-fm-black-soul',
+    title: 'Praise FM Black Soul',
+    host: 'Jeff Olumbe',
+    startTime: '17:00',
+    endTime: '18:00',
+    description: 'Celebrating Black gospel and soul music.',
+    image: IMAGES.BLACK_SOUL
+  },
+  {
+    id: 'saturday-praise-fm-country',
+    title: 'Praise FM Country',
+    host: 'Luke Dawson',
+    startTime: '18:00',
+    endTime: '19:00',
+    description: 'Country gospel and songs of faith.',
+    image: IMAGES.COUNTRY
+  },
+  {
+    id: 'saturday-praise-fm-rock-mix',
+    title: 'Praise FM Rock Mix',
+    host: 'Praise FM',
+    startTime: '19:00',
+    endTime: '20:00',
+    description: 'A nonstop mix of Christian rock.',
+    image: IMAGES.ROCK_MIX
+  },
+  {
+    id: 'saturday-praise-fm-classics-mix',
+    title: 'Praise FM Classics Mix',
+    host: 'Praise FM',
+    startTime: '20:00',
+    endTime: '21:00',
+    description: 'Timeless Christian classics in the mix.',
+    image: IMAGES.CLASSICS_MIX
+  },
+  {
+    id: 'saturday-praise-fm-non-stop',
+    title: 'Praise FM Non Stop',
+    host: 'Praise FM',
+    startTime: '21:00',
+    endTime: '22:00',
+    description: 'One hour of nonstop Christian music.',
+    image: IMAGES.NON_STOP
+  },
+  {
+    id: 'saturday-praise-fm-chill-mix',
+    title: 'Praise FM Chill Mix',
+    host: 'Praise FM',
+    startTime: '22:00',
+    endTime: '00:00',
+    description: 'A smooth two-hour mix to close out Saturday.',
+    image: IMAGES.CHILL_MIX
+  }
+]
 
 const sunday: Program[] = [
   {
@@ -333,5 +375,5 @@ export const SCHEDULES: Record<number, Program[]> = {
   3: wednesday, // Quarta (Golden Hymns)
   4: weekday,   // Quinta
   5: weekday,   // Sexta
-  6: saturday   // Sábado (Club Mix 16h, Black Soul 17h, World's Beat 20h, Classics Tributes 21h, Live Lounge 22h, Chill Mix 23h)
+  6: saturday   // Sábado (Country 18h, Rock Mix 19h, Classics Mix 20h, Non Stop 21h, Chill Mix 22h)
 }
