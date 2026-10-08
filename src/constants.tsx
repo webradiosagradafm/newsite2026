@@ -268,13 +268,13 @@ const saturday: Program[] = [
 
 const sunday: Program[] = [
   {
-    id: 'sunday-midnight-grace',
-    title: 'Midnight Grace',
-    host: 'Daniel Brooks',
+    id: 'sunday-insomnia-club-mix',
+    title: 'Insomnia Club Mix',
+    host: 'Praise FM',
     startTime: '00:00',
     endTime: '06:00',
-    description: 'Overnight worship.',
-    image: IMAGES.DANIEL_BROOKS
+    description: 'Overnight Christian music in the mix.',
+    image: IMAGES.INSOMNIA_CLUB_MIX
   },
   {
     id: 'sunday-worship-morning',
@@ -300,7 +300,7 @@ const sunday: Program[] = [
     host: 'Praise FM',
     startTime: '12:00',
     endTime: '13:00',
-    description: 'A midday hour of Worship.',
+    description: 'A midday hour of worship.',
     image: IMAGES.WORSHIP
   },
   {
@@ -309,26 +309,26 @@ const sunday: Program[] = [
     host: 'Michael Ray',
     startTime: '13:00',
     endTime: '16:00',
-    description: 'A smooth afternoon blend of Worship.',
+    description: 'Faith and encouragement through music.',
     image: IMAGES.MICHAEL_RAY
   },
   {
-    id: 'sunday-praise-fm-flow',
-    title: 'Praise FM Flow',
-    host: 'DJ Zion',
+    id: 'sunday-praise-fm-country',
+    title: 'Praise FM Country',
+    host: 'Luke Dawson',
     startTime: '16:00',
     endTime: '17:00',
-    description: 'Hip Hop and energy.',
-    image: IMAGES.DJ_ZION
+    description: 'Country gospel and songs of faith.',
+    image: IMAGES.COUNTRY
   },
   {
-    id: 'weekend-gospel-chart',
-    title: 'Weekend Gospel Chart',
-    host: 'Julia Wortman',
+    id: 'sunday-praise-fm-non-stop',
+    title: 'Praise FM Non Stop',
+    host: 'Praise FM',
     startTime: '17:00',
     endTime: '18:00',
-    description: "Counting down the week's biggest gospel hits.",
-    image: IMAGES.JULIA_WORTMAN
+    description: 'One hour of nonstop Christian music.',
+    image: IMAGES.NON_STOP
   },
   {
     id: 'sunday-worship-evening',
@@ -345,31 +345,31 @@ const sunday: Program[] = [
     host: 'Guest',
     startTime: '20:00',
     endTime: '21:00',
-    description: 'A focused message of faith, hope and encouragement.',
+    description: 'A message of faith, hope and encouragement.',
     image: IMAGES.SUNDAY_SERVICE
   },
   {
-    id: 'sunday-praise-fm-classics',
-    title: 'Praise FM Classics',
-    host: 'Scott Turner',
+    id: 'sunday-praise-fm-classics-mix',
+    title: 'Praise FM Classics Mix',
+    host: 'Praise FM',
     startTime: '21:00',
     endTime: '22:00',
-    description: 'Timeless Christian songs and modern classics.',
-    image: IMAGES.SCOTT_TURNER
+    description: 'Timeless Christian classics in the mix.',
+    image: IMAGES.CLASSICS_MIX
   },
   {
-    id: 'sunday-praise-fm-chill',
-    title: 'Praise FM Chill',
-    host: 'Ava Brooks',
+    id: 'sunday-praise-fm-chill-mix',
+    title: 'Praise FM Chill Mix',
+    host: 'Praise FM',
     startTime: '22:00',
     endTime: '00:00',
-    description: 'Ava Brooks brings the best of the Chill.',
-    image: IMAGES.AVA_BROOKS
+    description: 'A smooth mix to close out Sunday.',
+    image: IMAGES.CHILL_MIX
   }
 ]
 
 export const SCHEDULES: Record<number, Program[]> = {
-  0: sunday,    // Domingo (Weekend Gospel Chart 17h)
+  0: sunday,    // Domingo (Country 16h, Non Stop 17h, Classics Mix 21h, Chill Mix 22h)
   1: weekday,   // Segunda
   2: weekday,   // Terça
   3: wednesday, // Quarta (Golden Hymns)
