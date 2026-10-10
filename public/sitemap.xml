@@ -1,64 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://praisefmradio.vercel.app/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
   </url>
-
   <url>
-    <loc>https://praisefmradio.vercel.app/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://praisefmradio.vercel.app/music</loc>
   </url>
-
   <url>
-    <loc>https://praisefmradio.vercel.app/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://praisefmradio.vercel.app/schedule</loc>
   </url>
-
   <url>
-    <loc>https://praisefmradio.vercel.app/worship-radio</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://praisefmradio.vercel.app/devotional</loc>
   </url>
-
   <url>
-    <loc>https://praisefmradio.vercel.app/programs</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://praisefmradio.vercel.app/events</loc>
   </url>
-
   <url>
-    <loc>https://praisefmradio.vercel.app/programs/morning-show-with-stancy-campbell</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://praisefmradio.vercel.app/new-releases</loc>
   </url>
-
   <url>
-    <loc>https://praisefmradio.vercel.app/programs/midday-grace</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://praisefmradio.vercel.app/artists</loc>
   </url>
-
   <url>
-    <loc>https://praisefmradio.vercel.app/programs/praise-fm-worship</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://praisefmradio.vercel.app/presenters</loc>
   </url>
-
   <url>
-    <loc>https://praisefmradio.vercel.app/listen-live</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
+    <loc>https://praisefmradio.vercel.app/live-recordings</loc>
   </url>
-
   <url>
-    <loc>https://praisefmradio.vercel.app/about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://praisefmradio.vercel.app/listen-again</loc>
+  </url>
+  <url>
+    <loc>https://praisefmradio.vercel.app/help</loc>
+  </url>
+  <url>
+    <loc>https://praisefmradio.vercel.app/advertise</loc>
+  </url>
+  <url>
+    <loc>https://praisefmradio.vercel.app/privacy</loc>
+  </url>
+  <url>
+    <loc>https://praisefmradio.vercel.app/terms</loc>
+  </url>
+  <url>
+    <loc>https://praisefmradio.vercel.app/cookies</loc>
   </url>
 </urlset>
