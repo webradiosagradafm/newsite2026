@@ -97,3 +97,9 @@
 .praise-glow-active .text-black {
   color: #f8fafc !important;
 }
+/* Nomes dos programas na fila */
+.praise-glow-active .grid .font-bold,
+.praise-glow-active .grid .font-semibold {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
