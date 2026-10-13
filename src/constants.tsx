@@ -11,12 +11,12 @@ const IMAGES = {
   RACHAEL_HARRIS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/rachael-harris_pwfg0z.webp',
   MICHAEL_RAY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/michael-ray_n6ylzs.webp',
   STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782157748/stancy-campbell_zwsout.webp',
-  MATT_RILEY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/matt-riley_bun9ef.webp',
+  NICK_CUSACK: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791853507/weekend-breakfast_vkarso.webp',
   SUNDAY_SERVICE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1781538248/sunday-service_xmj94r.webp',
-  JAKE_HUNTER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782153980/jack-hunter_qagiwm.webp',
+  LEXXA: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791853506/praise-fm-rock_mz54t4.webp',
   AVA_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158973/ava-brooks_oyzibl.webp',
   SCOTT_TURNER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/scott-turner_cwy1bc.webp',
-  DJ_ZION: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/dj-zion_m2frte.webp',
+  KENNY_AJ: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791853506/praise-fm-flow_ef6gqq.webp',
   SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/sarah-jordan_tfnxpp.webp',
   WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176390/worship_tlnp2j.webp',
   GOLDEN_HYMNS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/GOLDEN_HYMNS_2016_j7n2io.webp',
@@ -84,11 +84,11 @@ const weekday: Program[] = [
   {
     id: 'praise-fm-flow',
     title: 'Praise FM Flow',
-    host: 'DJ Zion',
+    host: 'DJ Kenny AJ',
     startTime: '16:00',
     endTime: '17:00',
     description: 'Hip Hop and energy.',
-    image: IMAGES.DJ_ZION
+    image: IMAGES.KENNY_AJ
   },
   {
     id: 'future-artists',
@@ -111,11 +111,11 @@ const weekday: Program[] = [
   {
     id: 'praise-fm-rock',
     title: 'Praise FM Rock',
-    host: 'Jake Hunter',
+    host: 'Lexxa',
     startTime: '20:00',
     endTime: '21:00',
     description: 'Christian rock and Faith.',
-    image: IMAGES.JAKE_HUNTER
+    image: IMAGES.LEXXA
   },
   {
     id: 'praise-fm-classics',
@@ -175,13 +175,13 @@ const saturday: Program[] = [
     image: IMAGES.WORSHIP
   },
   {
-    id: 'saturday-morning-show',
-    title: 'Morning Show',
-    host: 'Stancy Campbell',
+    id: 'saturday-weekend-breakfast',
+    title: 'Weekend Breakfast',
+    host: 'Nick Cusack',
     startTime: '07:00',
     endTime: '12:00',
-    description: 'Music, encouragement and inspiration.',
-    image: IMAGES.STANCY_CAMPBELL
+    description: 'A fresh weekend morning with music, faith and inspiration.',
+    image: IMAGES.NICK_CUSACK
   },
   {
     id: 'saturday-worship-midday',
@@ -286,13 +286,13 @@ const sunday: Program[] = [
     image: IMAGES.WORSHIP
   },
   {
-    id: 'sunday-morning',
-    title: 'Sunday Morning',
-    host: 'Matt Riley',
+    id: 'sunday-weekend-breakfast',
+    title: 'Weekend Breakfast',
+    host: 'Nick Cusack',
     startTime: '07:00',
     endTime: '12:00',
-    description: 'Sunday with faith and worship.',
-    image: IMAGES.MATT_RILEY
+    description: 'A fresh weekend morning with music, faith and inspiration.',
+    image: IMAGES.NICK_CUSACK
   },
   {
     id: 'sunday-worship-midday',
