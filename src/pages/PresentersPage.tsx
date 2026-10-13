@@ -11,71 +11,62 @@ const PRESENTERS_DATA = [
   {
     name: 'Stancy Campbell',
     image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782157748/stancy-campbell_zwsout.webp',
-    bio: 'The energetic voice behind the Morning Show.',
+    bio: 'The energetic voice behind the Morning Show, bringing music and encouragement to weekday mornings.',
     programTitle: 'Morning Show'
   },
-
   {
     name: 'Michael Ray',
     image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/michael-ray_n6ylzs.webp',
     bio: 'Michael Ray is your afternoon companion on Midday Grace, bringing worship, peace, and encouragement during the busiest part of the day.',
     programTitle: 'Midday Grace'
   },
-
   {
-    name: 'DJ Zion',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/dj-zion_m2frte.webp',
-    bio: 'DJ Zion brings energy, rhythm, and fresh hip hop to Praise FM Flow.',
+    name: 'DJ Kenny AJ',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791853506/praise-fm-flow_ef6gqq.webp',
+    bio: 'DJ Kenny AJ brings fresh Christian hip-hop, rhythm, and energy to Praise FM Flow.',
     programTitle: 'Praise FM Flow'
   },
-
   {
     name: 'Sarah Jordan',
     image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/sarah-jordan_tfnxpp.webp',
     bio: 'Sarah hosts Future Artists, where she discovers and promotes independent talent from around the world.',
     programTitle: 'Future Artists'
   },
-
   {
-    name: 'Rachel Harris',
+    name: 'Rachael Harris',
     image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/rachael-harris_pwfg0z.webp',
-    bio: 'Rachel brings the hits and the perfect drive-home vibe on Praise FM Carpool.',
+    bio: 'Rachael brings the hits and the perfect drive-home vibe on Praise FM Carpool.',
     programTitle: 'Praise FM Carpool'
   },
-
   {
-    name: 'Jake Hunter',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782153980/jack-hunter_qagiwm.webp',
-    bio: 'Jake Hunter brings attitude and faith with Praise FM Rock.',
+    name: 'Lexxa',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791853506/praise-fm-rock_mz54t4.webp',
+    bio: 'Lexxa turns up the volume with powerful Christian rock, bold sounds, and faith-driven energy on Praise FM Rock.',
     programTitle: 'Praise FM Rock'
   },
-
   {
     name: 'Scott Turner',
     image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/scott-turner_cwy1bc.webp',
     bio: 'A historian of worship music, Scott hosts Praise FM Classics, taking listeners back to timeless songs that shaped generations.',
     programTitle: 'Classics'
   },
-
   {
     name: 'Ava Brooks',
     image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158973/ava-brooks_oyzibl.webp',
     bio: 'Ava closes the day with Praise FM Chill, creating the perfect atmosphere.',
     programTitle: 'Praise FM Chill'
   },
-
   {
     name: 'Daniel Brooks',
     image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/daniel-brooks_qbfdgc.webp',
     bio: 'The voice of the night. Daniel leads Midnight Grace with peaceful music and a calm overnight presence.',
     programTitle: 'Midnight Grace'
   },
-
   {
-    name: 'Matt Riley',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/matt-riley_bun9ef.webp',
-    bio: 'On Sundays, Matt Riley guiding listeners through a reflective and worship experience.',
-    programTitle: 'Sunday Morning'
+    name: 'Nick Cusack',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791853507/weekend-breakfast_vkarso.webp',
+    bio: 'Nick brings a fresh start to the weekend with uplifting music, positive energy, and great company on Weekend Breakfast.',
+    programTitle: 'Weekend Breakfast'
   }
 ];
 
