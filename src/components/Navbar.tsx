@@ -5,26 +5,22 @@ import {
   Radio,
   Menu,
   Calendar,
-  Sun,
-  Moon,
   X,
   Ticket,
-  Megaphone,
-  Heart
+  Megaphone
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 interface NavbarProps {
   activeTab: string
   theme: 'light' | 'dark'
-  onToggleTheme: () => void
-  programColor?: string // <--- Adicionado para receber a cor dinâmica
+  onToggleTheme?: () => void // Mantido apenas para compatibilidade com App.tsx
+  programColor?: string
 }
 
 const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   theme,
-  onToggleTheme,
   programColor
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -39,15 +35,17 @@ const Navbar: React.FC<NavbarProps> = ({
     { id: 'advertise', label: 'Advertise', icon: Megaphone, path: '/advertise' }
   ]
 
-  // Define a cor de fundo com prioridade para a cor dinâmica do programa
-  const headerBgStyle = {
-    backgroundColor: programColor && programColor !== 'transparent'
-      ? programColor
-      : (theme === 'dark' ? '#0b0b0b' : '#ffffff')
+  const headerBgStyle: React.CSSProperties = {
+    backgroundColor:
+      programColor && programColor !== 'transparent'
+        ? programColor
+        : theme === 'dark'
+          ? '#0b0b0b'
+          : '#ffffff'
   }
 
   return (
-    <header 
+    <header
       className="text-black dark:text-white transition-colors duration-1000 border-b border-gray-200 dark:border-white/10"
       style={headerBgStyle}
     >
@@ -98,19 +96,10 @@ const Navbar: React.FC<NavbarProps> = ({
 
         <div className="flex items-center">
           <button
-            onClick={onToggleTheme}
-            className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-gray-400 mr-8 md:mr-12"
-          >
-            {theme === 'light' ? (
-              <Moon className="w-4 h-4" />
-            ) : (
-              <Sun className="w-4 h-4 text-praise-accent" />
-            )}
-          </button>
-
-          <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 md:hidden text-gray-800 dark:text-white"
+            aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? (
               <X className="w-5 h-5" />
@@ -122,7 +111,7 @@ const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 top-16 z-40 md:hidden p-6 overflow-y-auto transition-colors duration-1000"
           style={headerBgStyle}
         >
