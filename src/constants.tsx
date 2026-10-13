@@ -20,19 +20,15 @@ const IMAGES = {
   SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/sarah-jordan_tfnxpp.webp',
   WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176390/worship_tlnp2j.webp',
   GOLDEN_HYMNS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/GOLDEN_HYMNS_2016_j7n2io.webp',
-  SCOTT_TURNER_TRIBUTE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/scott-turner-tribute_uuqi3m.webp',
   CHILL_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785297426/chill-mix_btpsnv.webp',
   CLUB_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785297861/club-mix_ritmbx.webp',
   BLACK_SOUL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1786538567/praisefmblacksoul_hvo3ah.webp',
   WORLD_BEATS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1787173961/world-beats_vhjv2i.webp',
-  JULIA_WORTMAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1787173960/julia-wortman_qcrjhe.webp',
-  LIVE_LOUNGE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1788703028/live-louge_h8zx91.webp',
   INSOMNIA_CLUB_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176390/insomnia-club-mix_vy81u6.webp',
   COUNTRY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176495/praise-fm-country_wi9hll.webp',
   ROCK_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176390/praise-fm-rock-mix_fstjt3.webp',
   CLASSICS_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791177197/praise-fm-classics-mix_s6iy8j.webp',
   NON_STOP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176390/non-stop_frjo6q.webp',
-  FLOW_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176390/praise-fm-flow-mix_uccp2e.webp'
 }
 
 const weekday: Program[] = [
