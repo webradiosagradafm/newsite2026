@@ -37,8 +37,28 @@ function coverColor(img: HTMLImageElement): RGB | null {
   const best = buckets.sort((a, b) => b.w - a.w)[0]
   return best?.w > 0 ? [Math.round(best.r / best.w), Math.round(best.g / best.w), Math.round(best.b / best.w)] : null
 }
-function complementary([r,g,b]: RGB): RGB {
-  return [Math.min(255, Math.round(b * .85 + 36)), Math.min(255, Math.round(r * .35 + g * .45 + 28)), Math.min(255, Math.round(g * .48 + b * .45 + 44))]
+function secondaryColor(rgb: RGB, title: string): RGB {
+  // Morning Show artwork uses warm reds and oranges, not green.
+  if (/morning show/i.test(title)) return [255, 112, 25]
+  // An analogous color keeps the secondary orb in the artwork's color family.
+  const [r, g, b] = rgb.map(v => v / 255)
+  const max = Math.max(r, g, b), min = Math.min(r, g, b)
+  const d = max - min
+  let h = 0
+  if (d) {
+    if (max === r) h = ((g - b) / d) % 6
+    else if (max === g) h = (b - r) / d + 2
+    else h = (r - g) / d + 4
+    h = (h * 60 + 360) % 360
+  }
+  const hue = (h + 22) % 360
+  const saturation = 0.78, value = 0.90
+  const c = value * saturation
+  const x = c * (1 - Math.abs((hue / 60) % 2 - 1))
+  const m = value - c
+  const sectors = [[c,x,0],[x,c,0],[0,c,x],[0,x,c],[x,0,c],[c,0,x]]
+  const channel = sectors[Math.floor(hue / 60) % 6]
+  return channel.map(v => Math.round((v + m) * 255)) as RGB
 }
 export default function AmbientBackground({ title, artwork }: { title: string; artwork?: string }) {
   const [rgb, setRgb] = useState<RGB>(() => defaultColor(title))
@@ -55,8 +75,10 @@ export default function AmbientBackground({ title, artwork }: { title: string; a
     img.src = artwork
     return () => { active = false }
   }, [title, artwork])
-  const [r,g,b] = rgb
-  const [r2,g2,b2] = complementary(rgb)
+  const isMorning = /morning show/i.test(title)
+  const primary: RGB = isMorning ? [230, 48, 35] : rgb
+  const [r,g,b] = primary
+  const [r2,g2,b2] = secondaryColor(primary, title)
   return (
     <div className="praise-glow-root" aria-hidden="true">
       <div className="praise-glow-orb praise-glow-orb-a" style={{ background: `radial-gradient(circle, rgba(${r},${g},${b},.88) 0%, rgba(${r},${g},${b},.30) 37%, transparent 70%)` }} />
