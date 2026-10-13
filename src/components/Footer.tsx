@@ -5,13 +5,8 @@ const Footer: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <footer className="relative isolate overflow-hidden border-t border-white/15 bg-[#111c30]/80 text-white backdrop-blur-2xl py-12">
-      {/* Soft atmospheric reflections; the page's animated Glow stays visible behind the footer. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-cyan-300/10 via-transparent to-violet-400/10" />
-      <div aria-hidden="true" className="pointer-events-none absolute -top-32 left-[8%] -z-10 h-64 w-80 rounded-full bg-cyan-300/10 blur-[90px]" />
-      <div aria-hidden="true" className="pointer-events-none absolute -bottom-36 right-[5%] -z-10 h-72 w-96 rounded-full bg-violet-400/10 blur-[100px]" />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4">
+    <footer className="relative bg-transparent text-white py-12">
+      <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-12">
           <div className="col-span-2">
             <button type="button" className="flex items-center mb-6 text-left" onClick={() => navigate('/')} aria-label="Praise FM USA home">

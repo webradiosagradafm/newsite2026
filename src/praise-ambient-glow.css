@@ -63,3 +63,16 @@
 .praise-glow-schedule { background:rgba(15,24,42,.97) !important; color:#f8fafc; }
 .praise-glow-schedule .text-black, .praise-glow-schedule .text-gray-900 { color:#f8fafc !important; }
 .praise-glow-schedule .text-gray-500 { color:#cbd5e1 !important; }
+
+/* V4: remove borders/white outlines from Recent Tracks cards and album covers */
+.praise-ambient-home .praise-recent-glass,
+.praise-ambient-home .praise-recent-glass > *,
+.praise-ambient-home .praise-recent-glass img,
+.praise-ambient-home .praise-recent-glass [class*="border"],
+.praise-ambient-home .praise-recent-glass [class*="ring-"] {
+  border-color: transparent !important;
+  outline: none !important;
+  --tw-ring-color: transparent !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+}
+.praise-ambient-home .praise-recent-glass > * { border: 0 !important; }
