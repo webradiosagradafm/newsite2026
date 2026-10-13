@@ -76,3 +76,24 @@
   --tw-ring-shadow: 0 0 #0000 !important;
 }
 .praise-ambient-home .praise-recent-glass > * { border: 0 !important; }
+/* PRAISE FM — Próximos programas */
+
+/* Textos dentro dos cartões de programação */
+.praise-glow-active .grid .text-gray-900,
+.praise-glow-active .grid .text-gray-800,
+.praise-glow-active .grid .text-gray-700,
+.praise-glow-active .grid .text-black {
+  color: #f8fafc !important;
+}
+
+/* Nomes dos apresentadores */
+.praise-glow-active .grid .text-gray-500,
+.praise-glow-active .grid .text-gray-600 {
+  color: #cbd5e1 !important;
+}
+
+/* Weather Outlook */
+.praise-glow-active .text-gray-900,
+.praise-glow-active .text-black {
+  color: #f8fafc !important;
+}
