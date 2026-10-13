@@ -34,27 +34,32 @@
 .praise-ambient-home .praise-recent-glass [class*="text-gray-6"] { color:#cbd5e1 !important; }
 @media(max-width:640px){ .praise-ambient-home .praise-glow-orb { min-width:440px;min-height:440px;filter:blur(30px) } }
 @media(prefers-reduced-motion:reduce){ .praise-ambient-home .praise-glow-orb { animation:none !important;will-change:auto } }
-/* PRAISE FM — GLOW: ajustes de contraste */
 
-/* Título do programa e textos principais */
-.praise-glow-active h1,
-.praise-glow-active h2,
-.praise-glow-active h3 {
-  color: #f8fafc;
+/* V3: stronger contrast on program title and Weather, without touching navbar */
+.praise-ambient-home main h1,
+.praise-ambient-home main h2,
+.praise-ambient-home main .text-black,
+.praise-ambient-home main .text-gray-900 { color:#f8fafc !important; }
+.praise-ambient-home main .text-gray-600,
+.praise-ambient-home main .text-gray-700 { color:#d7e1ed !important; }
+/* Sticky mini-player: matches the ambient theme in both desktop and mobile. */
+.praise-glow-mini-player {
+ background:linear-gradient(105deg,rgba(17,31,49,.94),rgba(33,34,57,.93)) !important;
+ color:#f8fafc !important;
+ border-top:1px solid rgba(255,255,255,.18) !important;
+ backdrop-filter:blur(22px) saturate(145%);
+ -webkit-backdrop-filter:blur(22px) saturate(145%);
+ box-shadow:0 -12px 36px rgba(3,9,22,.22);
 }
-
-/* Textos dos cartões e Weather */
-.praise-glow-active .text-black,
-.praise-glow-active .text-gray-900,
-.praise-glow-active .text-slate-900 {
-  color: #f8fafc !important;
-}
-
-/* Player fixo inferior */
-.praise-glow-active .praise-glow-player {
-  background: rgba(14, 22, 39, 0.88);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  color: #f8fafc;
-}
+.praise-glow-mini-player .text-black,
+.praise-glow-mini-player .text-gray-900,
+.praise-glow-mini-player .text-gray-700,
+.praise-glow-mini-player .text-gray-600 { color:#f8fafc !important; }
+.praise-glow-mini-player .text-gray-500,
+.praise-glow-mini-player .text-gray-400 { color:#cbd5e1 !important; }
+.praise-glow-mini-player button:not(.bg-orange-500):not(.hover\:bg-orange-600) { color:#e2e8f0; }
+.praise-glow-mini-player button.bg-white { background:rgba(255,255,255,.1) !important; border-color:rgba(255,255,255,.45) !important; }
+.praise-glow-mini-player .bg-gray-200 { background-color:rgba(255,255,255,.16) !important; }
+.praise-glow-schedule { background:rgba(15,24,42,.97) !important; color:#f8fafc; }
+.praise-glow-schedule .text-black, .praise-glow-schedule .text-gray-900 { color:#f8fafc !important; }
+.praise-glow-schedule .text-gray-500 { color:#cbd5e1 !important; }
