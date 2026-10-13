@@ -32,7 +32,6 @@ const Navbar: React.FC<NavbarProps> = ({
     { id: 'schedule', label: 'Schedule', icon: Calendar, path: '/schedule' },
     { id: 'events', label: 'Events', icon: Ticket, path: '/events' },
     { id: 'devotional', label: 'Devotional', icon: Radio, path: '/devotional' },
-    { id: 'advertise', label: 'Advertise', icon: Megaphone, path: '/advertise' }
   ]
 
   const headerBgStyle: React.CSSProperties = {

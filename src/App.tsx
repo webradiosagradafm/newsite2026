@@ -358,18 +358,6 @@ const HomeBBC = ({
           <div className="mt-8 praise-recent-glass">
             <RecentlyPlayed tracks={trackHistory} />
           </div>
-
-          <div className="flex justify-center md:justify-end mt-3 mb-5">
-            <button
-              onClick={() => navigate('/advertise')}
-              className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-orange-500 transition-colors group"
-            >
-              <Megaphone className="w-3.5 h-3.5 group-hover:text-orange-500" />
-              <span className="font-medium uppercase tracking-wider">
-                Advertise with us
-              </span>
-            </button>
-          </div>
         </div>
       </section>
     </>
