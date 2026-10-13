@@ -1,64 +1,110 @@
-// Vercel serverless function: /api/sports
-// ESPN scoreboard endpoints are public but unofficial; keep a graceful fallback.
+// Praise FM USA — Vercel function /api/sports
+// ESPN's public scoreboard API is unofficial and can change.
 const LEAGUES = [
   { id: 'NFL', sport: 'football', league: 'nfl' },
   { id: 'NBA', sport: 'basketball', league: 'nba' },
   { id: 'MLB', sport: 'baseball', league: 'mlb' }
 ] as const
 
+type Competitor = {
+  homeAway?: string
+  score?: string | number
+  team?: { abbreviation?: string; shortDisplayName?: string }
+}
 type Event = {
   date?: string
-  status?: { type?: { state?: string; shortDetail?: string; description?: string } }
-  competitions?: Array<{ competitors?: Array<{ homeAway?: string; score?: string | number; team?: { abbreviation?: string; shortDisplayName?: string } }> }>
+  status?: { type?: { state?: string; completed?: boolean; shortDetail?: string; description?: string } }
+  competitions?: Array<{ competitors?: Competitor[] }>
+}
+type Score = {
+  league: string
+  home: string
+  away: string
+  homeScore: string
+  awayScore: string
+  status: string
+  date: string
+  live: boolean
+  sortDate: number
 }
 
-function chicagoDay(date: Date) {
+function chicagoDay(date: Date): string {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit'
   }).formatToParts(date)
-  const get = (name: string) => parts.find(p => p.type === name)?.value || ''
-  return `${get('year')}${get('month')}${get('day')}`
+  const value = (type: string) => parts.find(p => p.type === type)?.value ?? ''
+  return `${value('year')}${value('month')}${value('day')}`
 }
 
-function normalize(event: Event, id: string) {
-  const competitors = event.competitions?.[0]?.competitors || []
-  if (competitors.length !== 2 || event.status?.type?.state === 'pre') return null
-  const home = competitors.find(c => c.homeAway === 'home') || competitors[0]
-  const away = competitors.find(c => c.homeAway === 'away') || competitors[1]
-  if (home.score == null || away.score == null || !event.date) return null
-  const when = Date.parse(event.date)
-  if (!Number.isFinite(when) || when > Date.now()) return null
+function normalize(event: Event, league: string): Score | null {
+  const status = event.status?.type
+  // Only final games. Never label a live/in-progress score as final.
+  if (!(status?.completed === true || status?.state === 'post')) return null
+  const competitors = event.competitions?.[0]?.competitors ?? []
+  if (competitors.length !== 2 || !event.date) return null
+  const home = competitors.find(c => c.homeAway === 'home')
+  const away = competitors.find(c => c.homeAway === 'away')
+  if (!home || !away || home.score == null || away.score == null) return null
+  const sortDate = Date.parse(event.date)
+  if (!Number.isFinite(sortDate) || sortDate > Date.now()) return null
   return {
-    league: id,
+    league,
     home: home.team?.abbreviation || home.team?.shortDisplayName || 'HOME',
     away: away.team?.abbreviation || away.team?.shortDisplayName || 'AWAY',
-    homeScore: String(home.score), awayScore: String(away.score),
-    status: event.status?.type?.shortDetail || event.status?.type?.description || 'Final',
-    date: event.date, live: event.status?.type?.state === 'in',
-    sortDate: when
+    homeScore: String(home.score),
+    awayScore: String(away.score),
+    status: status.shortDetail || status.description || 'Final',
+    date: event.date,
+    live: false,
+    sortDate
+  }
+}
+
+async function getEvents(url: string): Promise<Event[]> {
+  try {
+    const response = await fetch(url, {
+      headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(4500)
+    })
+    if (!response.ok) return []
+    const body = await response.json()
+    return Array.isArray(body?.events) ? body.events : []
+  } catch {
+    return []
   }
 }
 
 async function latest(id: string, sport: string, league: string) {
-  // Start with a broad range, then fall back to individual dates if the
-  // provider ignores range queries. Covers bye weeks and offseason gaps.
-  const offsets = [0, 1, 2, 3, 5, 7, 10, 14, 21, 30, 45, 60, 90]
   const base = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`
   const now = Date.now()
-  const range = `${chicagoDay(new Date(now - 30 * 86400000))}-${chicagoDay(new Date(now))}`
-  const urls = [`${base}?dates=${range}&limit=500`, ...offsets.map(days => `${base}?dates=${chicagoDay(new Date(now - days * 86400000))}&limit=100`)]
-  for (const url of urls) {
-    try {
-      const response = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(6500) })
-      if (!response.ok) continue
-      const data = await response.json()
-      const games = ((data.events || []) as Event[]).map(e => normalize(e, id)).filter(Boolean) as NonNullable<ReturnType<typeof normalize>>[]
-      if (games.length) {
-        games.sort((a, b) => Number(b.live) - Number(a.live) || b.sortDate - a.sortDate)
-        const { sortDate, ...score } = games[0]
-        return score
-      }
-    } catch { /* try an earlier date */ }
+  const year = Number(chicagoDay(new Date()).slice(0, 4))
+
+  // Try whole-season requests first: avoids 'No score' during off-days.
+  // If the provider doesn't support season-wide queries, fall back to days.
+  for (const seasonYear of [year, year - 1]) {
+    const events = await getEvents(`${base}?dates=${seasonYear}&limit=1000`)
+    const finals = events.map(e => normalize(e, id)).filter((e): e is Score => e !== null)
+    if (finals.length) {
+      finals.sort((a, b) => b.sortDate - a.sortDate)
+      const { sortDate, ...score } = finals[0]
+      return score
+    }
+  }
+
+  // ESPN may reject year queries. Check real calendar days in batches,
+  // newest first. Search up to 180 days for offseason coverage.
+  for (let start = 0; start < 180; start += 7) {
+    const offsets = Array.from({ length: Math.min(7, 180 - start) }, (_, i) => start + i)
+    const eventGroups = await Promise.all(offsets.map(days => {
+      const day = chicagoDay(new Date(now - days * 86400000))
+      return getEvents(`${base}?dates=${day}&limit=100`)
+    }))
+    const finals = eventGroups.flat().map(e => normalize(e, id)).filter((e): e is Score => e !== null)
+    if (finals.length) {
+      finals.sort((a, b) => b.sortDate - a.sortDate)
+      const { sortDate, ...score } = finals[0]
+      return score
+    }
   }
   return null
 }
@@ -66,6 +112,8 @@ async function latest(id: string, sport: string, league: string) {
 export default async function handler(req: any, res: any) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
   res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600')
-  const entries = await Promise.all(LEAGUES.map(async l => [l.id, await latest(l.id, l.sport, l.league)] as const))
+  const entries = await Promise.all(LEAGUES.map(async l =>
+    [l.id, await latest(l.id, l.sport, l.league)] as const
+  ))
   return res.status(200).json(Object.fromEntries(entries))
 }
