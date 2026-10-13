@@ -1,0 +1,24 @@
+/* Import this stylesheet in App.tsx. Scoped to Praise FM home only. */
+.praise-ambient-home { background: linear-gradient(145deg,#171925,#192436 58%,#161c2b) !important; color: #f7f7fa; }
+.praise-ambient-home .praise-glow-root { position:absolute; inset:0; overflow:hidden; z-index:0; pointer-events:none; isolation:isolate; }
+.praise-ambient-home .praise-glow-orb { position:absolute; width:90vw; height:90vw; min-width:650px; min-height:650px; max-width:1500px; max-height:1500px; border-radius:50%; opacity:.85; filter:blur(45px); will-change:transform; transition:background 5s ease; }
+.praise-glow-orb-a { top:-32%; left:-32%; animation:praise-glow-drift-a 26s ease-in-out infinite alternate; }
+.praise-glow-orb-b { top:4%; right:-35%; animation:praise-glow-drift-b 31s ease-in-out infinite alternate; }
+.praise-glow-orb-c { bottom:-35%; left:3%; animation:praise-glow-drift-c 36s ease-in-out infinite alternate; }
+@keyframes praise-glow-drift-a { from { transform:translate3d(-4%,-2%,0) scale(.95) } to { transform:translate3d(20%,15%,0) scale(1.15) } }
+@keyframes praise-glow-drift-b { from { transform:translate3d(4%,14%,0) scale(1.08) } to { transform:translate3d(-18%,-12%,0) scale(.93) } }
+@keyframes praise-glow-drift-c { from { transform:translate3d(-8%,5%,0) scale(.95) } to { transform:translate3d(16%,-14%,0) scale(1.12) } }
+/* Glass surfaces, no stark white rectangles on the homepage */
+.praise-ambient-home main > section { color:#f8fafc !important; }
+.praise-ambient-home main > section .bg-gray-100,
+.praise-ambient-home main > section .bg-white,
+.praise-ambient-home main > section .bg-white\/60,
+.praise-ambient-home main > section .bg-white\/45 { background-color:rgba(255,255,255,.10) !important; backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,.12); }
+.praise-ambient-home main > section .text-gray-950,
+.praise-ambient-home main > section .text-gray-900,
+.praise-ambient-home main > section .text-black { color:#f8fafc !important; }
+.praise-ambient-home main > section .text-gray-500,
+.praise-ambient-home main > section .text-gray-600 { color:#cbd5e1 !important; }
+.praise-ambient-home main > section .border-gray-300 { border-color:rgba(255,255,255,.22) !important; }
+@media (max-width:640px) { .praise-ambient-home .praise-glow-orb { min-width:450px;min-height:450px;filter:blur(32px) } }
+@media (prefers-reduced-motion:reduce) { .praise-ambient-home .praise-glow-orb { animation:none !important; will-change:auto } }
