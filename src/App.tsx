@@ -35,7 +35,6 @@ import FeedbackPage from './pages/FeedbackPage'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 import TermsOfUsePage from './pages/TermsOfUsePage'
 import CookiesPolicyPage from './pages/CookiesPolicyPage'
-import AdvertisePage from './pages/AdvertisePage'
 
 import { SCHEDULES } from './constants'
 import { Program } from './types'
@@ -840,7 +839,6 @@ const AppContent: React.FC = () => {
           <Route path="/listen-again" element={<ListenAgainPage />} />
           <Route path="/help" element={<HelpCenterPage />} />
           <Route path="/feedback" element={<FeedbackPage />} />
-          <Route path="/advertise" element={<AdvertisePage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsOfUsePage />} />
           <Route path="/cookies" element={<CookiesPolicyPage />} />
