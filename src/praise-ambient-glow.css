@@ -34,3 +34,27 @@
 .praise-ambient-home .praise-recent-glass [class*="text-gray-6"] { color:#cbd5e1 !important; }
 @media(max-width:640px){ .praise-ambient-home .praise-glow-orb { min-width:440px;min-height:440px;filter:blur(30px) } }
 @media(prefers-reduced-motion:reduce){ .praise-ambient-home .praise-glow-orb { animation:none !important;will-change:auto } }
+/* PRAISE FM — GLOW: ajustes de contraste */
+
+/* Título do programa e textos principais */
+.praise-glow-active h1,
+.praise-glow-active h2,
+.praise-glow-active h3 {
+  color: #f8fafc;
+}
+
+/* Textos dos cartões e Weather */
+.praise-glow-active .text-black,
+.praise-glow-active .text-gray-900,
+.praise-glow-active .text-slate-900 {
+  color: #f8fafc !important;
+}
+
+/* Player fixo inferior */
+.praise-glow-active .praise-glow-player {
+  background: rgba(14, 22, 39, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+}
