@@ -273,7 +273,7 @@ const HomeBBC = ({
             {/* Informações do Programa */}
             <div className="text-center md:text-left w-full">
               <div className="flex items-center justify-center md:justify-start gap-2 text-sm mb-2">
-                <span className="font-black text-orange-500">LIVE</span>
+                <span className="text-white font-bold">LIVE</span>
                 <span className="text-gray-500">·</span>
                 <span className="text-gray-500">
                   {currentProgram
