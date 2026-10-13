@@ -22,6 +22,7 @@ import SEO from './components/SEO'
 import WeatherBar from './components/WeatherBar'
 import LatestSportsScores from './components/LatestSportsScores'
 import AmbientBackground from './components/AmbientBackground'
+import './praise-ambient-glow.css'
 
 import DevotionalPage from './pages/DevotionalPage'
 import EventsPage from './pages/EventsPage'
@@ -759,7 +760,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="relative isolate min-h-screen flex flex-col pb-[120px] bg-[#f0eef3] dark:bg-[#181b29] transition-colors">
+    <div className={`relative isolate min-h-screen flex flex-col pb-[120px] transition-colors ${location.pathname === '/' ? 'praise-ambient-home' : 'bg-white dark:bg-[#121212]'}`}>
       {location.pathname === '/' && <AmbientBackground title={currentProgram?.title || 'Praise FM'} artwork={getProgramImage(currentProgram)} />}
       <div className="relative z-10 flex min-h-screen flex-col">
       <SEO
