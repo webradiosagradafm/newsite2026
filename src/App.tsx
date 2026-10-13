@@ -356,7 +356,7 @@ const HomeBBC = ({
           <WeatherBar />
           <LatestSportsScores />
 
-          <div className="mt-8">
+          <div className="mt-8 praise-recent-glass">
             <RecentlyPlayed tracks={trackHistory} />
           </div>
 

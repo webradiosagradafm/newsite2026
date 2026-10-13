@@ -1,24 +1,36 @@
-/* Import this stylesheet in App.tsx. Scoped to Praise FM home only. */
-.praise-ambient-home { background: linear-gradient(145deg,#171925,#192436 58%,#161c2b) !important; color: #f7f7fa; }
-.praise-ambient-home .praise-glow-root { position:absolute; inset:0; overflow:hidden; z-index:0; pointer-events:none; isolation:isolate; }
-.praise-ambient-home .praise-glow-orb { position:absolute; width:90vw; height:90vw; min-width:650px; min-height:650px; max-width:1500px; max-height:1500px; border-radius:50%; opacity:.85; filter:blur(45px); will-change:transform; transition:background 5s ease; }
-.praise-glow-orb-a { top:-32%; left:-32%; animation:praise-glow-drift-a 26s ease-in-out infinite alternate; }
-.praise-glow-orb-b { top:4%; right:-35%; animation:praise-glow-drift-b 31s ease-in-out infinite alternate; }
-.praise-glow-orb-c { bottom:-35%; left:3%; animation:praise-glow-drift-c 36s ease-in-out infinite alternate; }
-@keyframes praise-glow-drift-a { from { transform:translate3d(-4%,-2%,0) scale(.95) } to { transform:translate3d(20%,15%,0) scale(1.15) } }
-@keyframes praise-glow-drift-b { from { transform:translate3d(4%,14%,0) scale(1.08) } to { transform:translate3d(-18%,-12%,0) scale(.93) } }
-@keyframes praise-glow-drift-c { from { transform:translate3d(-8%,5%,0) scale(.95) } to { transform:translate3d(16%,-14%,0) scale(1.12) } }
-/* Glass surfaces, no stark white rectangles on the homepage */
-.praise-ambient-home main > section { color:#f8fafc !important; }
+/* Praise FM homepage ambient glow: no changes to the player or other routes. */
+.praise-ambient-home { background: #111827 !important; color:#f8fafc; }
+.praise-ambient-home .praise-glow-root { position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+.praise-ambient-home .praise-glow-orb { position:absolute; width:75vw; height:75vw; min-width:560px; min-height:560px; max-width:1250px; max-height:1250px; border-radius:50%; filter:blur(42px); opacity:.95; will-change:transform,opacity; transition:background 6s ease; }
+.praise-ambient-home .praise-glow-orb-a { top:-19%; left:-27%; animation:praise-orbit-a 24s ease-in-out infinite alternate; }
+.praise-ambient-home .praise-glow-orb-b { top:10%; right:-29%; animation:praise-orbit-b 29s ease-in-out infinite alternate; }
+.praise-ambient-home .praise-glow-orb-c { bottom:-27%; left:12%; animation:praise-orbit-c 34s ease-in-out infinite alternate; }
+@keyframes praise-orbit-a { 0%{transform:translate3d(-12%,-9%,0) scale(.83);opacity:.60} 50%{opacity:1} 100%{transform:translate3d(42%,24%,0) scale(1.2);opacity:.78} }
+@keyframes praise-orbit-b { 0%{transform:translate3d(17%,15%,0) scale(1.1);opacity:.55} 50%{opacity:1} 100%{transform:translate3d(-42%,-20%,0) scale(.86);opacity:.9} }
+@keyframes praise-orbit-c { 0%{transform:translate3d(-22%,14%,0) scale(.9);opacity:.5} 50%{opacity:.94} 100%{transform:translate3d(32%,-23%,0) scale(1.25);opacity:.72} }
+/* Glass cards, including recent tracks. */
 .praise-ambient-home main > section .bg-gray-100,
 .praise-ambient-home main > section .bg-white,
 .praise-ambient-home main > section .bg-white\/60,
-.praise-ambient-home main > section .bg-white\/45 { background-color:rgba(255,255,255,.10) !important; backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,.12); }
+.praise-ambient-home main > section .bg-white\/45 { background-color:rgba(20,28,43,.52) !important; backdrop-filter:blur(15px); border-color:rgba(255,255,255,.13) !important; }
 .praise-ambient-home main > section .text-gray-950,
 .praise-ambient-home main > section .text-gray-900,
 .praise-ambient-home main > section .text-black { color:#f8fafc !important; }
 .praise-ambient-home main > section .text-gray-500,
 .praise-ambient-home main > section .text-gray-600 { color:#cbd5e1 !important; }
-.praise-ambient-home main > section .border-gray-300 { border-color:rgba(255,255,255,.22) !important; }
-@media (max-width:640px) { .praise-ambient-home .praise-glow-orb { min-width:450px;min-height:450px;filter:blur(32px) } }
-@media (prefers-reduced-motion:reduce) { .praise-ambient-home .praise-glow-orb { animation:none !important; will-change:auto } }
+.praise-ambient-home main > section .border-gray-300 { border-color:rgba(255,255,255,.2) !important; }
+/* Specifically darken Recent Tracks, regardless of its internal card backgrounds. */
+.praise-ambient-home .praise-recent-glass,
+.praise-ambient-home .praise-recent-glass > *,
+.praise-ambient-home .praise-recent-glass > * > * { color:#f8fafc; }
+.praise-ambient-home .praise-recent-glass > * { background:rgba(13,20,35,.62) !important; border:1px solid rgba(255,255,255,.13) !important; border-radius:16px; backdrop-filter:blur(18px); }
+.praise-ambient-home .praise-recent-glass .bg-white,
+.praise-ambient-home .praise-recent-glass .bg-gray-50,
+.praise-ambient-home .praise-recent-glass .bg-gray-100,
+.praise-ambient-home .praise-recent-glass [class*="bg-white"] { background:rgba(255,255,255,.065) !important; }
+.praise-ambient-home .praise-recent-glass [class*="text-gray-9"],
+.praise-ambient-home .praise-recent-glass [class*="text-black"] { color:#f8fafc !important; }
+.praise-ambient-home .praise-recent-glass [class*="text-gray-5"],
+.praise-ambient-home .praise-recent-glass [class*="text-gray-6"] { color:#cbd5e1 !important; }
+@media(max-width:640px){ .praise-ambient-home .praise-glow-orb { min-width:440px;min-height:440px;filter:blur(30px) } }
+@media(prefers-reduced-motion:reduce){ .praise-ambient-home .praise-glow-orb { animation:none !important;will-change:auto } }
