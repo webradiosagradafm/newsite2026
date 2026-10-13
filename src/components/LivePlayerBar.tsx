@@ -1,3 +1,4 @@
+// Praise FM USA: Schedule do mini player = programa atual + 2 proximos.
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 
 import {
@@ -1324,7 +1325,7 @@ const LivePlayerBar: React.FC<
 
         <div className="flex-grow overflow-y-auto pb-4 md:pb-0">
 
-          <div className="p-3 border-b border-gray-100 dark:border-white/5">
+          <div className="p-3">
 
             <div className="flex items-start space-x-3">
 
@@ -1404,7 +1405,7 @@ const LivePlayerBar: React.FC<
 
           {queue
 
-            .slice(0, 4)
+            .slice(0, 2)
 
             .map(
 
@@ -1420,7 +1421,7 @@ const LivePlayerBar: React.FC<
 
                   key={prog.id}
 
-                  className="p-3 border-b border-gray-100 dark:border-white/5"
+                  className="p-3"
 
                 >
 
