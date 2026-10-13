@@ -20,6 +20,8 @@ import Playlist from './components/Playlist'
 import ScheduleList from './components/ScheduleList'
 import SEO from './components/SEO'
 import WeatherBar from './components/WeatherBar'
+import LatestSportsScores from './components/LatestSportsScores'
+import AmbientBackground from './components/AmbientBackground'
 
 import DevotionalPage from './pages/DevotionalPage'
 import EventsPage from './pages/EventsPage'
@@ -211,7 +213,7 @@ const HomeBBC = ({
 
   return (
     <>
-      <section className="bg-white dark:bg-[#121212] text-gray-950 dark:text-white">
+      <section className="bg-transparent text-gray-950 dark:text-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-10">
           
           {/* Seção Principal (Topo) */}
@@ -351,6 +353,7 @@ const HomeBBC = ({
           </div>
 
           <WeatherBar />
+          <LatestSportsScores />
           
               <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-xl transition-all duration-500 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-orange-500/25">
                 
@@ -402,7 +405,13 @@ const AppContent: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
+  const [clockTick, setClockTick] = useState(0)
+  useEffect(() => {
+    const id = window.setInterval(() => setClockTick(t => t + 1), 60000)
+    return () => window.clearInterval(id)
+  }, [])
   const { day, total } = getChicagoDayAndTotalMinutes()
+  void clockTick
 
   const { currentProgram, queue } = useMemo(() => {
     const schedule = SCHEDULES[day] || SCHEDULES[1]
@@ -754,7 +763,9 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col pb-[120px] bg-white dark:bg-[#121212] transition-colors">
+    <div className="relative isolate min-h-screen flex flex-col pb-[120px] bg-[#f7f7fa] dark:bg-[#14141b] transition-colors">
+      {location.pathname === '/' && <AmbientBackground title={currentProgram?.title || 'Praise FM'} artwork={getProgramImage(currentProgram)} />}
+      <div className="relative z-10 flex min-h-screen flex-col">
       <SEO
         title={seo.title}
         description={seo.description}
@@ -853,6 +864,7 @@ const AppContent: React.FC = () => {
           audioRef={audioRef}
         />
       )}
+      </div>
     </div>
   )
 }
