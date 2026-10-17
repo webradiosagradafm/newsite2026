@@ -11,7 +11,7 @@ const IMAGES = {
   RACHAEL_HARRIS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/rachael-harris_pwfg0z.webp',
   MICHAEL_RAY: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/michael-ray_n6ylzs.webp',
   STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782157748/stancy-campbell_zwsout.webp',
-  NICK_CUSACK: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791853507/weekend-breakfast_vkarso.webp',
+  NICK_CUSACK: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1792222383/weekend-morning_f0j3oi.webp',
   SUNDAY_SERVICE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1781538248/sunday-service_xmj94r.webp',
   LEXXA: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791853506/praise-fm-rock_mz54t4.webp',
   AVA_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158973/ava-brooks_oyzibl.webp',
@@ -171,8 +171,8 @@ const saturday: Program[] = [
     image: IMAGES.WORSHIP
   },
   {
-    id: 'saturday-weekend-breakfast',
-    title: 'Weekend Breakfast',
+    id: 'saturday-weekend-morning',
+    title: 'Weekend Morning',
     host: 'Nick Cusack',
     startTime: '07:00',
     endTime: '12:00',
@@ -282,8 +282,8 @@ const sunday: Program[] = [
     image: IMAGES.WORSHIP
   },
   {
-    id: 'sunday-weekend-breakfast',
-    title: 'Weekend Breakfast',
+    id: 'sunday-weekend-morning',
+    title: 'Weekend Morning',
     host: 'Nick Cusack',
     startTime: '07:00',
     endTime: '12:00',

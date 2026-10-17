@@ -64,9 +64,9 @@ const PRESENTERS_DATA = [
   },
   {
     name: 'Nick Cusack',
-    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791853507/weekend-breakfast_vkarso.webp',
-    bio: 'Nick brings a fresh start to the weekend with uplifting music, positive energy, and great company on Weekend Breakfast.',
-    programTitle: 'Weekend Breakfast'
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1792222383/weekend-morning_f0j3oi.webp',
+    bio: 'Nick brings a fresh start to the weekend with uplifting music, positive energy, and great company on Weekend morning.',
+    programTitle: 'Weekend Morning'
   }
 ];
 
