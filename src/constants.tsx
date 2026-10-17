@@ -337,12 +337,12 @@ const sunday: Program[] = [
     image: IMAGES.WORSHIP
   },
   {
-    id: 'bibleproject-podcast',
-    title: 'BibleProject Podcast',
-    host: 'BibleProject',
+    id: 'bible project-podcast',
+    title: 'Bible Project Podcast',
+    host: 'Bible Project',
     startTime: '19:00',
     endTime: '20:00',
-    description: 'Explore the Bible’s story and themes with BibleProject.',
+    description: 'Explore the Bible’s story and themes with Bible Project.',
     image: IMAGES.BIBLEPROJECT_PODCAST
   },
   {
