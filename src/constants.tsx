@@ -13,6 +13,7 @@ const IMAGES = {
   STANCY_CAMPBELL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782157748/stancy-campbell_zwsout.webp',
   NICK_CUSACK: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1792222383/weekend-morning_f0j3oi.webp',
   SUNDAY_SERVICE: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1781538248/sunday-service_xmj94r.webp',
+  BIBLEPROJECT_PODCAST: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1792277020/BP_Show_Podcast_Icon_yg8olu.webp',
   LEXXA: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791853506/praise-fm-rock_mz54t4.webp',
   AVA_BROOKS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158973/ava-brooks_oyzibl.webp',
   SCOTT_TURNER: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1783132371/scott-turner_cwy1bc.webp',
@@ -331,9 +332,18 @@ const sunday: Program[] = [
     title: 'Worship',
     host: 'Praise FM',
     startTime: '18:00',
-    endTime: '20:00',
+    endTime: '19:00',
     description: 'Evening worship and peaceful Christian music.',
     image: IMAGES.WORSHIP
+  },
+  {
+    id: 'bibleproject-podcast',
+    title: 'BibleProject Podcast',
+    host: 'BibleProject',
+    startTime: '19:00',
+    endTime: '20:00',
+    description: 'Explore the Bible’s story and themes with BibleProject.',
+    image: IMAGES.BIBLEPROJECT_PODCAST
   },
   {
     id: 'sunday-service',
