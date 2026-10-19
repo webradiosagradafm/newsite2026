@@ -10,7 +10,6 @@ import {
   X,
   Calendar,
 } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
 
 const MASTER_ARTISTS = [
   'Brandon Lake',
@@ -69,15 +68,13 @@ const PlaylistCard: React.FC<{
   isPlaying: boolean
   onTogglePlay: () => void
 }> = ({ track, isPlaying, onTogglePlay }) => {
-  const navigate = useNavigate()
-
   const handleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation()
-    // Favoritos ainda não implementados no AuthContext atual.
+    // Favoritos ainda não implementados.
   }
 
   return (
-    <div className="group relative bg-white dark:bg-[#111] border border-gray-100 dark:border-white/5 transition-all duration-300 hover:shadow-xl">
+    <div className="group relative bg-white/5 backdrop-blur border border-white/10 hover:border-[#ff6600]/60 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-black/30">
       <div className="relative aspect-square overflow-hidden">
         <img
           src={track.artworkUrl100.replace('100x100', '600x600')}
@@ -115,10 +112,10 @@ const PlaylistCard: React.FC<{
       </div>
 
       <div className="p-4">
-        <h3 className="font-medium text-lg text-gray-900 dark:text-white leading-tight truncate uppercase tracking-tighter">
+        <h3 className="font-bold text-lg text-white leading-tight truncate uppercase tracking-tighter">
           {track.trackName}
         </h3>
-        <p className="text-gray-500 dark:text-gray-400 text-[10px] font-normal uppercase tracking-[0.2em] mt-1">
+        <p className="text-white/60 text-[10px] font-normal uppercase tracking-[0.2em] mt-1 truncate">
           {track.artistName}
         </p>
       </div>
@@ -177,6 +174,13 @@ const Playlist: React.FC = () => {
     fetchTracks()
   }, [currentArtists])
 
+  // Para a prévia ao sair da página
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause()
+    }
+  }, [])
+
   const togglePreview = (track: Track) => {
     if (!track.previewUrl || !audioRef.current) return
 
@@ -195,13 +199,14 @@ const Playlist: React.FC = () => {
   const cList = tracks.slice(8, 12)
 
   return (
-    <div className="bg-[#f2f2f2] dark:bg-[#000] min-h-screen transition-colors duration-300">
+    // Sem fundo próprio: o fundo ambiente do App aparece por trás
+    <div className="min-h-screen text-white">
       <audio ref={audioRef} onEnded={() => setActivePreview(null)} />
 
       {showArchive && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white dark:bg-[#111] w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl">
-            <div className="p-6 border-b border-gray-100 dark:border-white/10 flex justify-between items-center bg-[#ff6600] text-white">
+          <div className="bg-black/70 backdrop-blur-xl border border-white/10 w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl rounded-2xl">
+            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-[#ff6600] text-white">
               <div className="flex items-center space-x-3">
                 <Calendar className="w-5 h-5" />
                 <h2 className="text-xl font-black uppercase tracking-tighter">Archive Selection</h2>
@@ -209,6 +214,7 @@ const Playlist: React.FC = () => {
               <button
                 onClick={() => setShowArchive(false)}
                 className="p-2 hover:bg-black/20 rounded-full transition-colors"
+                aria-label="Close"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -218,19 +224,19 @@ const Playlist: React.FC = () => {
               {ARCHIVE_DATA.map((item, idx) => (
                 <div
                   key={idx}
-                  className="p-5 border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 hover:border-[#ff6600] transition-colors group cursor-default"
+                  className="p-5 border border-white/10 bg-white/5 rounded-xl hover:border-[#ff6600]/60 transition-colors group cursor-default"
                 >
                   <span className="text-[10px] font-black text-[#ff6600] uppercase tracking-[0.2em] mb-2 block">
                     {item.date}
                   </span>
-                  <h3 className="text-lg font-black dark:text-white uppercase tracking-tight mb-3">
+                  <h3 className="text-lg font-black text-white uppercase tracking-tight mb-3">
                     The A-List Artists
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {item.artists.map((artist, aIdx) => (
                       <span
                         key={aIdx}
-                        className="bg-white dark:bg-black px-3 py-1 text-xs font-regular border border-gray-200 dark:border-white/10 dark:text-gray-300"
+                        className="bg-black/40 px-3 py-1 text-xs rounded-full border border-white/10 text-white/80"
                       >
                         {artist}
                       </span>
@@ -240,8 +246,8 @@ const Playlist: React.FC = () => {
               ))}
             </div>
 
-            <div className="p-6 border-t border-gray-100 dark:border-white/10 text-center">
-              <p className="text-xs text-gray-400 uppercase font-regular tracking-widest">
+            <div className="p-6 border-t border-white/10 text-center">
+              <p className="text-xs text-white/50 uppercase tracking-widest">
                 Showing last 4 daily editions
               </p>
             </div>
@@ -249,7 +255,7 @@ const Playlist: React.FC = () => {
         </div>
       )}
 
-      <div className="bg-white dark:bg-[#111] border-b border-gray-200 dark:border-white/5 py-12 md:py-20">
+      <div className="border-b border-white/10 py-12 md:py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center space-x-2 text-[#ff6600] mb-4">
             <Music className="w-4 h-4" />
@@ -257,38 +263,38 @@ const Playlist: React.FC = () => {
               Official Praise FM USA Selection
             </span>
           </div>
-          <h1 className="text-5xl md:text-8xl font-medium uppercase tracking-tighter mb-6 dark:text-white leading-none">
+          <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter mb-6 text-white leading-none">
             Playlist
           </h1>
-          <p className="text-xl text-gray-500 dark:text-gray-400 max-w-2xl font-normal leading-tight uppercase">
+          <p className="text-xl text-white/70 max-w-2xl font-normal leading-tight uppercase">
             Curated daily. The definitive sound of{' '}
-            <span className="text-black dark:text-white font-medium">Praise FM USA</span>,
+            <span className="text-white font-bold">Praise FM USA</span>,
             featuring the world's most impactful worship hits.
           </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-16">
+      <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-40">
+          <div className="flex flex-col items-center justify-center py-32">
             <Loader2 className="w-12 h-12 text-[#ff6600] animate-spin mb-4" />
-            <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-gray-400">
+            <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/50">
               Refreshing Daily Playlist...
             </p>
           </div>
         ) : (
           <>
             {aList.length > 0 && (
-              <section className="mb-24">
-                <div className="flex items-baseline space-x-4 mb-10 border-b-4 border-black dark:border-white pb-4">
-                  <h2 className="text-4xl font-medium uppercase tracking-tighter dark:text-white">
+              <section className="mb-16 md:mb-24">
+                <div className="flex items-baseline space-x-4 mb-8 border-b-2 border-[#ff6600] pb-4">
+                  <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white">
                     A List
                   </h2>
                   <span className="text-[#ff6600] text-sm font-medium uppercase tracking-widest">
                     Power Rotation
                   </span>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                   {aList.map((track) => (
                     <PlaylistCard
                       key={track.trackId}
@@ -302,16 +308,16 @@ const Playlist: React.FC = () => {
             )}
 
             {bList.length > 0 && (
-              <section className="mb-24">
-                <div className="flex items-baseline space-x-4 mb-10 border-b-4 border-black/20 dark:border-white/20 pb-4">
-                  <h2 className="text-4xl font-medium uppercase tracking-tighter dark:text-white opacity-60">
+              <section className="mb-16 md:mb-24">
+                <div className="flex items-baseline space-x-4 mb-8 border-b-2 border-white/30 pb-4">
+                  <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white/80">
                     B List
                   </h2>
-                  <span className="text-gray-400 text-sm font-medium uppercase tracking-widest">
+                  <span className="text-white/50 text-sm font-medium uppercase tracking-widest">
                     On The Rise
                   </span>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                   {bList.map((track) => (
                     <PlaylistCard
                       key={track.trackId}
@@ -325,16 +331,16 @@ const Playlist: React.FC = () => {
             )}
 
             {cList.length > 0 && (
-              <section className="mb-24">
-                <div className="flex items-baseline space-x-4 mb-10 border-b-4 border-black/10 dark:border-white/10 pb-4">
-                  <h2 className="text-4xl font-medium uppercase tracking-tighter dark:text-white opacity-40">
+              <section className="mb-16 md:mb-24">
+                <div className="flex items-baseline space-x-4 mb-8 border-b-2 border-white/15 pb-4">
+                  <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white/60">
                     C List
                   </h2>
-                  <span className="text-gray-300 text-sm font-medium uppercase tracking-widest">
+                  <span className="text-white/40 text-sm font-medium uppercase tracking-widest">
                     New & Next
                   </span>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                   {cList.map((track) => (
                     <PlaylistCard
                       key={track.trackId}
@@ -349,18 +355,18 @@ const Playlist: React.FC = () => {
           </>
         )}
 
-        <div className="bg-white dark:bg-[#111] p-12 mt-20 border border-gray-200 dark:border-white/5">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-12">
-            <div className="flex items-center space-x-8">
+        <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl p-8 md:p-12 mt-12 md:mt-20">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-10">
+            <div className="flex flex-col md:flex-row items-center md:space-x-8 text-center md:text-left gap-6 md:gap-0">
               <div className="w-16 h-16 bg-[#ff6600] rounded-full flex items-center justify-center text-white flex-shrink-0">
                 <Info className="w-8 h-8" />
               </div>
               <div>
-                <h4 className="text-2xl font-medium uppercase tracking-tighter dark:text-white">
+                <h4 className="text-2xl font-black uppercase tracking-tighter text-white">
                   Daily Rotation
                 </h4>
-                <p className="text-gray-500 dark:text-gray-400 text-sm max-w-lg mt-2 uppercase font-normal tracking-tight leading-relaxed">
-                  The <span className="text-[#ff6600] font-medium">Praise FM USA Playlist</span>{' '}
+                <p className="text-white/60 text-sm max-w-lg mt-2 uppercase font-normal tracking-tight leading-relaxed">
+                  The <span className="text-[#ff6600] font-bold">Praise FM USA Playlist</span>{' '}
                   is updated every 24 hours. We select the most impactful songs from around the
                   world to inspire your faith journey daily.
                 </p>
@@ -369,7 +375,7 @@ const Playlist: React.FC = () => {
 
             <button
               onClick={() => setShowArchive(true)}
-              className="bg-black dark:bg-white text-white dark:text-black px-10 py-5 text-[10px] font-medium uppercase tracking-[0.3em] flex items-center space-x-3 hover:bg-[#ff6600] dark:hover:bg-[#ff6600] hover:text-white transition-all shadow-lg active:scale-95"
+              className="bg-[#ff6600] hover:bg-orange-600 text-white rounded-xl px-10 py-5 text-[10px] font-bold uppercase tracking-[0.3em] flex items-center space-x-3 transition-all shadow-lg shadow-orange-500/20 active:scale-95 whitespace-nowrap"
             >
               <span>View Past Daily Lists</span>
               <ExternalLink className="w-4 h-4" />

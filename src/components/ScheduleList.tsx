@@ -46,7 +46,7 @@ const ProgramProgressRing: React.FC<{ program: Program; isActive: boolean; nowMi
     const offset = circumference - progress * circumference;
 
     return (
-      <div className="relative flex-shrink-0 flex items-center justify-center bg-[#f2f2f2] dark:bg-[#1a1a1a] p-3 group-hover:scale-105 transition-transform duration-500">
+      <div className="relative flex-shrink-0 flex items-center justify-center bg-black/30 border border-white/10 rounded-2xl p-3 group-hover:scale-105 transition-transform duration-500">
         <div className="relative rounded-full overflow-hidden" style={{ width: innerSize, height: innerSize }}>
           <img
             src={program.image}
@@ -69,10 +69,9 @@ const ProgramProgressRing: React.FC<{ program: Program; isActive: boolean; nowMi
               cx={innerSize / 2}
               cy={innerSize / 2}
               r={radius}
-              stroke="#dbdbdb"
+              stroke="rgba(255,255,255,0.15)"
               strokeWidth={strokeWidth}
               fill="transparent"
-              className="dark:stroke-white/10"
             />
 
             {isActive && (
@@ -198,32 +197,33 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
   }, [selectedDay]);
 
   return (
+    // Sem fundo próprio: o fundo ambiente do App aparece por trás
     <section
       ref={listContainerRef}
-      className="bg-white dark:bg-[#000] min-h-screen font-sans transition-colors duration-300"
+      className="min-h-screen font-sans text-white"
     >
-      <div className="max-w-7xl mx-auto px-4 py-20">
+      <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
         {onBack && (
           <button
             onClick={onBack}
-            className="flex items-center text-gray-400 hover:text-[#ff6600] transition-colors mb-6 text-xs font-normal uppercase tracking-widest"
+            className="flex items-center text-white/60 hover:text-[#ff6600] transition-colors mb-6 text-xs font-normal uppercase tracking-widest"
           >
             <ArrowLeft className="w-4 h-4 mr-2" /> Back Home
           </button>
         )}
 
         <div className="mb-10">
-          <div className="flex flex-col md:flex-row md:items-baseline md:space-x-4 mb-6 border-b-4 border-black dark:border-white pb-6">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white uppercase tracking-tight leading-none">
+          <div className="flex flex-col md:flex-row md:items-baseline md:space-x-4 mb-6 border-b-2 border-[#ff6600] pb-6">
+            <h1 className="text-5xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none">
               Schedule
             </h1>
-            <p className="text-gray-400 font-normal uppercase tracking-wide text-sm mt-4 md:mt-0">
+            <p className="text-white/60 font-normal uppercase tracking-wide text-sm mt-4 md:mt-0">
               {selectedDayInfo.isToday ? 'Today' : selectedDayInfo.dayLabel} • {selectedDayInfo.fullLabel}
             </p>
           </div>
 
-          <div className="bg-[#1a1f22] overflow-x-auto mb-10">
-            <div className="flex min-w-max border-b border-white/10">
+          <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl overflow-x-auto mb-10">
+            <div className="flex min-w-max">
               {weekDays.map((day) => {
                 const active = selectedDay === day.value;
 
@@ -231,10 +231,10 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
                   <button
                     key={day.value}
                     onClick={() => setSelectedDay(day.value)}
-                    className={`min-w-[96px] px-4 py-3 text-center border-r border-white/10 transition-all ${
+                    className={`min-w-[96px] px-4 py-3 text-center border-r border-white/10 last:border-r-0 transition-all ${
                       active
-                        ? 'bg-white text-black'
-                        : 'bg-transparent text-[#ffe600] hover:bg-white/5'
+                        ? 'bg-[#ff6600] text-white'
+                        : 'bg-transparent text-white/70 hover:bg-white/10 hover:text-white'
                     }`}
                   >
                     <div className="text-[11px] font-bold tracking-wide">
@@ -251,8 +251,8 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
         </div>
 
         <div className="mb-12">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] uppercase tracking-[0.25em] text-gray-400">
-            <span className="text-gray-300 dark:text-gray-600">Browse</span>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] uppercase tracking-[0.25em] text-white/60">
+            <span className="text-white/30">Browse</span>
 
             {(Object.keys(sections) as string[]).map((title) => (
               <button
@@ -277,12 +277,12 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
 
         {(Object.entries(sections) as [string, Program[]][]).map(([title, items]) =>
           items.length > 0 ? (
-            <div key={title} id={title} className="mb-20 scroll-mt-32">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-8 uppercase tracking-tight">
+            <div key={title} id={title} className="mb-16 md:mb-20 scroll-mt-24">
+              <h3 className="text-xl font-bold text-white mb-8 uppercase tracking-tight border-l-4 border-[#ff6600] pl-4">
                 {title}
               </h3>
 
-              <div className="space-y-8">
+              <div className="space-y-5">
                 {items.map((prog) => {
                   const active = isLiveNow(prog.startTime, prog.endTime);
 
@@ -291,10 +291,10 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
                       key={prog.id}
                       data-live={active}
                       onClick={() => onNavigateToProgram(prog)}
-                      className={`relative flex flex-col md:flex-row items-start p-6 transition-all cursor-pointer group rounded-2xl md:rounded-3xl border ${
+                      className={`relative flex flex-col md:flex-row items-start p-6 transition-all cursor-pointer group rounded-2xl md:rounded-3xl border backdrop-blur ${
                         active
-                          ? 'bg-orange-500/10 dark:bg-orange-500/10 border-orange-500 shadow-xl shadow-orange-500/10'
-                          : 'bg-white dark:bg-[#171717] border-black/5 dark:border-white/5 opacity-80 hover:opacity-100 hover:border-black/20 dark:hover:border-white/20'
+                          ? 'bg-orange-500/10 border-orange-500 shadow-xl shadow-orange-500/10'
+                          : 'bg-white/5 border-white/10 opacity-80 hover:opacity-100 hover:border-white/30'
                       }`}
                     >
                       {active && (
@@ -306,7 +306,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
                           className={`text-2xl font-bold tracking-tight ${
                             active
                               ? 'text-[#ff6600]'
-                              : 'text-gray-400 dark:text-gray-500 group-hover:text-black dark:group-hover:text-white'
+                              : 'text-white/50 group-hover:text-white'
                           }`}
                         >
                           {format12h(prog.startTime)}
@@ -329,16 +329,16 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ onNavigateToProgram, onBack
 
                       <div className="flex-grow min-w-0 pt-1">
                         <h4 className={`text-2xl md:text-3xl font-bold leading-tight tracking-tight mb-2 transition-all duration-300 ${
-                          active ? 'text-[#ff6600]' : 'text-gray-900 dark:text-white group-hover:text-[#ff6600]'
+                          active ? 'text-[#ff6600]' : 'text-white group-hover:text-[#ff6600]'
                         }`}>
                           {prog.title}
                         </h4>
 
-                        <p className="text-gray-500 dark:text-gray-400 font-normal text-base mb-4 tracking-tight">
+                        <p className="text-white/60 font-normal text-base mb-4 tracking-tight">
                           with {prog.host}
                         </p>
 
-                        <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed font-normal max-w-2xl">
+                        <p className="text-white/70 text-sm leading-relaxed font-normal max-w-2xl">
                           {prog.description}
                         </p>
 
