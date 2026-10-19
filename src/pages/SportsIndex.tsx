@@ -1,95 +1,79 @@
-
-import React from 'react'
 import { Link } from 'react-router-dom'
 import LatestSportsScores from '../components/LatestSportsScores'
 
 const leagues = [
-  { name: 'NFL', description: 'Professional American football', emoji: '🏈' },
-  { name: 'NBA', description: 'Professional basketball', emoji: '🏀' },
-  { name: 'MLB', description: 'Major League Baseball', emoji: '⚾' },
-  { name: 'NHL', description: 'Professional ice hockey', emoji: '🏒' },
-  { name: 'College Football', description: 'US college football', emoji: '🎓' },
+  {
+    id: 'nfl',
+    name: 'NFL',
+    fullName: 'National Football League',
+    emoji: '🏈',
+    description: 'American football scores and results.',
+    path: '/sports/nfl',
+  },
+  {
+    id: 'nba',
+    name: 'NBA',
+    fullName: 'National Basketball Association',
+    emoji: '🏀',
+    description: 'Basketball scores and results.',
+    path: '/sports/nba',
+  },
+  {
+    id: 'mlb',
+    name: 'MLB',
+    fullName: 'Major League Baseball',
+    emoji: '⚾',
+    description: 'Baseball scores and results.',
+    path: '/sports/mlb',
+  },
 ]
 
 export default function SportsIndex() {
   return (
-    <main className="mx-auto w-full max-w-7xl px-4 py-8 text-white md:px-6 md:py-12">
-      <header className="mb-8 rounded-2xl border border-white/10 bg-black/30 p-6 md:p-10">
-        <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-orange-400">
+    <main className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 text-white">
+      <header>
+        <p className="text-sm font-bold uppercase tracking-widest text-orange-400">
           Praise FM USA
         </p>
-
-        <h1 className="text-4xl font-black tracking-tight md:text-6xl">
+        <h1 className="mt-2 text-3xl font-bold sm:text-4xl">
           Sports Center
         </h1>
-
-        <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 md:text-lg">
-          Your destination for American sports scores, game updates and
-          the latest sports stories.
+        <p className="mt-2 text-white/70">
+          Latest scores, results and updates from American sports.
         </p>
-
-        <a
-          href="#latest-scores"
-          className="mt-6 inline-flex rounded-xl bg-orange-500 px-5 py-3 font-bold text-white transition hover:bg-orange-600"
-        >
-          View Latest Scores
-        </a>
       </header>
 
-      <section id="latest-scores" className="mb-10 scroll-mt-6">
-        <h2 className="mb-4 text-2xl font-extrabold md:text-3xl">
-          Latest Scores
-        </h2>
+      <LatestSportsScores />
 
-        <LatestSportsScores />
-
-        <p className="mt-3 text-sm text-white/50">
-          Scores are provided by ESPN public endpoints and may not always
-          be available or up to date.
-        </p>
-      </section>
-
-      <section className="mb-10">
-        <h2 className="mb-4 text-2xl font-extrabold md:text-3xl">
-          Explore the Leagues
-        </h2>
+      <section>
+        <h2 className="mb-4 text-xl font-bold">Explore the leagues</h2>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {leagues.map((league) => (
-            <article
-              key={league.name}
-              className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 transition hover:border-orange-400/50 hover:bg-white/[0.07]"
+            <Link
+              key={league.id}
+              to={league.path}
+              className="group block rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:-translate-y-1 hover:border-orange-400/60 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-orange-400"
             >
-              <div className="mb-3 text-3xl" aria-hidden="true">
-                {league.emoji}
+              <div className="flex items-center justify-between">
+                <span className="text-4xl" aria-hidden="true">
+                  {league.emoji}
+                </span>
+                <span className="text-sm font-semibold text-orange-400 transition group-hover:translate-x-1">
+                  Explore →
+                </span>
               </div>
 
-              <h3 className="text-xl font-bold">{league.name}</h3>
-
-              <p className="mt-2 text-sm leading-6 text-white/60">
+              <h3 className="mt-5 text-2xl font-bold">{league.name}</h3>
+              <p className="mt-1 text-sm text-white/60">
+                {league.fullName}
+              </p>
+              <p className="mt-4 text-sm text-white/80">
                 {league.description}
               </p>
-            </article>
+            </Link>
           ))}
         </div>
-      </section>
-
-      <section className="rounded-2xl border border-white/10 bg-black/20 p-6 md:p-8">
-        <h2 className="text-2xl font-extrabold">
-          More from Praise FM
-        </h2>
-
-        <p className="mt-3 max-w-2xl leading-7 text-white/70">
-          Stay connected with Praise FM USA for uplifting music,
-          programming and new stories.
-        </p>
-
-        <Link
-          to="/"
-          className="mt-5 inline-flex font-bold text-orange-400 hover:text-orange-300"
-        >
-          Listen to Praise FM Live →
-        </Link>
       </section>
     </main>
   )
