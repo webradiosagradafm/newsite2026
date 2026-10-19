@@ -1,14 +1,12 @@
 
-import type { IncomingMessage, ServerResponse } from 'http'
-
-type VercelRequest = IncomingMessage & {
+type VercelRequest = {
   method?: string
   query?: Record<string, unknown>
   body?: unknown
 }
 
-type VercelResponse = ServerResponse & {
-  setHeader: ServerResponse['setHeader']
+type VercelResponse = {
+  setHeader: (name: string, value: string) => void
   status: (code: number) => VercelResponse
   json: (body: unknown) => VercelResponse
 }
