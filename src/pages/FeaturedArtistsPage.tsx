@@ -89,8 +89,9 @@ const FeaturedArtistsPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-white dark:bg-[#000] min-h-screen transition-colors duration-300 font-sans">
-      <div className="bg-black text-white py-16 md:py-24 border-b border-white/10 relative overflow-hidden">
+    // Sem fundo próprio: o fundo ambiente do App aparece por trás
+    <div className="min-h-screen text-white font-sans">
+      <div className="py-14 md:py-20 border-b border-white/10 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#ff6600]/10 to-transparent pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 relative z-10">
@@ -102,13 +103,13 @@ const FeaturedArtistsPage: React.FC = () => {
             </span>
           </div>
 
-          <h1 className="text-5xl md:text-8xl font-medium uppercase tracking-tighter leading-[0.85] mb-8">
+          <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85] mb-8">
             Featured
             <br />
             Artists
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-400 max-w-2xl font-normal uppercase tracking-tight leading-tight">
+          <p className="text-lg md:text-xl text-white/70 max-w-2xl font-normal uppercase tracking-tight leading-tight">
             The sounds defining a generation of faith. Exclusive sessions and
             deep dives into the artists behind the world's biggest worship
             anthems.
@@ -116,12 +117,12 @@ const FeaturedArtistsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        <h2 className="bbc-section-title text-2xl dark:text-white uppercase font-medium">
+      <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
+        <h2 className="text-2xl text-white uppercase font-bold tracking-tight border-l-4 border-[#ff6600] pl-4">
           Current Rotation
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-100 dark:bg-white/5 border border-gray-100 dark:border-white/5 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
           {FEATURED_ARTISTS.map((artist) => {
             const followed = false
 
@@ -129,7 +130,7 @@ const FeaturedArtistsPage: React.FC = () => {
               <div
                 key={artist.id}
                 onClick={() => handleArtistClick(artist.name)}
-                className="group relative aspect-square overflow-hidden bg-black cursor-pointer transition-all duration-500"
+                className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-black/40 cursor-pointer transition-all duration-500 hover:border-[#ff6600]/60"
               >
                 <img
                   src={artist.image}
@@ -150,12 +151,12 @@ const FeaturedArtistsPage: React.FC = () => {
                     {artist.genre}
                   </span>
 
-                  <h3 className="text-3xl md:text-4xl font-medium text-white uppercase tracking-tighter leading-none group-hover:text-[#ff6600] transition-colors duration-300">
+                  <h3 className="text-3xl md:text-4xl font-bold text-white uppercase tracking-tighter leading-none group-hover:text-[#ff6600] transition-colors duration-300">
                     {artist.name}
                   </h3>
 
                   <div className="mt-6 h-0 group-hover:h-auto overflow-hidden transition-all duration-700 opacity-0 group-hover:opacity-100">
-                    <p className="text-gray-400 text-[9px] font-medium uppercase tracking-widest mb-4 flex items-center">
+                    <p className="text-white/60 text-[9px] font-medium uppercase tracking-widest mb-4 flex items-center">
                       <Music className="w-3 h-3 mr-2 text-[#ff6600]" />
                       Top Tracks
                     </p>
@@ -167,7 +168,7 @@ const FeaturedArtistsPage: React.FC = () => {
                           onClick={(e) =>
                             handleSongClick(e, artist.name, hit)
                           }
-                          className="bg-white/10 text-white text-[9px] px-3 py-1.5 uppercase tracking-widest backdrop-blur-md border border-white/10 hover:bg-[#ff6600] hover:text-white transition-all active:scale-95"
+                          className="bg-white/10 text-white text-[9px] px-3 py-1.5 rounded-full uppercase tracking-widest backdrop-blur-md border border-white/10 hover:bg-[#ff6600] hover:text-white transition-all active:scale-95"
                         >
                           {hit}
                         </button>
@@ -201,18 +202,18 @@ const FeaturedArtistsPage: React.FC = () => {
           })}
         </div>
 
-        <div className="mt-24 bg-gray-50 dark:bg-[#111] p-10 md:p-16 flex flex-col md:flex-row items-center justify-between border border-gray-100 dark:border-white/5 transition-colors">
+        <div className="mt-16 md:mt-24 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 md:p-14 flex flex-col md:flex-row items-center justify-between">
           <div className="flex flex-col md:flex-row items-center md:space-x-10 text-center md:text-left mb-10 md:mb-0">
-            <div className="w-20 h-20 bg-black dark:bg-white rounded-full flex items-center justify-center text-white dark:text-black shadow-xl mb-6 md:mb-0 transition-colors">
+            <div className="w-20 h-20 bg-[#ff6600] rounded-full flex items-center justify-center text-white shadow-xl mb-6 md:mb-0">
               <Users className="w-10 h-10" />
             </div>
 
             <div className="max-w-md">
-              <h4 className="text-3xl font-medium uppercase tracking-tighter dark:text-white leading-none mb-4">
+              <h4 className="text-3xl font-bold uppercase tracking-tighter text-white leading-none mb-4">
                 Artist Submissions
               </h4>
 
-              <p className="text-gray-500 text-sm font-normal uppercase tracking-tight leading-relaxed">
+              <p className="text-white/60 text-sm font-normal uppercase tracking-tight leading-relaxed">
                 We champion the next generation. If you're creating music that
                 inspires, we want to hear your story and your sound for
                 potential airplay.
@@ -222,7 +223,7 @@ const FeaturedArtistsPage: React.FC = () => {
 
           <button
             onClick={() => navigate('/feedback?type=music')}
-            className="bg-[#ff6600] text-white px-10 py-6 text-[10px] font-medium uppercase tracking-[0.4em] hover:bg-black transition-all shadow-xl active:scale-95 whitespace-nowrap flex items-center space-x-3"
+            className="bg-[#ff6600] text-white px-10 py-5 rounded-xl text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20 active:scale-95 whitespace-nowrap flex items-center space-x-3"
           >
             <span>Upload Your Track</span>
 
