@@ -1,4 +1,4 @@
-
+import SportsNews from '../components/SportsNews'
 import { Link, useParams } from 'react-router-dom'
 import LatestSportsScores from '../components/LatestSportsScores'
 
@@ -56,6 +56,11 @@ export default function SportsLeaguePage() {
         <p className="mt-3 text-sm text-white/50">
           Scores show the latest finalized games provided by our sports API.
         </p>
+      </section>
+
+      <section>
+        <h2 className="mb-3 text-xl font-bold">Latest news</h2>
+        <SportsNews />
       </section>
     </main>
   )
