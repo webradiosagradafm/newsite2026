@@ -34,6 +34,7 @@ import TermsOfUsePage from './pages/TermsOfUsePage'
 import CookiesPolicyPage from './pages/CookiesPolicyPage'
 import { SCHEDULES } from './constants'
 import { Program } from './types'
+import SportsIndex from './pages/SportsIndex'
 
 const DEFAULT_COVER = '/icon-512.png'
 const STREAM_URL = 'https://stream.zeno.fm/vku09lx2rkntv'
@@ -796,6 +797,7 @@ const AppContent: React.FC = () => {
             <Route path="/terms" element={<TermsOfUsePage />} />
             <Route path="/cookies" element={<CookiesPolicyPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/sports" element={<SportsIndex />} />
           </Routes>
         </main>
 
