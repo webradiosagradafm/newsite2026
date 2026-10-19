@@ -1,68 +1,117 @@
+
 import { useEffect } from 'react'
 
 interface SEOProps {
   title: string
   description: string
   url?: string
+  image?: string
   jsonLd?: Record<string, unknown>
 }
+
+const SITE_URL = 'https://praisefmradio.vercel.app'
+const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`
 
 export default function SEO({
   title,
   description,
   url,
+  image = DEFAULT_IMAGE,
   jsonLd,
 }: SEOProps) {
   useEffect(() => {
     document.title = title
 
-    let descriptionTag = document.querySelector(
-      'meta[name="description"]'
-    )
-    if (!descriptionTag) {
-      descriptionTag = document.createElement('meta')
-      descriptionTag.setAttribute('name', 'description')
-      document.head.appendChild(descriptionTag)
-    }
-    descriptionTag.setAttribute('content', description)
+    const absoluteUrl = url
+      ? new URL(url, SITE_URL).href
+      : undefined
 
-    let canonicalTag = document.querySelector(
-      'link[rel="canonical"]'
-    )
-    if (url) {
-      if (!canonicalTag) {
-        canonicalTag = document.createElement('link')
-        canonicalTag.setAttribute('rel', 'canonical')
-        document.head.appendChild(canonicalTag)
-      }
-      canonicalTag.setAttribute('href', url)
-    }
+    const absoluteImage = new URL(image, SITE_URL).href
 
     const setMeta = (
-      property: string,
+      selector: string,
+      attribute: 'name' | 'property',
+      key: string,
       content: string
     ) => {
-      let tag = document.querySelector(
-        `meta[property="${property}"]`
-      )
+      let tag = document.head.querySelector<HTMLMetaElement>(selector)
+
       if (!tag) {
         tag = document.createElement('meta')
-        tag.setAttribute('property', property)
+        tag.setAttribute(attribute, key)
         document.head.appendChild(tag)
       }
-      tag.setAttribute('content', content)
+
+      tag.content = content
     }
 
-    setMeta('og:title', title)
-    setMeta('og:description', description)
-    setMeta('og:type', 'website')
-    if (url) {
-      setMeta('og:url', url)
+    const setLink = (rel: string, href: string) => {
+      let tag = document.head.querySelector<HTMLLinkElement>(
+        `link[rel="${rel}"]`
+      )
+
+      if (!tag) {
+        tag = document.createElement('link')
+        tag.rel = rel
+        document.head.appendChild(tag)
+      }
+
+      tag.href = href
     }
 
-    // JSON-LD (Schema.org)
-    // Usa um id fixo para poder localizar e atualizar/remover
-    // a tag em re-renders, em vez de duplicar scripts.
+    setMeta(
+      'meta[name="description"]',
+      'name',
+      'description',
+      description
+    )
+
+    setMeta('meta[property="og:title"]', 'property', 'og:title', title)
+    setMeta(
+      'meta[property="og:description"]',
+      'property',
+      'og:description',
+      description
+    )
+    setMeta('meta[property="og:type"]', 'property', 'og:type', 'website')
+    setMeta(
+      'meta[property="og:site_name"]',
+      'property',
+      'og:site_name',
+      'Praise FM USA'
+    )
+    setMeta(
+      'meta[property="og:image"]',
+      'property',
+      'og:image',
+      absoluteImage
+    )
+
+    setMeta(
+      'meta[name="twitter:card"]',
+      'name',
+      'twitter:card',
+      'summary_large_image'
+    )
+    setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', title)
+    setMeta(
+      'meta[name="twitter:description"]',
+      'name',
+      'twitter:description',
+      description
+    )
+    setMeta(
+      'meta[name="twitter:image"]',
+      'name',
+      'twitter:image',
+      absoluteImage
+    )
+
+    if (absoluteUrl) {
+      setLink('canonical', absoluteUrl)
+      setMeta('meta[property="og:url"]', 'property', 'og:url', absoluteUrl)
+    }
+
     const scriptId = 'seo-jsonld'
     let scriptTag = document.getElementById(
       scriptId
@@ -75,14 +124,12 @@ export default function SEO({
         scriptTag.type = 'application/ld+json'
         document.head.appendChild(scriptTag)
       }
+
       scriptTag.textContent = JSON.stringify(jsonLd)
-    } else if (scriptTag) {
-      // Se a página não passar jsonLd, remove qualquer
-      // script deixado por uma página anterior (evita que
-      // o JSON-LD errado "vaze" entre rotas no SPA).
-      scriptTag.remove()
+    } else {
+      scriptTag?.remove()
     }
-  }, [title, description, url, jsonLd])
+  }, [title, description, url, image, jsonLd])
 
   return null
 }
