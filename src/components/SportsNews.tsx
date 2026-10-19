@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 type Story = {
   title: string
@@ -19,45 +19,45 @@ export default function SportsNews({ league }: SportsNewsProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
-  useEffect(() => {
-    let active = true
-
+  const loadNews = useCallback(async (signal?: AbortSignal) => {
     setLoading(true)
     setError(false)
 
-    fetch('/api/sports-news')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('News unavailable')
-        }
-        return response.json()
-      })
-      .then((data) => {
-        if (!active) return
-
-        const stories: Story[] = Array.isArray(data.news)
-          ? data.news
-          : []
-
-        const filteredStories = league
-          ? stories.filter(
-              (story) => story.league?.toUpperCase() === league
-            )
-          : stories
-
-        setNews(filteredStories)
-      })
-      .catch(() => {
-        if (active) setError(true)
-      })
-      .finally(() => {
-        if (active) setLoading(false)
+    try {
+      const response = await fetch('/api/sports-news', {
+        cache: 'no-store',
+        signal,
       })
 
-    return () => {
-      active = false
+      if (!response.ok) {
+        throw new Error(`News request failed: ${response.status}`)
+      }
+
+      const data = await response.json()
+      const stories: Story[] = Array.isArray(data.news) ? data.news : []
+
+      const filtered = league
+        ? stories.filter(
+            (story) => story.league?.toUpperCase() === league
+          )
+        : stories
+
+      setNews(filtered)
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return
+      setError(true)
+    } finally {
+      if (!signal?.aborted) setLoading(false)
     }
   }, [league])
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    void loadNews(controller.signal)
+
+    return () => controller.abort()
+  }, [loadNews])
 
   const formatDate = (date: string) => {
     if (!date || Number.isNaN(Date.parse(date))) return ''
@@ -66,7 +66,7 @@ export default function SportsNews({ league }: SportsNewsProps) {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
-      timeZone: 'UTC'
+      timeZone: 'UTC',
     })
   }
 
@@ -95,36 +95,12 @@ export default function SportsNews({ league }: SportsNewsProps) {
       {!loading && error && (
         <div className="rounded-xl border border-white/10 bg-white/[0.04] p-6">
           <p className="text-gray-300">
-            News is temporarily unavailable.
+            News could not be loaded.
           </p>
+
           <button
             type="button"
-            onClick={() => {
-              setError(false)
-              setLoading(true)
-
-              fetch('/api/sports-news')
-                .then((response) => {
-                  if (!response.ok) throw new Error('News unavailable')
-                  return response.json()
-                })
-                .then((data) => {
-                  const stories: Story[] = Array.isArray(data.news)
-                    ? data.news
-                    : []
-
-                  setNews(
-                    league
-                      ? stories.filter(
-                          (story) =>
-                            story.league?.toUpperCase() === league
-                        )
-                      : stories
-                  )
-                })
-                .catch(() => setError(true))
-                .finally(() => setLoading(false))
-            }}
+            onClick={() => void loadNews()}
             className="mt-3 font-bold text-orange-400 hover:text-orange-300"
           >
             Try again
