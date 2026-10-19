@@ -1,20 +1,31 @@
+
 import React, { useState } from 'react'
-import { Home, Music, Radio, Menu, Calendar, X, Ticket } from 'lucide-react'
+import {
+  Home,
+  Music,
+  Radio,
+  Menu,
+  Calendar,
+  X,
+  Ticket,
+  Trophy
+} from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 interface NavbarProps {
   activeTab: string
-  // Props mantidas só por compatibilidade; o menu agora é sempre "vidro"
+  // Props mantidas por compatibilidade
   theme?: 'light' | 'dark'
   onToggleTheme?: () => void
   glass?: boolean
-  // Cor de destaque do item ativo (padrão: laranja da marca)
+  // Cor de destaque do item ativo
   programColor?: string
 }
 
 const navItems = [
   { id: 'home', label: 'Home', icon: Home, path: '/' },
   { id: 'music', label: 'Music', icon: Music, path: '/music' },
+  { id: 'sports', label: 'Sports', icon: Trophy, path: '/sports' },
   { id: 'schedule', label: 'Schedule', icon: Calendar, path: '/schedule' },
   { id: 'devotional', label: 'Devotional', icon: Radio, path: '/devotional' }
 ]
@@ -24,7 +35,9 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, programColor }) => {
   const navigate = useNavigate()
 
   const accent =
-    programColor && programColor !== 'transparent' ? programColor : '#ff6600'
+    programColor && programColor !== 'transparent'
+      ? programColor
+      : '#ff6600'
 
   return (
     <>
@@ -34,6 +47,14 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, programColor }) => {
             <div
               className="flex items-center cursor-pointer h-full"
               onClick={() => navigate('/')}
+              role="button"
+              tabIndex={0}
+              aria-label="Go to Praise FM USA home"
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  navigate('/')
+                }
+              }}
             >
               <img
                 src="https://res.cloudinary.com/dtecypmsh/image/upload/v1769820657/logo_hochsa.webp"
@@ -42,7 +63,10 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, programColor }) => {
               />
             </div>
 
-            <nav className="hidden md:flex items-center space-x-6 h-full">
+            <nav
+              className="hidden md:flex items-center space-x-6 h-full"
+              aria-label="Main navigation"
+            >
               {navItems.map((item) => {
                 const Icon = item.icon
                 const isActive = activeTab === item.id
@@ -51,7 +75,10 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, programColor }) => {
                   <button
                     key={item.id}
                     onClick={() => navigate(item.path)}
-                    style={{ borderColor: isActive ? accent : 'transparent' }}
+                    aria-current={isActive ? 'page' : undefined}
+                    style={{
+                      borderColor: isActive ? accent : 'transparent'
+                    }}
                     className={`flex items-center space-x-2 text-[14px] font-medium transition-all h-full border-b-2 px-1 uppercase tracking-tighter ${
                       isActive
                         ? 'text-white'
@@ -77,6 +104,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, programColor }) => {
               className="p-2 md:hidden text-white"
               aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-navigation"
             >
               {isMobileMenuOpen ? (
                 <X className="w-5 h-5" />
@@ -89,12 +117,18 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, programColor }) => {
       </header>
 
       {/*
-        O menu mobile fica FORA do <header>: backdrop-filter num elemento pai
-        faz o filho "fixed" posicionar em relação a ele, quebrando o overlay.
+        O menu mobile fica fora do header para preservar
+        o posicionamento correto do overlay.
       */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 top-16 z-40 md:hidden p-6 overflow-y-auto bg-black/70 backdrop-blur-xl">
-          <nav className="flex flex-col space-y-4">
+        <div
+          id="mobile-navigation"
+          className="fixed inset-0 top-16 z-40 md:hidden p-6 overflow-y-auto bg-black/70 backdrop-blur-xl"
+        >
+          <nav
+            className="flex flex-col space-y-4"
+            aria-label="Mobile navigation"
+          >
             {navItems.map((item) => {
               const Icon = item.icon
               const isActive = activeTab === item.id
@@ -106,14 +140,19 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, programColor }) => {
                     navigate(item.path)
                     setIsMobileMenuOpen(false)
                   }}
+                  aria-current={isActive ? 'page' : undefined}
                   style={
-                    isActive ? { borderLeft: `3px solid ${accent}` } : undefined
+                    isActive
+                      ? { borderLeft: `3px solid ${accent}` }
+                      : undefined
                   }
                   className={`flex items-center space-x-4 p-4 rounded-xl text-lg font-medium uppercase tracking-tighter transition-colors hover:bg-white/10 ${
-                    isActive ? 'text-white bg-white/10' : 'text-white/80'
+                    isActive
+                      ? 'text-white bg-white/10'
+                      : 'text-white/80'
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className="w-5 h-5" strokeWidth={1.5} />
                   <span>{item.label}</span>
                 </button>
               )
