@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   ArrowLeft,
   Calendar,
@@ -132,18 +132,40 @@ const getTrackTime = (track: LiveMetadata) => {
   })
 }
 
-const getTrackImage = (artist: string, title: string) => {
+// Imagem de reserva, usada enquanto a capa real carrega ou se não for encontrada
+const getFallbackImage = (artist: string, title: string) => {
   return `https://picsum.photos/seed/${encodeURIComponent(
     `${artist}-${title}`
   )}/160/160`
+}
+
+// Cache das capas: evita buscar a mesma música de novo ao navegar entre páginas
+const coverCache = new Map<string, string>()
+
+const trackKey = (artist: string, title: string) =>
+  `${artist}-${title}`.toLowerCase()
+
+const fetchCover = async (artist: string, title: string): Promise<string | null> => {
+  try {
+    const q = encodeURIComponent(`${artist} ${title}`)
+    const res = await fetch(
+      `https://itunes.apple.com/search?term=${q}&media=music&entity=song&limit=1`
+    )
+    if (!res.ok) return null
+
+    const data = await res.json()
+    const art: string | undefined = data.results?.[0]?.artworkUrl100
+
+    return art ? art.replace('100x100', '200x200') : null
+  } catch {
+    return null
+  }
 }
 
 const ProgramDetail: React.FC<ProgramDetailProps> = ({
   program,
   onBack,
   onViewSchedule,
-  onListenClick,
-  isPlaying,
   liveMetadata,
   trackHistory = []
 }) => {
@@ -173,25 +195,29 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
     return list.slice(0, 15)
   }, [liveMetadata, trackHistory])
 
+  const glassCard =
+    'bg-white/5 backdrop-blur border border-white/10 rounded-3xl'
+
   return (
-    <div className="min-h-[100dvh] bg-white dark:bg-[#0f0f0f] text-gray-950 dark:text-white">
-      <section className="relative overflow-hidden border-b border-black/10 dark:border-white/10">
+    // Sem fundo próprio: o fundo ambiente do App aparece por trás
+    <div className="min-h-[100dvh] text-white">
+      <section className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0">
           <img
             src={programImage}
-            alt={program.title}
+            alt=""
             className="w-full h-full object-cover opacity-20 blur-2xl scale-110"
             onError={(e) => {
               e.currentTarget.src = DEFAULT_COVER
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white to-white dark:from-black/50 dark:via-[#0f0f0f] dark:to-[#0f0f0f]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 md:px-6 pt-8 pb-12 md:pb-16">
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-orange-500 transition mb-8"
+            className="inline-flex items-center gap-2 text-sm font-bold text-white/60 hover:text-orange-500 transition mb-8"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -199,7 +225,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
 
           <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-8 lg:gap-12 items-center">
             <div className="relative">
-              <div className="aspect-square rounded-[2rem] overflow-hidden bg-gray-200 dark:bg-[#1a1a1a] shadow-2xl">
+              <div className="aspect-square rounded-[2rem] overflow-hidden bg-black/30 border border-white/10 shadow-2xl">
                 <img
                   src={programImage}
                   alt={program.title}
@@ -210,7 +236,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
                 />
               </div>
 
-              <div className="absolute -bottom-5 left-6 bg-black text-white dark:bg-white dark:text-black px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3">
+              <div className="absolute -bottom-5 left-6 bg-black/70 backdrop-blur-md border border-white/10 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3">
                 <Radio className="w-5 h-5 text-orange-500" />
                 <span className="text-xs font-black uppercase tracking-widest">
                   {isLive ? 'Live Now' : 'On Demand'}
@@ -224,7 +250,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
                   {isLive ? 'Live' : 'Program'}
                 </span>
 
-                <span className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm font-semibold">
+                <span className="inline-flex items-center gap-2 text-white/60 text-sm font-semibold">
                   <Clock className="w-4 h-4" />
                   {formatRangeToAmPm(program.startTime, program.endTime)}
                 </span>
@@ -234,18 +260,18 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
                 {program.title}
               </h1>
 
-              <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl leading-relaxed mb-6">
+              <p className="text-lg md:text-xl text-white/70 max-w-3xl leading-relaxed mb-6">
                 {program.description}
               </p>
 
               <div className="flex flex-wrap items-center gap-4 mb-8">
-                <div className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                <div className="inline-flex items-center gap-2 text-white/70">
                   <UserRound className="w-5 h-5 text-orange-500" />
                   <span className="font-bold">{program.host || 'Praise FM'}</span>
                 </div>
 
                 {liveMetadata?.artist && (
-                  <div className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                  <div className="inline-flex items-center gap-2 text-white/70">
                     <Headphones className="w-5 h-5 text-orange-500" />
                     <span className="font-bold">{liveMetadata.artist}</span>
                   </div>
@@ -253,10 +279,9 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
               </div>
 
               <div className="flex flex-wrap gap-3">
-                {/* Botão de Schedule mantido e centralizado */}
                 <button
                   onClick={onViewSchedule}
-                  className="inline-flex items-center justify-center gap-3 bg-gray-100 hover:bg-gray-200 dark:bg-[#1b1b1b] dark:hover:bg-[#252525] px-8 py-4 rounded-2xl font-black text-lg transition"
+                  className="inline-flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 px-8 py-4 rounded-2xl font-black text-lg transition active:scale-95"
                 >
                   <Calendar className="w-5 h-5 text-orange-500" />
                   Schedule
@@ -270,7 +295,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
       <section className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-14">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8">
           <div className="space-y-8">
-            <div className="bg-gray-100 dark:bg-[#171717] rounded-[2rem] p-6 md:p-8 border border-black/5 dark:border-white/5">
+            <div className={`${glassCard} p-6 md:p-8`}>
               <div className="flex items-center justify-between gap-4 mb-6">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.25em] text-orange-500 mb-2">
@@ -282,13 +307,13 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
                 </div>
               </div>
 
-              <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
+              <p className="text-white/70 text-lg leading-relaxed">
                 {program.description}
               </p>
             </div>
 
-            <div className="bg-gray-100 dark:bg-[#171717] rounded-[2rem] overflow-hidden border border-black/5 dark:border-white/5">
-              <div className="p-6 md:p-8 border-b border-black/5 dark:border-white/10 flex items-center justify-between">
+            <div className={`${glassCard} overflow-hidden`}>
+              <div className="p-6 md:p-8 border-b border-white/10 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.25em] text-orange-500 mb-2">
                     Recently
@@ -302,7 +327,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
               </div>
 
               {tracks.length > 0 ? (
-                <div className="divide-y divide-black/5 dark:divide-white/10">
+                <div className="divide-y divide-white/10">
                   {tracks.map((track, index) => {
                     const isCurrent =
                       liveMetadata?.artist?.toLowerCase() === track.artist?.toLowerCase() &&
@@ -312,14 +337,12 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
                       <div
                         key={`${track.artist}-${track.title}-${index}`}
                         className={`flex items-center gap-4 p-4 md:p-5 transition ${
-                          isCurrent
-                            ? 'bg-orange-500/10'
-                            : 'hover:bg-white/70 dark:hover:bg-white/5'
+                          isCurrent ? 'bg-orange-500/10' : 'hover:bg-white/5'
                         }`}
                       >
-                        <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl overflow-hidden bg-gray-300 dark:bg-[#222] flex-shrink-0">
+                        <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl overflow-hidden bg-black/30 flex-shrink-0">
                           <img
-                            src={getTrackImage(track.artist, track.title)}
+                            src={getFallbackImage(track.artist, track.title)}
                             alt=""
                             className="w-full h-full object-cover"
                           />
@@ -338,12 +361,12 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
                             {track.title}
                           </h3>
 
-                          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                          <p className="text-sm text-white/60 truncate">
                             {track.artist}
                           </p>
                         </div>
 
-                        <div className="hidden sm:block text-right text-xs font-bold text-gray-400 uppercase tracking-widest">
+                        <div className="hidden sm:block text-right text-xs font-bold text-white/40 uppercase tracking-widest">
                           {getTrackTime(track)}
                         </div>
                       </div>
@@ -352,7 +375,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
                 </div>
               ) : (
                 <div className="p-10 md:p-14 text-center">
-                  <div className="w-16 h-16 rounded-full bg-white dark:bg-[#222] mx-auto mb-5 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full bg-white/10 mx-auto mb-5 flex items-center justify-center">
                     <Music className="w-7 h-7 text-orange-500" />
                   </div>
 
@@ -360,7 +383,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
                     No tracks yet
                   </h3>
 
-                  <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                  <p className="text-white/60 max-w-md mx-auto">
                     Keep listening — tracks played on Praise FM will appear here.
                   </p>
                 </div>
@@ -369,13 +392,13 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
           </div>
 
           <aside className="space-y-6">
-            <div className="bg-gray-100 dark:bg-[#171717] rounded-[2rem] p-6 border border-black/5 dark:border-white/5">
+            <div className={`${glassCard} p-6`}>
               <p className="text-xs font-black uppercase tracking-[0.25em] text-orange-500 mb-4">
                 Host
               </p>
 
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl overflow-hidden bg-gray-300 dark:bg-[#222]">
+                <div className="w-16 h-16 rounded-2xl overflow-hidden bg-black/30">
                   <img
                     src={programImage}
                     alt={program.host || program.title}
@@ -387,14 +410,14 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
                   <h3 className="text-xl font-black leading-tight">
                     {program.host || 'Praise FM'}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-white/60">
                     Presenter
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gray-100 dark:bg-[#171717] rounded-[2rem] p-6 border border-black/5 dark:border-white/5">
+            <div className={`${glassCard} p-6`}>
               <p className="text-xs font-black uppercase tracking-[0.25em] text-orange-500 mb-4">
                 Coming Up
               </p>
@@ -405,22 +428,22 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
                     {nextProgram.title}
                   </h3>
 
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  <p className="text-sm text-white/60 mb-4">
                     {nextProgram.host}
                   </p>
 
-                  <div className="inline-flex items-center gap-2 bg-white dark:bg-[#222] px-4 py-2 rounded-full text-sm font-black">
+                  <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full text-sm font-black">
                     <Clock className="w-4 h-4 text-orange-500" />
                     {formatToAmPm(nextProgram.startTime)}
                   </div>
                 </div>
               ) : (
-                <p className="text-gray-500">End of schedule</p>
+                <p className="text-white/60">End of schedule</p>
               )}
             </div>
 
-            <div className="bg-orange-500 rounded-[2rem] p-6 text-white">
-              <p className="text-xs font-black uppercase tracking-[0.25em] opacity-80 mb-4">
+            <div className="bg-orange-500/10 backdrop-blur border border-orange-500/60 rounded-3xl p-6 text-white">
+              <p className="text-xs font-black uppercase tracking-[0.25em] text-orange-400 mb-4">
                 Live Radio
               </p>
 
@@ -428,7 +451,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({
                 Praise FM USA
               </h3>
 
-              <p className="text-white/85 text-sm leading-relaxed">
+              <p className="text-white/80 text-sm leading-relaxed">
                 Worship, gospel, Christian hits and inspiring moments streaming 24/7 worldwide.
               </p>
             </div>
