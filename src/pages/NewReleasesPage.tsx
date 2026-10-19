@@ -3,7 +3,6 @@ import {
   Play, Pause, Zap, Flame, Heart,
   Loader2, RefreshCw, ExternalLink
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 interface Release {
   id: string;
@@ -79,7 +78,7 @@ const ReleaseCard: React.FC<CardProps> = ({
   const isPlaying = activePreview === release.id;
 
   return (
-    <div className="bg-white dark:bg-[#111] group relative">
+    <div className="bg-white/5 backdrop-blur border border-white/10 hover:border-[#ff6600]/60 rounded-2xl overflow-hidden group relative transition-colors">
       <div className="aspect-square relative overflow-hidden">
         {release.image ? (
           <img
@@ -92,7 +91,7 @@ const ReleaseCard: React.FC<CardProps> = ({
             }}
           />
         ) : (
-          <div className="w-full h-full bg-gray-900 flex items-center justify-center">
+          <div className="w-full h-full bg-black/40 flex items-center justify-center">
             <span className="text-white/20 text-6xl font-black uppercase tracking-tighter">
               {release.artist.charAt(0)}
             </span>
@@ -102,14 +101,14 @@ const ReleaseCard: React.FC<CardProps> = ({
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all" />
 
         {isNew(release.releaseDate) && (
-          <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 flex items-center space-x-1">
+          <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full flex items-center space-x-1">
             <Zap className="w-3 h-3 fill-current" />
             <span className="text-[9px] font-black uppercase tracking-widest">New</span>
           </div>
         )}
 
         {release.isHot && !isNew(release.releaseDate) && (
-          <div className="absolute top-4 left-4 bg-[#ff6600] text-white px-3 py-1 flex items-center space-x-1">
+          <div className="absolute top-4 left-4 bg-[#ff6600] text-white px-3 py-1 rounded-full flex items-center space-x-1">
             <Flame className="w-3 h-3 fill-current" />
             <span className="text-[9px] font-black uppercase tracking-widest">Hot</span>
           </div>
@@ -155,17 +154,17 @@ const ReleaseCard: React.FC<CardProps> = ({
             {release.artist}
           </p>
 
-          <h4 className="text-white text-lg font-medium uppercase tracking-tight truncate">
+          <h4 className="text-white text-lg font-bold uppercase tracking-tight truncate">
             {release.title}
           </h4>
         </div>
       </div>
 
       <div className="p-6 group-hover:bg-[#ff6600] transition-colors duration-500">
-        <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-1 group-hover:text-black/60 truncate">
+        <p className="text-white/50 text-[10px] font-black uppercase tracking-[0.2em] mb-1 group-hover:text-black/60 truncate">
           {release.artist}
         </p>
-        <h4 className="text-black dark:text-white text-xl font-medium uppercase tracking-tighter truncate group-hover:text-black">
+        <h4 className="text-white text-xl font-bold uppercase tracking-tighter truncate group-hover:text-black">
           {release.title}
         </h4>
       </div>
@@ -179,8 +178,6 @@ const NewReleasesPage: React.FC = () => {
   const [error, setError] = useState(false);
   const [activePreview, setActivePreview] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  const navigate = useNavigate();
 
   const load = async () => {
     setLoading(true);
@@ -209,6 +206,13 @@ const NewReleasesPage: React.FC = () => {
     load();
   }, []);
 
+  // Para a prévia ao sair da página
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause();
+    };
+  }, []);
+
   const togglePlay = (id: string, url: string) => {
     if (!url || !audioRef.current) return;
 
@@ -225,19 +229,19 @@ const NewReleasesPage: React.FC = () => {
   const handleFavorite = (e: React.MouseEvent, _release: Release) => {
     e.stopPropagation();
 
-
-    // Favoritos ainda não implementados no AuthContext atual.
+    // Favoritos ainda não implementados.
   };
 
   const main = releases[0];
   const rest = releases.slice(1);
 
   return (
-    <div className="bg-white dark:bg-[#000] min-h-screen transition-colors duration-300">
+    // Sem fundo próprio: o fundo ambiente do App aparece por trás
+    <div className="min-h-screen text-white">
       <audio ref={audioRef} onEnded={() => setActivePreview(null)} />
 
-      <div className="bg-black text-white relative overflow-hidden h-[70vh] flex items-center">
-        <div className="absolute inset-0 opacity-40">
+      <div className="relative overflow-hidden min-h-[60vh] flex items-center py-16 border-b border-white/10">
+        <div className="absolute inset-0 opacity-30">
           {main && (
             <img
               src={main.image}
@@ -251,27 +255,27 @@ const NewReleasesPage: React.FC = () => {
           )}
         </div>
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
 
         <div className="max-w-7xl mx-auto px-4 relative z-10 w-full">
-          <div className="inline-flex items-center space-x-2 bg-[#ff6600] text-black px-4 py-1.5 mb-8">
+          <div className="inline-flex items-center space-x-2 bg-[#ff6600] text-white rounded-full px-4 py-1.5 mb-8">
             <Zap className="w-4 h-4 fill-current" />
             <span className="text-[10px] font-black uppercase tracking-[0.2em]">
               #1 Gospel Right Now
             </span>
           </div>
 
-          <h1 className="text-7xl md:text-[9rem] font-medium uppercase tracking-tighter leading-[0.85] mb-8">
+          <h1 className="text-6xl md:text-[8rem] font-black uppercase tracking-tighter leading-[0.85] mb-8">
             The New<br />Wave
           </h1>
 
           {main && (
-            <div className="flex flex-col md:flex-row md:items-end gap-10">
+            <div className="flex flex-col md:flex-row md:items-end gap-8 md:gap-10">
               <div>
-                <p className="text-[#ff6600] text-lg font-medium uppercase tracking-widest mb-2">
+                <p className="text-[#ff6600] text-lg font-bold uppercase tracking-widest mb-2">
                   {main.artist}
                 </p>
-                <h2 className="text-4xl md:text-5xl font-medium uppercase tracking-tight">
+                <h2 className="text-3xl md:text-5xl font-bold uppercase tracking-tight">
                   {main.title}
                 </h2>
               </div>
@@ -291,13 +295,13 @@ const NewReleasesPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-24">
-        <div className="flex flex-col md:flex-row items-center justify-between mb-16 border-b-2 border-black dark:border-white pb-8">
-          <div className="flex items-center space-x-4 mb-6 md:mb-0">
-            <h3 className="text-4xl font-medium uppercase tracking-tighter dark:text-white">
+      <div className="max-w-7xl mx-auto px-4 py-12 md:py-20">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-10 md:mb-14 border-b border-white/10 pb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:space-x-4 mb-6 md:mb-0 text-center md:text-left">
+            <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white">
               Top Gospel Right Now
             </h3>
-            <span className="text-gray-400 text-sm uppercase tracking-widest pt-1">
+            <span className="text-white/50 text-sm uppercase tracking-widest md:pt-1">
               iTunes Charts · US
             </span>
           </div>
@@ -305,7 +309,7 @@ const NewReleasesPage: React.FC = () => {
           <button
             onClick={load}
             disabled={loading}
-            className="flex items-center space-x-2 bg-transparent text-gray-400 px-4 py-2 text-[10px] font-black uppercase tracking-widest border border-gray-200 dark:border-white/10 hover:border-[#ff6600] hover:text-[#ff6600] transition-colors disabled:opacity-40"
+            className="flex items-center space-x-2 bg-white/5 text-white/70 rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest border border-white/10 hover:border-[#ff6600] hover:text-[#ff6600] transition-colors disabled:opacity-40"
           >
             <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
@@ -313,22 +317,22 @@ const NewReleasesPage: React.FC = () => {
         </div>
 
         {loading && (
-          <div className="flex flex-col items-center justify-center py-40">
+          <div className="flex flex-col items-center justify-center py-32">
             <Loader2 className="w-12 h-12 text-[#ff6600] animate-spin mb-4" />
-            <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-gray-400">
+            <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/50">
               Loading from iTunes...
             </p>
           </div>
         )}
 
         {error && !loading && (
-          <div className="text-center py-40">
-            <p className="text-gray-400 mb-4 text-sm uppercase tracking-widest">
+          <div className="text-center py-32">
+            <p className="text-white/60 mb-4 text-sm uppercase tracking-widest">
               Could not load releases.
             </p>
             <button
               onClick={load}
-              className="bg-[#ff6600] text-white px-6 py-2 text-[10px] font-black uppercase tracking-widest"
+              className="bg-[#ff6600] hover:bg-orange-600 text-white rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-colors"
             >
               Try Again
             </button>
@@ -336,7 +340,7 @@ const NewReleasesPage: React.FC = () => {
         )}
 
         {!loading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-100 dark:bg-white/5 border border-gray-100 dark:border-white/5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {rest.map((release) => (
               <ReleaseCard
                 key={release.id}
@@ -351,15 +355,15 @@ const NewReleasesPage: React.FC = () => {
         )}
 
         {!loading && !error && (
-          <div className="mt-32 border-t border-gray-100 dark:border-white/10 pt-16 flex flex-col md:flex-row items-start gap-20">
+          <div className="mt-16 md:mt-24 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-start gap-10 md:gap-16">
             <div className="w-full md:w-1/3">
               <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#ff6600] mb-6">
                 About This Chart
               </h4>
-              <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed uppercase tracking-tight mb-4">
+              <p className="text-white/60 text-sm leading-relaxed uppercase tracking-tight mb-4">
                 Real-time Gospel & Christian music chart pulled directly from iTunes US. Updated daily. No editorial bias — just what listeners are playing right now.
               </p>
-              <div className="flex items-center space-x-2 text-[9px] font-medium uppercase tracking-widest text-gray-400">
+              <div className="flex items-center space-x-2 text-[9px] font-medium uppercase tracking-widest text-white/50">
                 <RefreshCw className="w-3 h-3" />
                 <span>Powered by iTunes RSS · Updated daily</span>
               </div>
@@ -373,8 +377,8 @@ const NewReleasesPage: React.FC = () => {
                 { v: '24/7', l: 'Global Discovery' },
               ].map(({ v, l }) => (
                 <div key={l} className="space-y-2">
-                  <p className="text-3xl font-medium uppercase tracking-tighter dark:text-white">{v}</p>
-                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{l}</p>
+                  <p className="text-3xl font-black uppercase tracking-tighter text-white">{v}</p>
+                  <p className="text-[9px] font-black text-white/50 uppercase tracking-widest">{l}</p>
                 </div>
               ))}
             </div>
