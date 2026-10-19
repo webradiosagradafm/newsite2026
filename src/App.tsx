@@ -7,7 +7,7 @@ import {
   useLocation,
   useNavigate
 } from 'react-router-dom'
-import { Play, Pause, Megaphone } from 'lucide-react'
+import { Play, Pause } from 'lucide-react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import { Analytics } from '@vercel/analytics/react'
 import Navbar from './components/Navbar'
@@ -36,13 +36,16 @@ import TermsOfUsePage from './pages/TermsOfUsePage'
 import CookiesPolicyPage from './pages/CookiesPolicyPage'
 import { SCHEDULES } from './constants'
 import { Program } from './types'
+
 const DEFAULT_COVER = '/icon-512.png'
 const STREAM_URL = 'https://stream.zeno.fm/vku09lx2rkntv'
 const METADATA_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/vku09lx2rkntv'
+
 // Tempo máximo (ms) sem sinal de vida do áudio antes de considerarmos
 // que a conexão travou e precisamos reconectar.
 const STALL_RECONNECT_DELAY = 8000
 const MAX_RETRY_DELAY = 30000
+
 const BLOCKED_METADATA_KEYWORDS = [
   'praise fm',
   'praisefm',
@@ -58,12 +61,14 @@ const BLOCKED_METADATA_KEYWORDS = [
   'jingle',
   'bumper'
 ]
+
 interface LiveMetadata {
   artist: string
   title: string
   playedAt?: Date
   isMusic?: boolean
 }
+
 // Helper central pra atualizar o Media Session — usado tanto na
 // criação do áudio quanto sempre que a metadata (faixa tocando) muda.
 // É essencial pro Chrome/Android saber que existe uma sessão de mídia
@@ -76,11 +81,10 @@ const updateMediaSessionMetadata = (title: string, artist: string) => {
     title,
     artist,
     album: 'Praise FM USA',
-    artwork: [
-      { src: '/icon-512.png', sizes: '512x512', type: 'image/png' }
-    ]
+    artwork: [{ src: '/icon-512.png', sizes: '512x512', type: 'image/png' }]
   })
 }
+
 const formatToAmPm = (time?: string) => {
   if (!time) return ''
   const [hourRaw, minuteRaw] = time.split(':').map(Number)
@@ -89,10 +93,12 @@ const formatToAmPm = (time?: string) => {
   const period = hourRaw >= 12 ? 'PM' : 'AM'
   return `${hour}:${minute} ${period}`
 }
+
 const formatRangeToAmPm = (start?: string, end?: string) => {
   if (!start || !end) return '24/7'
   return `${formatToAmPm(start)} - ${formatToAmPm(end)}`
 }
+
 const getChicagoDayAndTotalMinutes = () => {
   const now = new Date()
   const formatter = new Intl.DateTimeFormat('en-US', {
@@ -102,10 +108,12 @@ const getChicagoDayAndTotalMinutes = () => {
     minute: '2-digit',
     hour12: false
   })
+
   const parts = formatter.formatToParts(now)
   const weekday = parts.find((p) => p.type === 'weekday')?.value || 'Mon'
   const hour = Number(parts.find((p) => p.type === 'hour')?.value || 0)
   const minute = Number(parts.find((p) => p.type === 'minute')?.value || 0)
+
   const dayMap: Record<string, number> = {
     Sun: 0,
     Mon: 1,
@@ -115,23 +123,30 @@ const getChicagoDayAndTotalMinutes = () => {
     Fri: 5,
     Sat: 6
   }
+
   return {
     day: dayMap[weekday] ?? 1,
     total: hour * 60 + minute
   }
 }
+
 const getProgramProgress = (program?: Program) => {
   if (!program) return 0
+
   const { total } = getChicagoDayAndTotalMinutes()
   const [sH, sM] = program.startTime.split(':').map(Number)
   const [eH, eM] = program.endTime.split(':').map(Number)
+
   const start = sH * 60 + sM
   let end = eH * 60 + eM
   if (end === 0 || end <= start) end = 24 * 60
+
   if (total <= start) return 0
   if (total >= end) return 100
+
   return Math.round(((total - start) / (end - start)) * 100)
 }
+
 const getProgramImage = (program?: Program) => {
   const p = program as any
   return (
@@ -142,13 +157,17 @@ const getProgramImage = (program?: Program) => {
     DEFAULT_COVER
   )
 }
+
 const ScrollToTop = () => {
   const { pathname } = useLocation()
+
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [pathname])
+
   return null
 }
+
 const HomeBBC = ({
   isPlaying,
   liveMetadata,
@@ -166,17 +185,19 @@ const HomeBBC = ({
   onNavigateToProgram: (program: Program) => void
   trackHistory: LiveMetadata[]
 }) => {
-  const navigate = useNavigate()
   const nextOne = queue?.[0]
   const nextTwo = queue?.[1]
   const nextThree = queue?.[2]
+
   const presenterImage = getProgramImage(currentProgram)
   const progress = getProgramProgress(currentProgram)
+
   const size = 190
   const strokeWidth = 6
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
   const center = size / 2
+
   return (
     <>
       <section className="bg-transparent text-gray-950 dark:text-white">
@@ -215,6 +236,7 @@ const HomeBBC = ({
                   className="transition-all duration-1000 ease-out"
                 />
               </svg>
+
               <div className="absolute inset-[14px] rounded-full overflow-hidden bg-gray-200 shadow-lg">
                 <img
                   src={presenterImage}
@@ -225,10 +247,12 @@ const HomeBBC = ({
                   }}
                 />
               </div>
+
               <div className="absolute -right-3 bottom-1 w-16 h-16 rounded-full bg-black text-white flex items-center justify-center text-4xl font-black border-4 border-white dark:border-[#121212] shadow-lg pointer-events-none">
                 1
               </div>
             </div>
+
             {/* Informações do Programa */}
             <div className="text-center md:text-left w-full">
               <div className="flex items-center justify-center md:justify-start gap-2 text-sm mb-2">
@@ -240,6 +264,7 @@ const HomeBBC = ({
                     : '24/7'}
                 </span>
               </div>
+
               <button
                 onClick={() => currentProgram && onNavigateToProgram(currentProgram)}
                 className="group text-center md:text-left w-full md:w-auto"
@@ -251,12 +276,14 @@ const HomeBBC = ({
                   </span>
                 </h1>
               </button>
+
               {/* Nome do Host sem a palavra "Host" */}
               {currentProgram?.host && (
                 <p className="text-white font-normal tracking-wide">
                   {currentProgram.host}
                 </p>
               )}
+
               <button
                 onClick={onListenClick}
                 className="mt-6 bg-orange-500 hover:bg-orange-600 text-white px-10 md:px-12 py-3 md:py-4 font-black text-lg transition active:scale-95 inline-flex items-center justify-center gap-3 mx-auto md:mx-0 rounded-xl shadow-lg shadow-orange-500/20"
@@ -266,6 +293,7 @@ const HomeBBC = ({
               </button>
             </div>
           </div>
+
           {/* Seção Próximos Programas (Upcoming) com Capas Interativas */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-8">
             {[nextOne, nextTwo, nextThree].filter(Boolean).map((program) => (
@@ -284,6 +312,7 @@ const HomeBBC = ({
                     className="w-full h-full object-cover"
                   />
                 </div>
+
                 <button
                   onClick={() => onNavigateToProgram(program as Program)}
                   className="min-w-0 text-left flex-1"
@@ -304,9 +333,11 @@ const HomeBBC = ({
               </div>
             ))}
           </div>
+
           <WeatherBar />
           <LatestSportsScores />
           <UpcomingConcerts artist={liveMetadata?.isMusic ? liveMetadata.artist : undefined} />
+
           <div className="mt-8 praise-recent-glass">
             <RecentlyPlayed tracks={trackHistory} />
           </div>
@@ -315,16 +346,16 @@ const HomeBBC = ({
     </>
   )
 }
+
 const AppContent: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [liveMetadata, setLiveMetadata] = useState<LiveMetadata | null>(null)
   const [trackHistory, setTrackHistory] = useState<LiveMetadata[]>([])
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
-  const [theme, setTheme] = useState<'light' | 'dark'>(
-    () => (localStorage.getItem('praise-theme') as 'light' | 'dark') || 'light'
-  )
+
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const eventSourceRef = useRef<EventSource | null>(null)
+
   // --- Controle de reconexão automática do stream ---
   // Guarda se o usuário QUER que esteja tocando (independente do
   // estado real da conexão), pra sabermos se devemos reconectar.
@@ -333,68 +364,87 @@ const AppContent: React.FC = () => {
   const stallTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const retryCountRef = useRef(0)
   const reconnectingRef = useRef(false)
+
   const location = useLocation()
   const navigate = useNavigate()
+
   const [clockTick, setClockTick] = useState(0)
+
   useEffect(() => {
-    const id = window.setInterval(() => setClockTick(t => t + 1), 60000)
+    const id = window.setInterval(() => setClockTick((t) => t + 1), 60000)
     return () => window.clearInterval(id)
   }, [])
+
   const { day, total } = getChicagoDayAndTotalMinutes()
   void clockTick
+
   const { currentProgram, queue } = useMemo(() => {
     const schedule = SCHEDULES[day] || SCHEDULES[1]
+
     const currentIndex = schedule.findIndex((p: Program) => {
       const [sH, sM] = p.startTime.split(':').map(Number)
       const [eH, eM] = p.endTime.split(':').map(Number)
+
       const start = sH * 60 + sM
       let end = eH * 60 + eM
       if (end === 0 || end <= start) end = 24 * 60
+
       return total >= start && total < end
     })
+
     const safeIndex = currentIndex === -1 ? 0 : currentIndex
     const currentProgram = schedule[safeIndex]
+
     const nextPrograms: Program[] = []
     for (let i = 1; i <= 4; i++) {
       const nextIndex = (safeIndex + i) % schedule.length
       nextPrograms.push(schedule[nextIndex])
     }
+
     return {
       currentProgram,
       queue: nextPrograms
     }
   }, [day, total])
+
+  // Tema sempre escuro: todo o site usa o visual "vidro" da página inicial.
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark')
-    localStorage.setItem('praise-theme', theme)
-  }, [theme])
+    document.documentElement.classList.add('dark')
+  }, [])
+
   useEffect(() => {
     const audio = new Audio(STREAM_URL)
     audio.crossOrigin = 'anonymous'
     audio.preload = 'none'
     audio.volume = parseFloat(localStorage.getItem('praise-volume') || '0.8')
+
     const clearStallTimer = () => {
       if (stallTimeoutRef.current) {
         clearTimeout(stallTimeoutRef.current)
         stallTimeoutRef.current = null
       }
     }
+
     const clearRetryTimer = () => {
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current)
         retryTimeoutRef.current = null
       }
     }
+
     // Recria a conexão com o stream do zero (equivalente ao F5,
     // mas sem recarregar a página).
     const reconnect = () => {
       if (reconnectingRef.current) return
       if (!shouldBePlayingRef.current) return
+
       reconnectingRef.current = true
       clearStallTimer()
+
       const cacheBustUrl = `${STREAM_URL}?_=${Date.now()}`
       audio.src = cacheBustUrl
       audio.load()
+
       audio
         .play()
         .then(() => {
@@ -406,6 +456,7 @@ const AppContent: React.FC = () => {
           scheduleRetry()
         })
     }
+
     const scheduleRetry = () => {
       clearRetryTimer()
       const delay = Math.min(
@@ -415,6 +466,7 @@ const AppContent: React.FC = () => {
       retryCountRef.current += 1
       retryTimeoutRef.current = setTimeout(reconnect, delay)
     }
+
     // Se o áudio ficar "esperando dados" por tempo demais, tratamos
     // como conexão travada e reconectamos.
     const armStallTimer = () => {
@@ -424,6 +476,7 @@ const AppContent: React.FC = () => {
         reconnect()
       }, STALL_RECONNECT_DELAY)
     }
+
     const handlePlay = () => {
       setIsPlaying(true)
       clearStallTimer()
@@ -433,6 +486,7 @@ const AppContent: React.FC = () => {
         navigator.mediaSession.playbackState = 'playing'
       }
     }
+
     const handlePlaying = () => {
       setIsPlaying(true)
       clearStallTimer()
@@ -442,6 +496,7 @@ const AppContent: React.FC = () => {
         navigator.mediaSession.playbackState = 'playing'
       }
     }
+
     const handlePause = () => {
       setIsPlaying(false)
       if ('mediaSession' in navigator) {
@@ -453,9 +508,11 @@ const AppContent: React.FC = () => {
         scheduleRetry()
       }
     }
+
     const handleWaitingOrStalled = () => {
       armStallTimer()
     }
+
     const handleError = () => {
       setIsPlaying(false)
       clearStallTimer()
@@ -463,6 +520,7 @@ const AppContent: React.FC = () => {
         scheduleRetry()
       }
     }
+
     audio.addEventListener('play', handlePlay)
     audio.addEventListener('playing', handlePlaying)
     audio.addEventListener('pause', handlePause)
@@ -470,7 +528,9 @@ const AppContent: React.FC = () => {
     audio.addEventListener('stalled', handleWaitingOrStalled)
     audio.addEventListener('suspend', handleWaitingOrStalled)
     audio.addEventListener('error', handleError)
+
     audioRef.current = audio
+
     // --- Media Session API ---
     // Essencial pro Chrome/Android reconhecer isto como uma sessão
     // de mídia ativa: sem isso, o app não ganha a notificação/
@@ -495,20 +555,25 @@ const AppContent: React.FC = () => {
       navigator.mediaSession.setActionHandler('previoustrack', null)
       navigator.mediaSession.setActionHandler('nexttrack', null)
       navigator.mediaSession.setActionHandler('seekto', null)
+
       updateMediaSessionMetadata('Praise FM USA', 'Live')
     }
+
     // Quando a aba volta a ficar visível, confere se o áudio
     // realmente está tocando; se não, reconecta.
     const handleVisibilityChange = () => {
       if (document.visibilityState !== 'visible') return
       if (!shouldBePlayingRef.current) return
+
       const readyEnoughAndPlaying =
         !audio.paused && !audio.ended && audio.readyState >= 3
+
       if (!readyEnoughAndPlaying) {
         reconnect()
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
+
     // Quando um dispositivo de áudio conecta/desconecta (ex: a
     // caixinha Bluetooth caiu e voltou), o navegador às vezes
     // mantém a stream de áudio presa no dispositivo antigo, sem
@@ -522,6 +587,7 @@ const AppContent: React.FC = () => {
     if (navigator.mediaDevices && 'addEventListener' in navigator.mediaDevices) {
       navigator.mediaDevices.addEventListener('devicechange', handleDeviceChange)
     }
+
     // Rede de segurança: a cada 15s, confere se o currentTime do
     // áudio realmente avançou. Cobre travamentos silenciosos (ex:
     // troca de dispositivo de saída) que não disparam nenhum evento.
@@ -529,11 +595,13 @@ const AppContent: React.FC = () => {
     const heartbeat = setInterval(() => {
       if (!shouldBePlayingRef.current) return
       if (audio.paused) return
+
       if (audio.currentTime === lastCheckedTime) {
         reconnect()
       }
       lastCheckedTime = audio.currentTime
     }, 15000)
+
     return () => {
       audio.removeEventListener('play', handlePlay)
       audio.removeEventListener('playing', handlePlaying)
@@ -554,66 +622,86 @@ const AppContent: React.FC = () => {
       audioRef.current = null
     }
   }, [])
+
   const togglePlayback = () => {
     if (!audioRef.current) return
+
     if (isPlaying) {
       shouldBePlayingRef.current = false
       audioRef.current.pause()
       return
     }
+
     shouldBePlayingRef.current = true
     audioRef.current.play().catch(() => setIsPlaying(false))
   }
+
   const openProgramPage = (program: Program) => {
     setSelectedProgram(program)
     navigate('/program')
   }
+
   useEffect(() => {
     const es = new EventSource(METADATA_URL, {
       withCredentials: false
     })
+
     eventSourceRef.current = es
+
     es.onmessage = (e) => {
       try {
         const data = JSON.parse(e.data)
         const streamTitle = data.streamTitle || ''
+
         if (!streamTitle.includes(' - ')) return
+
         const [artistRaw, ...rest] = streamTitle.split(' - ')
         const artist = artistRaw.trim()
         const title = rest.join(' - ').trim()
+
         if (!artist || !title) return
+
         const fullText = `${artist} ${title}`.toLowerCase()
+
         if (BLOCKED_METADATA_KEYWORDS.some((k) => fullText.includes(k))) {
           return
         }
+
         setLiveMetadata((prev) => {
           if (prev && prev.title === title && prev.artist === artist) {
             return prev
           }
+
           const meta: LiveMetadata = {
             artist,
             title,
             playedAt: new Date(),
             isMusic: true
           }
+
           setTrackHistory((history) => [meta, ...history].slice(0, 10))
+
           // Mantém a notificação de mídia / lock screen com a
           // faixa que está tocando agora.
           updateMediaSessionMetadata(title, artist)
+
           return meta
         })
       } catch {}
     }
+
     return () => {
       es.close()
       eventSourceRef.current = null
     }
   }, [])
+
   const seo = {
     title: 'Praise FM USA - 24/7 Worship & Gospel Radio',
     description:
       'Listen live to Praise FM USA — 24/7 Christian radio streaming worship music, gospel hits, devotionals, and uplifting shows.'
   }
+
   const homeJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'RadioStation',
@@ -623,99 +711,115 @@ const AppContent: React.FC = () => {
     description: seo.description,
     address: { '@type': 'PostalAddress', addressCountry: 'US' }
   }
+
   return (
-    <div className={`relative isolate min-h-screen flex flex-col pb-[120px] transition-colors ${location.pathname === '/' ? 'praise-ambient-home' : 'bg-white dark:bg-[#121212]'}`}>
-      {location.pathname === '/' && <AmbientBackground title={currentProgram?.title || 'Praise FM'} artwork={getProgramImage(currentProgram)} />}
+    // Fundo ambiente (muda conforme a capa do programa) em TODAS as rotas
+    <div className="relative isolate min-h-screen flex flex-col pb-[120px] transition-colors praise-ambient-home">
+      <AmbientBackground
+        title={currentProgram?.title || 'Praise FM'}
+        artwork={getProgramImage(currentProgram)}
+      />
+
       <div className="relative z-10 flex min-h-screen flex-col">
-      <SEO
-        title={seo.title}
-        description={seo.description}
-        url={window.location.href}
-        jsonLd={location.pathname === '/' ? homeJsonLd : undefined}
-      />
-      <Navbar
-        activeTab={location.pathname === '/' ? 'home' : location.pathname.split('/')[1]}
-        theme={theme}
-        onToggleTheme={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
-      />
-      <main className="flex-grow">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <HomeBBC
-                isPlaying={isPlaying}
-                liveMetadata={liveMetadata}
-                currentProgram={currentProgram}
-                queue={queue}
-                onListenClick={togglePlayback}
-                onNavigateToProgram={openProgramPage}
-                trackHistory={trackHistory}
-              />
-            }
-          />
-          <Route
-            path="/program"
-            element={
-              selectedProgram ? (
-                <ProgramDetail
-                  program={selectedProgram}
-                  liveMetadata={liveMetadata}
-                  trackHistory={trackHistory}
-                  isPlaying={isPlaying}
-                  onListenClick={togglePlayback}
-                  onBack={() => navigate(-1)}
-                  onViewSchedule={() => navigate('/schedule')}
-                />
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
-          <Route path="/program/:slug" element={<Navigate to="/schedule" replace />} />
-          <Route path="/music" element={<Playlist />} />
-          <Route
-            path="/schedule"
-            element={
-              <ScheduleList
-                onNavigateToProgram={openProgramPage}
-                onBack={() => navigate('/')}
-              />
-            }
-          />
-          <Route path="/devotional" element={<DevotionalPage />} />
-          <Route path="/events" element={<EventsPage />} />
-          <Route path="/new-releases" element={<NewReleasesPage />} />
-          <Route path="/artists" element={<FeaturedArtistsPage />} />
-          <Route
-            path="/presenters"
-            element={<PresentersPage onNavigateToProgram={openProgramPage} />}
-          />
-          <Route path="/live-recordings" element={<Navigate to="/listen-again" replace />} />
-          <Route path="/listen-again" element={<ListenAgainPage />} />
-          <Route path="/help" element={<HelpCenterPage />} />
-          <Route path="/feedback" element={<FeedbackPage />} />
-          <Route path="/privacy" element={<PrivacyPolicyPage />} />
-          <Route path="/terms" element={<TermsOfUsePage />} />
-          <Route path="/cookies" element={<CookiesPolicyPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
-      <Footer />
-      {currentProgram && (
-        <LivePlayerBar
-          isPlaying={isPlaying}
-          onTogglePlayback={togglePlayback}
-          program={currentProgram}
-          liveMetadata={liveMetadata}
-          queue={queue}
-          audioRef={audioRef}
+        <SEO
+          title={seo.title}
+          description={seo.description}
+          url={window.location.href}
+          jsonLd={location.pathname === '/' ? homeJsonLd : undefined}
         />
-      )}
+
+        <Navbar
+          activeTab={location.pathname === '/' ? 'home' : location.pathname.split('/')[1]}
+          theme="dark"
+          glass
+        />
+
+        <main className="flex-grow">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <HomeBBC
+                  isPlaying={isPlaying}
+                  liveMetadata={liveMetadata}
+                  currentProgram={currentProgram}
+                  queue={queue}
+                  onListenClick={togglePlayback}
+                  onNavigateToProgram={openProgramPage}
+                  trackHistory={trackHistory}
+                />
+              }
+            />
+
+            <Route
+              path="/program"
+              element={
+                selectedProgram ? (
+                  <ProgramDetail
+                    program={selectedProgram}
+                    liveMetadata={liveMetadata}
+                    trackHistory={trackHistory}
+                    isPlaying={isPlaying}
+                    onListenClick={togglePlayback}
+                    onBack={() => navigate(-1)}
+                    onViewSchedule={() => navigate('/schedule')}
+                  />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
+
+            <Route path="/program/:slug" element={<Navigate to="/schedule" replace />} />
+
+            <Route path="/music" element={<Playlist />} />
+
+            <Route
+              path="/schedule"
+              element={
+                <ScheduleList
+                  onNavigateToProgram={openProgramPage}
+                  onBack={() => navigate('/')}
+                />
+              }
+            />
+
+            <Route path="/devotional" element={<DevotionalPage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/new-releases" element={<NewReleasesPage />} />
+            <Route path="/artists" element={<FeaturedArtistsPage />} />
+            <Route
+              path="/presenters"
+              element={<PresentersPage onNavigateToProgram={openProgramPage} />}
+            />
+            <Route path="/live-recordings" element={<Navigate to="/listen-again" replace />} />
+            <Route path="/listen-again" element={<ListenAgainPage />} />
+            <Route path="/help" element={<HelpCenterPage />} />
+            <Route path="/feedback" element={<FeedbackPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsOfUsePage />} />
+            <Route path="/cookies" element={<CookiesPolicyPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+
+        <Footer />
+
+        {currentProgram && (
+          <LivePlayerBar
+            isPlaying={isPlaying}
+            onTogglePlayback={togglePlayback}
+            program={currentProgram}
+            liveMetadata={liveMetadata}
+            queue={queue}
+            audioRef={audioRef}
+          />
+        )}
       </div>
     </div>
   )
 }
+
 export default function App() {
   return (
     <BrowserRouter>
