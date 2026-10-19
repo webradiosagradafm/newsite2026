@@ -8,8 +8,7 @@ import {
 // A chave do Ticketmaster vem SOMENTE da variável de ambiente.
 // 1. Local: coloque no .env  →  VITE_TICKETMASTER_KEY=sua_consumer_key
 // 2. Produção: Vercel → Project Settings → Environment Variables
-const TM_API_KEY = import.meta.env.VITE_TICKETMASTER_KEY ?? '';
-
+const TM_API_KEY = import.meta.env.VITE_TICKETMASTER_KEY;
 // Artistas Gospel/CCM monitorados — adicione ou remova à vontade
 const GOSPEL_KEYWORDS = [
   'Kirk Franklin',
