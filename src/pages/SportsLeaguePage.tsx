@@ -18,7 +18,7 @@ const leagues = {
     title: 'Major League Baseball',
     emoji: '⚾',
   },
-}
+} as const
 
 export default function SportsLeaguePage() {
   const { league } = useParams<{ league: string }>()
@@ -60,7 +60,7 @@ export default function SportsLeaguePage() {
 
       <section>
         <h2 className="mb-3 text-xl font-bold">Latest news</h2>
-        <SportsNews />
+        <SportsNews league={current.name} />
       </section>
     </main>
   )
