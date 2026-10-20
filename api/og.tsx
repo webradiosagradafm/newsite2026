@@ -1,6 +1,10 @@
 
 import { ImageResponse } from '@vercel/og'
 
+export const config = {
+  runtime: 'edge',
+}
+
 export default function handler(request: Request) {
   const { searchParams } = new URL(request.url)
 
@@ -18,6 +22,8 @@ export default function handler(request: Request) {
           flexDirection: 'column',
           justifyContent: 'center',
           padding: '64px',
+          boxSizing: 'border-box',
+          position: 'relative',
           color: '#ffffff',
           background:
             'linear-gradient(135deg, #10152f 0%, #24205b 55%, #642b86 100%)',
