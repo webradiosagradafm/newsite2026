@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react'
 
 interface SEOProps {
@@ -10,13 +9,12 @@ interface SEOProps {
 }
 
 const SITE_URL = 'https://praisefmradio.vercel.app'
-const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`
 
 export default function SEO({
   title,
   description,
   url,
-  image = DEFAULT_IMAGE,
+  image,
   jsonLd,
 }: SEOProps) {
   useEffect(() => {
@@ -26,15 +24,18 @@ export default function SEO({
       ? new URL(url, SITE_URL).href
       : undefined
 
-    const absoluteImage = new URL(image, SITE_URL).href
+    const imageUrl = image
+      ? new URL(image, SITE_URL).href
+      : `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`
 
-    const setMeta = (
-      selector: string,
+    function setMeta(
       attribute: 'name' | 'property',
       key: string,
-      content: string
-    ) => {
-      let tag = document.head.querySelector<HTMLMetaElement>(selector)
+      content: string,
+    ) {
+      let tag = document.head.querySelector<HTMLMetaElement>(
+        `meta[${attribute}="${key}"]`,
+      )
 
       if (!tag) {
         tag = document.createElement('meta')
@@ -45,9 +46,9 @@ export default function SEO({
       tag.content = content
     }
 
-    const setLink = (rel: string, href: string) => {
+    function setLink(rel: string, href: string) {
       let tag = document.head.querySelector<HTMLLinkElement>(
-        `link[rel="${rel}"]`
+        `link[rel="${rel}"]`,
       )
 
       if (!tag) {
@@ -59,62 +60,33 @@ export default function SEO({
       tag.href = href
     }
 
-    setMeta(
-      'meta[name="description"]',
-      'name',
-      'description',
-      description
-    )
+    // SEO básico
+    setMeta('name', 'description', description)
 
-    setMeta('meta[property="og:title"]', 'property', 'og:title', title)
-    setMeta(
-      'meta[property="og:description"]',
-      'property',
-      'og:description',
-      description
-    )
-    setMeta('meta[property="og:type"]', 'property', 'og:type', 'website')
-    setMeta(
-      'meta[property="og:site_name"]',
-      'property',
-      'og:site_name',
-      'Praise FM USA'
-    )
-    setMeta(
-      'meta[property="og:image"]',
-      'property',
-      'og:image',
-      absoluteImage
-    )
-
-    setMeta(
-      'meta[name="twitter:card"]',
-      'name',
-      'twitter:card',
-      'summary_large_image'
-    )
-    setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', title)
-    setMeta(
-      'meta[name="twitter:description"]',
-      'name',
-      'twitter:description',
-      description
-    )
-    setMeta(
-      'meta[name="twitter:image"]',
-      'name',
-      'twitter:image',
-      absoluteImage
-    )
+    // Open Graph
+    setMeta('property', 'og:title', title)
+    setMeta('property', 'og:description', description)
+    setMeta('property', 'og:type', 'website')
+    setMeta('property', 'og:site_name', 'Praise FM USA')
+    setMeta('property', 'og:image', imageUrl)
+    setMeta('property', 'og:image:width', '1200')
+    setMeta('property', 'og:image:height', '630')
 
     if (absoluteUrl) {
       setLink('canonical', absoluteUrl)
-      setMeta('meta[property="og:url"]', 'property', 'og:url', absoluteUrl)
+      setMeta('property', 'og:url', absoluteUrl)
     }
 
+    // Twitter / X
+    setMeta('name', 'twitter:card', 'summary_large_image')
+    setMeta('name', 'twitter:title', title)
+    setMeta('name', 'twitter:description', description)
+    setMeta('name', 'twitter:image', imageUrl)
+
+    // Dados estruturados JSON-LD
     const scriptId = 'seo-jsonld'
     let scriptTag = document.getElementById(
-      scriptId
+      scriptId,
     ) as HTMLScriptElement | null
 
     if (jsonLd) {
@@ -126,8 +98,8 @@ export default function SEO({
       }
 
       scriptTag.textContent = JSON.stringify(jsonLd)
-    } else {
-      scriptTag?.remove()
+    } else if (scriptTag) {
+      scriptTag.remove()
     }
   }, [title, description, url, image, jsonLd])
 
