@@ -4,6 +4,9 @@
     <loc>https://praisefmradio.vercel.app/</loc>
   </url>
   <url>
+    <loc>https://praisefmradio.vercel.app/sports</loc>
+  </url>
+  <url>
     <loc>https://praisefmradio.vercel.app/music</loc>
   </url>
   <url>
@@ -33,7 +36,9 @@
   <url>
     <loc>https://praisefmradio.vercel.app/help</loc>
   </url>
+  <url>
     <loc>https://praisefmradio.vercel.app/feedback</loc>
+  </url>
   <url>
     <loc>https://praisefmradio.vercel.app/privacy</loc>
   </url>
