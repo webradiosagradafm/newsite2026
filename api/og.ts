@@ -1,5 +1,6 @@
 
 import { ImageResponse } from '@vercel/og'
+import { createElement } from 'react'
 
 export const config = {
   runtime: 'edge',
@@ -13,9 +14,10 @@ export default function handler(request: Request) {
   ).slice(0, 100)
 
   return new ImageResponse(
-    (
-      <div
-        style={{
+    createElement(
+      'div',
+      {
+        style: {
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -28,57 +30,61 @@ export default function handler(request: Request) {
           background:
             'linear-gradient(135deg, #10152f 0%, #24205b 55%, #642b86 100%)',
           fontFamily: 'Arial',
-        }}
-      >
-        <div
-          style={{
+        },
+      },
+      createElement(
+        'div',
+        {
+          style: {
             display: 'flex',
             fontSize: 24,
             fontWeight: 700,
             color: '#d7c5ff',
             marginBottom: 24,
-          }}
-        >
-          PRAISE FM USA
-        </div>
-
-        <div
-          style={{
+          },
+        },
+        'PRAISE FM USA',
+      ),
+      createElement(
+        'div',
+        {
+          style: {
             display: 'flex',
             maxWidth: '1000px',
             fontSize: title.length > 55 ? 48 : 64,
             fontWeight: 800,
             lineHeight: 1.15,
             overflowWrap: 'break-word',
-          }}
-        >
-          {title}
-        </div>
-
-        <div
-          style={{
+          },
+        },
+        title,
+      ),
+      createElement(
+        'div',
+        {
+          style: {
             display: 'flex',
             marginTop: 28,
             fontSize: 24,
             color: '#e5e7eb',
-          }}
-        >
-          Faith • Music • Community
-        </div>
-
-        <div
-          style={{
+          },
+        },
+        'Faith • Music • Community',
+      ),
+      createElement(
+        'div',
+        {
+          style: {
             display: 'flex',
             position: 'absolute',
             bottom: 36,
             right: 64,
             fontSize: 20,
             color: '#d7c5ff',
-          }}
-        >
-          praisefmradio.vercel.app
-        </div>
-      </div>
+          },
+        },
+        'praisefmradio.vercel.app',
+      ),
     ),
     {
       width: 1200,
