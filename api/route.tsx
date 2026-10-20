@@ -1,9 +1,11 @@
+import React from 'react'
+import { ImageResponse } from '@vercel/og'
 
-import { ImageResponse } from 'next/og'
+export const config = {
+  runtime: 'edge',
+}
 
-export const runtime = 'edge'
-
-export async function GET(request: Request) {
+export default function handler(request: Request) {
   const { searchParams } = new URL(request.url)
 
   const title = (
