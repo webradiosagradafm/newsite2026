@@ -5,7 +5,7 @@ const el = (style: Record<string, unknown>, children: unknown) => ({
   props: { style: { display: 'flex', ...style }, children },
 })
 
-export default function handler(request: Request) {
+export function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const title = (searchParams.get('title') || 'Praise FM USA').slice(0, 100)
 
