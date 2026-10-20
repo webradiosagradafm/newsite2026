@@ -1,9 +1,13 @@
+
 import { ImageResponse } from '@vercel/og'
+
+export const config = {
+  runtime: 'edge',
+}
 
 export default function handler(request: Request) {
   const { searchParams } = new URL(request.url)
 
-  // Limita o título para manter a imagem legível.
   const title = (
     searchParams.get('title') || 'Praise FM USA'
   ).slice(0, 100)
@@ -27,7 +31,6 @@ export default function handler(request: Request) {
         <div
           style={{
             display: 'flex',
-            alignItems: 'center',
             fontSize: 24,
             fontWeight: 700,
             color: '#d7c5ff',
