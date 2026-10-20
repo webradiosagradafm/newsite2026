@@ -1,9 +1,5 @@
 import { ImageResponse } from '@vercel/og'
 
-export const config = {
-  runtime: 'edge',
-}
-
 const el = (style: Record<string, unknown>, children: unknown) => ({
   type: 'div',
   props: { style: { display: 'flex', ...style }, children },
