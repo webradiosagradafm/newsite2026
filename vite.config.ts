@@ -1,3 +1,4 @@
+
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -11,9 +12,7 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.js',
       injectManifest: {
-        // Evita que o manifesto de precache tente incluir o próprio
-        // stream ou qualquer coisa não construída pelo Vite.
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}']
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
       },
 
       registerType: 'autoUpdate',
@@ -30,17 +29,22 @@ export default defineConfig({
           {
             src: '/pwa-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
           },
           {
             src: '/pwa-512x512.png',
             sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
-      }
-    })
+            type: 'image/png',
+          },
+        ],
+      },
+    }),
   ],
+
+  // Evita que o Vite empacote @vercel/og no contexto de SSR.
+  ssr: {
+    external: ['@vercel/og'],
+  },
 
   build: {
     chunkSizeWarningLimit: 1000,
@@ -66,8 +70,8 @@ export default defineConfig({
 
             return 'vendor'
           }
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
 })
