@@ -1,3 +1,4 @@
+import { cloudinaryImage } from '../cloudinaryImage';
 // Praise FM USA: Schedule do mini player = programa atual + 2 proximos.
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 
@@ -1335,7 +1336,7 @@ const LivePlayerBar: React.FC<
 
                   <img
 
-                    src={program.image}
+                    src={cloudinaryImage(program.image, 128)}
 
                     className="w-full h-full object-cover"
 
@@ -1433,11 +1434,7 @@ const LivePlayerBar: React.FC<
 
                         <img
 
-                          src={
-
-                            prog.image
-
-                          }
+                          src={cloudinaryImage(prog.image, 128)}
 
                           className="w-full h-full object-cover"
 

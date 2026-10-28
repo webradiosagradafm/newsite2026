@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { Play, Pause, ChevronRight, Zap, ArrowRight } from 'lucide-react'
 import { SCHEDULES } from '../constants'
 import { Program } from '../types'
+import { cloudinaryImage } from '../cloudinaryImage'
 import { useNavigate } from 'react-router-dom'
 
 const getChicagoInfo = () => {
@@ -216,7 +217,7 @@ const Hero: React.FC<HeroProps> = ({
                     <div className="w-24 h-24 flex-shrink-0 bg-gray-100 overflow-hidden">
                       {/* Abaixo da dobra: lazy loading libera banda pra imagem LCP acima. */}
                       <img
-                        src={prog.image}
+                        src={cloudinaryImage(prog.image, 224)}
                         alt={prog.title}
                         loading="lazy"
                         decoding="async"

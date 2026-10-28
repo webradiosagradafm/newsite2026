@@ -3,6 +3,7 @@ import { Users, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Program } from '../types';
 import { SCHEDULES } from '../constants';
+import { cloudinaryImage } from '../cloudinaryImage';
 
 interface PresentersPageProps {
   onNavigateToProgram: (program: Program) => void;
@@ -120,7 +121,7 @@ const PresentersPage: React.FC<PresentersPageProps> = ({ onNavigateToProgram }) 
               >
                 <div className="relative aspect-[4/5] overflow-hidden">
                   <img
-                    src={presenter.image}
+                    src={cloudinaryImage(presenter.image, 568, 710)}
                     alt={presenter.name}
                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
                   />

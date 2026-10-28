@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { SCHEDULES } from '../constants';
 import { Program } from '../types';
+import { cloudinaryImage } from '../cloudinaryImage';
 
 interface ScheduleListProps {
   onNavigateToProgram: (program: Program) => void;
@@ -49,7 +50,7 @@ const ProgramProgressRing: React.FC<{ program: Program; isActive: boolean; nowMi
       <div className="relative flex-shrink-0 flex items-center justify-center bg-black/30 border border-white/10 rounded-2xl p-3 group-hover:scale-105 transition-transform duration-500">
         <div className="relative rounded-full overflow-hidden" style={{ width: innerSize, height: innerSize }}>
           <img
-            src={program.image}
+            src={cloudinaryImage(program.image, 256)}
             alt={program.title}
             loading="lazy"
             decoding="async"
