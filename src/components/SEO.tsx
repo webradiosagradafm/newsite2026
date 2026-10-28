@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react'
 
 interface SEOProps {
@@ -6,9 +7,26 @@ interface SEOProps {
   url?: string
   image?: string
   jsonLd?: Record<string, unknown>
+  noIndex?: boolean
 }
 
 const SITE_URL = 'https://praisefmradio.vercel.app'
+const DEFAULT_IMAGE = `${SITE_URL}/icon-512.png`
+
+function getCanonicalUrl(url?: string) {
+  const parsed = new URL(url || window.location.pathname, SITE_URL)
+
+  // Remove parâmetros e fragmentos da URL canônica.
+  parsed.search = ''
+  parsed.hash = ''
+
+  // Mantém a barra apenas na página inicial.
+  if (parsed.pathname !== '/') {
+    parsed.pathname = parsed.pathname.replace(/\/+$/, '')
+  }
+
+  return parsed.href
+}
 
 export default function SEO({
   title,
@@ -16,17 +34,15 @@ export default function SEO({
   url,
   image,
   jsonLd,
+  noIndex = false,
 }: SEOProps) {
   useEffect(() => {
-    document.title = title
-
-    const absoluteUrl = url
-      ? new URL(url, SITE_URL).href
-      : undefined
-
+    const canonicalUrl = getCanonicalUrl(url)
     const imageUrl = image
       ? new URL(image, SITE_URL).href
-      : `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`
+      : DEFAULT_IMAGE
+
+    document.title = title
 
     function setMeta(
       attribute: 'name' | 'property',
@@ -43,7 +59,7 @@ export default function SEO({
         document.head.appendChild(tag)
       }
 
-      tag.content = content
+      tag.setAttribute('content', content)
     }
 
     function setLink(rel: string, href: string) {
@@ -62,28 +78,34 @@ export default function SEO({
 
     // SEO básico
     setMeta('name', 'description', description)
+    setMeta(
+      'name',
+      'robots',
+      noIndex ? 'noindex, nofollow' : 'index, follow',
+    )
+
+    // URL canônica
+    setLink('canonical', canonicalUrl)
 
     // Open Graph
-    setMeta('property', 'og:title', title)
-    setMeta('property', 'og:description', description)
     setMeta('property', 'og:type', 'website')
     setMeta('property', 'og:site_name', 'Praise FM USA')
+    setMeta('property', 'og:url', canonicalUrl)
+    setMeta('property', 'og:title', title)
+    setMeta('property', 'og:description', description)
     setMeta('property', 'og:image', imageUrl)
-    setMeta('property', 'og:image:width', '1200')
-    setMeta('property', 'og:image:height', '630')
-
-    if (absoluteUrl) {
-      setLink('canonical', absoluteUrl)
-      setMeta('property', 'og:url', absoluteUrl)
-    }
+    setMeta('property', 'og:image:alt', title)
+    setMeta('property', 'og:image:width', '512')
+    setMeta('property', 'og:image:height', '512')
+    setMeta('property', 'og:locale', 'en_US')
 
     // Twitter / X
-    setMeta('name', 'twitter:card', 'summary_large_image')
+    setMeta('name', 'twitter:card', 'summary')
     setMeta('name', 'twitter:title', title)
     setMeta('name', 'twitter:description', description)
     setMeta('name', 'twitter:image', imageUrl)
 
-    // Dados estruturados JSON-LD
+    // Dados estruturados
     const scriptId = 'seo-jsonld'
     let scriptTag = document.getElementById(
       scriptId,
@@ -98,10 +120,10 @@ export default function SEO({
       }
 
       scriptTag.textContent = JSON.stringify(jsonLd)
-    } else if (scriptTag) {
-      scriptTag.remove()
+    } else {
+      scriptTag?.remove()
     }
-  }, [title, description, url, image, jsonLd])
+  }, [title, description, url, image, jsonLd, noIndex])
 
   return null
 }
