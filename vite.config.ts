@@ -11,12 +11,17 @@ export default defineConfig({
       strategies: 'injectManifest',
       srcDir: 'src',
       filename: 'sw.js',
+
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
       },
 
+      // Registra o Service Worker sem bloquear a leitura inicial do HTML.
+      injectRegister: 'script-defer',
       registerType: 'autoUpdate',
+
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+
       manifest: {
         name: 'Praise FM USA',
         short_name: 'Praise FM',
