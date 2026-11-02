@@ -20,7 +20,7 @@ const IMAGES = {
   KENNY_AJ: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791853506/praise-fm-flow_ef6gqq.webp',
   SARAH_JORDAN: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1782158974/sarah-jordan_tfnxpp.webp',
   WORSHIP: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1791176390/worship_tlnp2j.webp',
-  GOLDEN_HYMNS: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1784947340/GOLDEN_HYMNS_2016_j7n2io.webp',
+  ARTHUR_BRADFORD: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1793619657/arthur_bradford_zzmftc.webp',
   CHILL_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785297426/chill-mix_btpsnv.webp',
   CLUB_MIX: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1785297861/club-mix_ritmbx.webp',
   BLACK_SOUL: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1786538567/praisefmblacksoul_hvo3ah.webp',
@@ -140,11 +140,11 @@ const wednesday: Program[] = weekday.map((program) => {
     return {
       id: 'praise-fm-golden-hymns',
       title: 'Golden Hymns',
-      host: 'Scott Turner',
+      host: 'Arthur Bradford',
       startTime: '21:00',
       endTime: '22:00',
       description: 'Traditional hymns and classic faith songs.',
-      image: IMAGES.GOLDEN_HYMNS
+      image: IMAGES.ARTHUR_BRADFORD
     }
   }
 

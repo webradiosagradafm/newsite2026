@@ -69,7 +69,13 @@ const PRESENTERS_DATA = [
     image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1792222383/weekend-morning_f0j3oi.webp',
     bio: 'Nick brings a fresh start to the weekend with uplifting music, positive energy, and great company on Weekend morning.',
     programTitle: 'Weekend Morning'
-  }
+  },
+  {
+    name: 'Arthur Bradford',
+    image: 'https://res.cloudinary.com/dtecypmsh/image/upload/v1793619657/arthur_bradford_zzmftc.webp',
+    bio: 'Arthur Bradford brings the timeless beauty of traditional hymns and beloved worship classics to Golden Hymns, celebrating the songs that have inspired generations.',
+    programTitle: 'Golden Hymns'
+  },
 ];
 
 const PresentersPage: React.FC<PresentersPageProps> = ({ onNavigateToProgram }) => {
